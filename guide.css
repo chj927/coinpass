@@ -1,0 +1,98 @@
+/* guide.css */
+
+/* Using variables from index.css */
+.section-subtitle {
+    font-size: 1.2rem;
+    color: var(--secondary-text-color);
+    max-width: 600px;
+    margin: -2rem auto 3rem auto;
+    text-align: center;
+}
+
+.guides-container {
+    max-width: 900px;
+    margin: 3rem auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.guide-item {
+    background: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden; /* Helps contain children */
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.guide-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.guide-item .guide-title {
+    padding: 1.5rem 2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none; /* Remove default marker */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.guide-item .guide-title:hover {
+    color: var(--accent-color);
+}
+
+.guide-item .guide-title::-webkit-details-marker {
+    display: none; /* Hide for Chrome */
+}
+
+.guide-item .guide-title::after {
+    content: '+';
+    font-size: 2rem;
+    font-weight: 300;
+    transition: transform 0.3s ease;
+    color: var(--secondary-text-color);
+}
+
+.guide-item[open] > .guide-title {
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.guide-item[open] > .guide-title::after {
+    transform: rotate(45deg);
+}
+
+.guide-content {
+    padding: 0 2rem 2rem 2rem;
+}
+
+.guide-content p {
+    font-size: 1.1rem;
+    color: var(--secondary-text-color);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.guide-content p:last-child {
+    margin-bottom: 0;
+}
+
+.guide-content strong, .guide-content b {
+    color: var(--primary-text-color);
+    font-weight: 600;
+}
+
+.guide-content a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.guide-content a:hover {
+    text-decoration: underline;
+}
