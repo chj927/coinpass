@@ -144,10 +144,8 @@ let currentLang = 'ko';
 document.addEventListener('DOMContentLoaded', () => {
     setupLanguage();
     loadContent();
-    setupScrollAnimations();
     setupMobileMenu();
     setupNavigation();
-    setupPopup();
 });
 
 class TypingAnimator {
@@ -285,7 +283,8 @@ function loadContent() {
     populateExchangeGrid('dex-grid', siteData.dexExchanges);
     updateFaqs(siteData.faqs);
     updateSupportSection(siteData.support);
-    setupPopup(); // Re-setup popup to get correct language text
+    setupPopup();
+    setupScrollAnimations(); // BUGFIX: Re-initialize animations after content re-render
 }
 
 let heroAnimator;
