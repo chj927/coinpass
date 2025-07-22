@@ -80,8 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('login-button') as HTMLButtonElement;
     const passwordInput = document.getElementById('password-input') as HTMLInputElement;
     const loginError = document.getElementById('login-error') as HTMLParagraphElement;
-    
-    const PWD_HASH = '64213276850a314986687841366964958f8e434f4a3877995166a22143588998';
+    const PWD_HASH = '324b43e939e0eb81492bfd49c46fe96bafa77e8efe5ab9eec454add3c4f7f895';
 
     loginButton.addEventListener('click', async () => {
         const enteredPassword = passwordInput.value;
