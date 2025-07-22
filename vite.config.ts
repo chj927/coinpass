@@ -21,6 +21,9 @@ export default defineConfig(({ mode }) => {
         strictPort: true,
         allowedHosts: [
           'coinpass.onrender.com', // 우리 서비스 주소 허용
+          'coinpass.kr',
+          'www.coinpass.kr',
+
         ],
       }
       // --------------------------
