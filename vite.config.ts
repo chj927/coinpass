@@ -13,18 +13,26 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
-
-      // --- 이 부분을 추가하면 됩니다 ---
       preview: {
-        host: true, // 외부 접속 허용
-        port: 8080, // Render가 선호하는 포트
+        host: true,
+        port: 8080,
         strictPort: true,
         allowedHosts: [
-          'coinpass.onrender.com', // 우리 서비스 주소 허용
+          'coinpass.onrender.com',
           'coinpass.kr',
           'www.coinpass.kr',
         ],
-      }
-      // --------------------------
+      },
+      // --- 이 build 부분을 추가하면 됩니다 ---
+      build: {
+        rollupOptions: {
+          input: {
+            main: path.resolve(__dirname, 'index.html'),
+            admin: path.resolve(__dirname, 'admin.html'),
+            guide: path.resolve(__dirname, 'guide.html'),
+          },
+        },
+      },
+      // ---------------------------------
     };
 });
