@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -10,6 +11,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 </head>
 <body>
+    <a href="#main-content" class="skip-link" data-lang-key="skipLink">메인 콘텐츠로 건너뛰기</a>
     <div id="app-container">
         <header>
             <div class="header-container">
@@ -25,47 +27,59 @@
                         <span class="logo-text">코인패스</span>
                     </div>
                 </a>
-                 <nav>
-                    <ul>
-                        <li>
-                            <a href="index.html#cex-partners">
-                                <span class="nav-title">파트너 혜택</span>
-                                <span class="nav-subtitle">CEX & DEX</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="index.html#about-us">
-                                <span class="nav-title">서비스 소개</span>
-                                <span class="nav-subtitle">코인패스 이야기</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="index.html#how-it-works">
-                                <span class="nav-title">사용방법</span>
-                                <span class="nav-subtitle">3단계 가이드</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="guide.html" target="_blank" rel="noopener noreferrer">
-                                <span class="nav-title">가이드</span>
-                                <span class="nav-subtitle">거래소 가이드</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="index.html#faq">
-                                <span class="nav-title">자주 묻는 질문</span>
-                                <span class="nav-subtitle">FAQ</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                 <div class="nav-container">
+                    <button class="hamburger-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="main-nav">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
+                    <nav id="main-nav">
+                        <ul>
+                            <li>
+                                <a href="index.html#cex-partners">
+                                    <span class="nav-title" data-lang-key="nav.partners">파트너 혜택</span>
+                                    <span class="nav-subtitle">CEX & DEX</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index.html#about-us">
+                                    <span class="nav-title" data-lang-key="nav.about">서비스 소개</span>
+                                    <span class="nav-subtitle" data-lang-key="nav.aboutSubtitle">코인패스 이야기</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index.html#how-it-works">
+                                    <span class="nav-title" data-lang-key="nav.howTo">사용방법</span>
+                                    <span class="nav-subtitle" data-lang-key="nav.howToSubtitle">3단계 가이드</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="guide.html">
+                                    <span class="nav-title" data-lang-key="nav.guides">가이드</span>
+                                    <span class="nav-subtitle" data-lang-key="nav.guidesSubtitle">사용안내 및 이벤트</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index.html#faq">
+                                    <span class="nav-title" data-lang-key="nav.faq">자주 묻는 질문</span>
+                                    <span class="nav-subtitle">FAQ</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="language-switcher">
+                    <button id="lang-ko" class="lang-btn">KO</button>
+                    <span>|</span>
+                    <button id="lang-en" class="lang-btn">EN</button>
+                </div>
             </div>
         </header>
 
-        <main>
+        <main id="main-content">
             <section id="guides-section" aria-labelledby="guides-title">
-                <h1 id="guides-title" class="section-title anim-fade-in">거래소 이용 가이드</h1>
-                <p id="guides-subtitle" class="section-subtitle anim-fade-in">초보자도 쉽게 따라할 수 있는 상세 가이드를 확인해보세요.</p>
+                <h1 id="guides-title" class="section-title anim-fade-in" data-lang-key="guides.pageTitle"></h1>
+                <p id="guides-subtitle" class="section-subtitle anim-fade-in" data-lang-key="guides.pageSubtitle"></p>
                 <div class="guides-container" id="guides-container">
                     <!-- Guides will be populated by JS -->
                 </div>
@@ -74,8 +88,8 @@
 
         <footer>
             <div class="footer-content">
-                 <p>&copy; 2024 코인패스. All rights reserved. | <a href="admin.html" class="admin-link">관리자</a></p>
-                 <p class="disclaimer">본 사이트는 암호화폐 거래소의 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.</p>
+                 <p>&copy; 2025 CoinPass. All rights reserved.</p>
+                 <p class="disclaimer" data-lang-key="footer.disclaimer"></p>
             </div>
         </footer>
     </div>

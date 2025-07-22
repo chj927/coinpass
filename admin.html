@@ -6,86 +6,216 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 페이지 - 코인패스</title>
     <link rel="stylesheet" href="admin.css">
-     <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 </head>
 <body>
     <div id="login-container">
-        <h2>관리자 로그인</h2>
-        <input type="password" id="password-input" placeholder="비밀번호를 입력하세요">
-        <button id="login-button">로그인</button>
-        <p id="login-error" class="error-message"></p>
+        <div class="login-box">
+            <h2>관리자 로그인</h2>
+            <p>콘텐츠를 관리하려면 로그인하세요.</p>
+            <input type="password" id="password-input" placeholder="비밀번호를 입력하세요">
+            <button id="login-button">로그인</button>
+            <p id="login-error" class="error-message"></p>
+        </div>
     </div>
 
     <div id="admin-panel" style="display: none;">
-        <header>
-            <h1>코인패스 콘텐츠 관리</h1>
-            <a href="index.html" target="_blank">사이트 보기</a>
-        </header>
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h3>코인패스 관리자</h3>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="#" class="nav-link" data-target="dashboard-section">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>대시보드</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="popup-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    <span>팝업 관리</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="hero-editor">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <span>메인 배너</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="about-us-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <span>서비스 소개</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="exchanges-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    <span>CEX 파트너</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="dex-exchanges-editor">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    <span>DEX 파트너</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="faq-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span>FAQ</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="support-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    <span>고객센터</span>
+                </a></li>
+                <li><a href="#" class="nav-link" data-target="guides-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <span>가이드</span>
+                </a></li>
+            </ul>
+            <div class="sidebar-footer">
+                 <a href="index.html" target="_blank" class="site-link">사이트 바로가기</a>
+            </div>
+        </aside>
 
-        <main>
-            <button id="save-all-button" title="모든 변경사항을 브라우저에 저장합니다.">전체 저장</button>
+        <main id="main-content">
+            <header class="main-header">
+                <h2 id="main-content-title"></h2>
+                <button id="save-all-button" title="모든 변경사항을 브라우저에 저장합니다.">변경사항 저장</button>
+            </header>
+            <div class="content-area">
 
-            <section class="editor-section" id="data-management">
-                <h2>데이터 백업 및 복원</h2>
-                <p>현재 모든 콘텐츠 데이터를 파일로 다운로드(백업)하거나, 백업된 파일을 불러와(복원) 사이트에 적용할 수 있습니다. 브라우저를 변경하거나 데이터를 초기화할 경우를 대비해 주기적으로 백업하는 것을 권장합니다.</p>
-                <div class="data-buttons">
-                    <button id="export-button">JSON으로 내보내기</button>
-                    <label for="import-file" class="import-button-label">
-                        JSON에서 가져오기
-                    </label>
-                    <input type="file" id="import-file" accept=".json">
-                </div>
-            </section>
-            
-            <section class="editor-section" id="hero-editor">
-                <h2>메인 배너</h2>
-                <div class="form-group">
-                    <label for="hero-title-input">애니메이션 문구 (한 줄에 하나씩 입력)</label>
-                    <textarea id="hero-title-input" rows="4" placeholder="첫 번째 문구...&#10;두 번째 문구...&#10;세 번째 문구..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="hero-subtitle-input">설명</label>
-                    <textarea id="hero-subtitle-input"></textarea>
-                </div>
-            </section>
+                <section class="editor-section" id="dashboard-section">
+                    <h2>데이터 백업 및 복원</h2>
+                    <p>현재 모든 콘텐츠 데이터를 파일로 다운로드(백업)하거나, 백업된 파일을 불러와(복원) 사이트에 적용할 수 있습니다. 브라우저를 변경하거나 데이터를 초기화할 경우를 대비해 주기적으로 백업하는 것을 권장합니다.</p>
+                    <div class="data-buttons">
+                        <button id="export-button">JSON으로 내보내기</button>
+                        <label for="import-file" class="import-button-label">
+                            JSON에서 가져오기
+                        </label>
+                        <input type="file" id="import-file" accept=".json">
+                    </div>
+                </section>
+                
+                <section class="editor-section" id="popup-editor">
+                    <h2>팝업 관리</h2>
+                    <div class="form-group">
+                        <label>팝업 활성화</label>
+                        <label class="switch">
+                            <input type="checkbox" id="popup-enabled-input">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>팝업 유형</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="popup-type" value="text"> 텍스트</label>
+                            <label><input type="radio" name="popup-type" value="image"> 이미지</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="popup-text-group">
+                        <div class="bilingual-group">
+                            <div class="form-group">
+                                <label for="popup-content-ko-input">팝업 내용 (KO)</label>
+                                <textarea id="popup-content-ko-input" class="popup-content" data-lang="ko" rows="5"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="popup-content-en-input">Popup Content (EN)</label>
+                                <textarea id="popup-content-en-input" class="popup-content" data-lang="en" rows="5"></textarea>
+                            </div>
+                        </div>
+                    </div>
 
-            <section class="editor-section" id="about-us-editor">
-                <h2>서비스 소개 (About Us)</h2>
-                <div class="form-group">
-                    <label for="about-us-title-input">제목</label>
-                    <input type="text" id="about-us-title-input">
-                </div>
-                <div class="form-group">
-                    <label for="about-us-content-input">내용 (문단은 빈 줄로 구분)</label>
-                    <textarea id="about-us-content-input" rows="10"></textarea>
-                </div>
-            </section>
+                    <div class="form-group" id="popup-image-group">
+                        <label for="popup-image-url-input">이미지 URL</label>
+                        <input type="url" id="popup-image-url-input" placeholder="https://example.com/image.png">
+                    </div>
+                    <div class="form-group">
+                        <label>팝업 노출 기간 (비워두면 항상 노출)</label>
+                        <div class="grid-2">
+                             <div>
+                                <label for="popup-start-date-input" class="sub-label">시작일</label>
+                                <input type="datetime-local" id="popup-start-date-input">
+                            </div>
+                            <div>
+                                <label for="popup-end-date-input" class="sub-label">종료일</label>
+                                <input type="datetime-local" id="popup-end-date-input">
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-            <section class="editor-section" id="exchanges-editor">
-                <h2>파트너 거래소 (CEX)</h2>
-                <div id="exchanges-list"></div>
-                <button id="add-exchange-button" class="add-button">CEX 추가</button>
-            </section>
+                <section class="editor-section" id="hero-editor">
+                    <h2>메인 배너</h2>
+                    <div class="bilingual-group">
+                        <div class="form-group">
+                            <label for="hero-title-ko-input">애니메이션 문구 (KO) (한 줄에 하나씩)</label>
+                            <textarea id="hero-title-ko-input" class="hero-title" data-lang="ko" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="hero-title-en-input">Animated Phrases (EN) (One per line)</label>
+                            <textarea id="hero-title-en-input" class="hero-title" data-lang="en" rows="4"></textarea>
+                        </div>
+                    </div>
+                    <div class="bilingual-group">
+                        <div class="form-group">
+                            <label for="hero-subtitle-ko-input">설명 (KO)</label>
+                            <textarea id="hero-subtitle-ko-input" class="hero-subtitle" data-lang="ko"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="hero-subtitle-en-input">Subtitle (EN)</label>
+                            <textarea id="hero-subtitle-en-input" class="hero-subtitle" data-lang="en"></textarea>
+                        </div>
+                    </div>
+                </section>
 
-            <section class="editor-section" id="dex-exchanges-editor">
-                <h2>파트너 거래소 (DEX)</h2>
-                <div id="dex-exchanges-list"></div>
-                <button id="add-dex-exchange-button" class="add-button">DEX 추가</button>
-            </section>
+                <section class="editor-section" id="about-us-editor">
+                    <h2>서비스 소개 (About Us)</h2>
+                    <div class="bilingual-group">
+                        <div class="form-group">
+                            <label for="about-us-title-ko-input">제목 (KO)</label>
+                            <input type="text" id="about-us-title-ko-input" class="about-us-title" data-lang="ko">
+                        </div>
+                        <div class="form-group">
+                            <label for="about-us-title-en-input">Title (EN)</label>
+                            <input type="text" id="about-us-title-en-input" class="about-us-title" data-lang="en">
+                        </div>
+                    </div>
+                     <div class="bilingual-group">
+                        <div class="form-group">
+                            <label for="about-us-content-ko-input">내용 (KO) (문단은 빈 줄로 구분)</label>
+                            <textarea id="about-us-content-ko-input" class="about-us-content" data-lang="ko" rows="10"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="about-us-content-en-input">Content (EN) (Separate paragraphs with blank lines)</label>
+                            <textarea id="about-us-content-en-input" class="about-us-content" data-lang="en" rows="10"></textarea>
+                        </div>
+                    </div>
+                </section>
 
-            <section class="editor-section" id="faq-editor">
-                <h2>자주 묻는 질문 (FAQ)</h2>
-                <div id="faq-list"></div>
-                <button id="add-faq-button" class="add-button">FAQ 추가</button>
-            </section>
+                <section class="editor-section" id="exchanges-editor">
+                    <h2>파트너 거래소 (CEX)</h2>
+                    <div id="exchanges-list"></div>
+                    <button id="add-exchange-button" class="add-button">CEX 추가</button>
+                </section>
 
-            <section class="editor-section" id="guides-editor">
-                <h2>가이드</h2>
-                <div id="guides-list"></div>
-                <button id="add-guide-button" class="add-button">가이드 추가</button>
-            </section>
+                <section class="editor-section" id="dex-exchanges-editor">
+                    <h2>파트너 거래소 (DEX)</h2>
+                    <div id="dex-exchanges-list"></div>
+                    <button id="add-dex-exchange-button" class="add-button">DEX 추가</button>
+                </section>
 
+                <section class="editor-section" id="faq-editor">
+                    <h2>자주 묻는 질문 (FAQ)</h2>
+                    <div id="faq-list"></div>
+                    <button id="add-faq-button" class="add-button">FAQ 추가</button>
+                </section>
+
+                <section class="editor-section" id="support-editor">
+                    <h2>고객센터 관리</h2>
+                    <div class="form-group">
+                        <label for="support-telegram-url-input">텔레그램 문의 링크</label>
+                        <input type="url" id="support-telegram-url-input" placeholder="https://t.me/example_user">
+                    </div>
+                </section>
+
+                <section class="editor-section" id="guides-editor">
+                    <h2>가이드</h2>
+                    <div id="guides-list"></div>
+                    <button id="add-guide-button" class="add-button">가이드 추가</button>
+                </section>
+            </div>
         </main>
     </div>
 
