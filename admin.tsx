@@ -282,7 +282,7 @@ function renderList(containerId, dataList, listName, fields) {
 function renderExchanges() {
     renderList('exchanges-list', siteData.exchanges, 'exchanges', [
         { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'logoText', labels: { ko: '로고 텍스트', en: 'Logo Text' }, bilingual: false, elType: 'input' },
+        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
         { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
@@ -294,7 +294,7 @@ function renderExchanges() {
 function renderDexExchanges() {
      renderList('dex-exchanges-list', siteData.dexExchanges, 'dexExchanges', [
         { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'logoText', labels: { ko: '로고 텍스트', en: 'Logo Text' }, bilingual: false, elType: 'input' },
+        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
         { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
@@ -369,11 +369,11 @@ function setupEventListeners() {
 
     // Add buttons
     document.getElementById('add-exchange-button').addEventListener('click', () => {
-        siteData.exchanges.push({ name: {ko:'', en:''}, logoText: '', benefit1_tag: {ko:'', en:''}, benefit1_value: {ko:'', en:''}, benefit2_tag: {ko:'', en:''}, benefit2_value: {ko:'', en:''}, link: '' });
+        siteData.exchanges.push({ name: {ko:'', en:''}, logoImageUrl: '', benefit1_tag: {ko:'', en:''}, benefit1_value: {ko:'', en:''}, benefit2_tag: {ko:'', en:''}, benefit2_value: {ko:'', en:''}, link: '' });
         renderExchanges();
     });
     document.getElementById('add-dex-exchange-button').addEventListener('click', () => {
-        siteData.dexExchanges.push({ name: {ko:'', en:''}, logoText: '', benefit1_tag: {ko:'', en:''}, benefit1_value: {ko:'', en:''}, benefit2_tag: {ko:'', en:''}, benefit2_value: {ko:'', en:''}, link: '' });
+        siteData.dexExchanges.push({ name: {ko:'', en:''}, logoImageUrl: '', benefit1_tag: {ko:'', en:''}, benefit1_value: {ko:'', en:''}, benefit2_tag: {ko:'', en:''}, benefit2_value: {ko:'', en:''}, link: '' });
         renderDexExchanges();
     });
     document.getElementById('add-faq-button').addEventListener('click', () => {

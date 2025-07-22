@@ -1,5 +1,3 @@
-
-
 const defaultSiteData = {
     hero: {
         title: {
@@ -46,17 +44,17 @@ Start your Web3 journey with Coinpass now. Beyond exchanges, we will become your
         }
     },
     exchanges: [
-        { name: { ko: '바이낸스', en: 'Binance' }, logoText: 'Binance', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 40%', en: 'Up to 40%' }, link: '#' },
-        { name: { ko: '바이비트', en: 'Bybit' }, logoText: 'Bybit', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 $30,000', en: 'Up to $30,000' }, link: '#' },
-        { name: { ko: 'OKX', en: 'OKX' }, logoText: 'OKX', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 $10,000', en: 'Up to $10,000' }, link: '#' },
-        { name: { ko: '비트겟', en: 'Bitget' }, logoText: 'Bitget', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '50%', en: '50%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 $5,005', en: 'Up to $5,005' }, link: '#' },
-        { name: { ko: 'MEXC', en: 'MEXC' }, logoText: 'MEXC', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '$100 상당 리워드', en: '$100 Reward' }, link: '#' },
-        { name: { ko: '플립스터', en: 'Flipster' }, logoText: 'Flipster', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '최대 $9,999', en: 'Up to $9,999' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '20%', en: '20%' }, link: '#' },
+        { name: { ko: '바이낸스', en: 'Binance' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 40%', en: 'Up to 40%' }, link: '#' },
+        { name: { ko: '바이비트', en: 'Bybit' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 $30,000', en: 'Up to $30,000' }, link: '#' },
+        { name: { ko: 'OKX', en: 'OKX' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 $10,000', en: 'Up to $10,000' }, link: '#' },
+        { name: { ko: '비트겟', en: 'Bitget' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '50%', en: '50%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 $5,005', en: 'Up to $5,005' }, link: '#' },
+        { name: { ko: 'MEXC', en: 'MEXC' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '20%', en: '20%' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '$100 상당 리워드', en: '$100 Reward' }, link: '#' },
+        { name: { ko: '플립스터', en: 'Flipster' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '최대 $9,999', en: 'Up to $9,999' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '20%', en: '20%' }, link: '#' },
     ],
     dexExchanges: [
-        { name: { ko: 'Avantis', en: 'Avantis' }, logoText: 'AVA', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '포인트 부스트', en: 'Points Boost' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 20%', en: 'Up to 20%' }, link: '#' },
-        { name: { ko: 'GRVT', en: 'GRVT' }, logoText: 'GRVT', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '미스터리 박스', en: 'Mystery Box' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '시즌별 혜택', en: 'Seasonal Benefits' }, link: '#' },
-        { name: { ko: '하이퍼리퀴드', en: 'Hyperliquid' }, logoText: 'HYP', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '포인트 적립', en: 'Earn Points' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '10% 리베이트', en: '10% Rebate' }, link: '#' },
+        { name: { ko: 'Avantis', en: 'Avantis' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '포인트 부스트', en: 'Points Boost' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '최대 20%', en: 'Up to 20%' }, link: '#' },
+        { name: { ko: 'GRVT', en: 'GRVT' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '미스터리 박스', en: 'Mystery Box' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '시즌별 혜택', en: 'Seasonal Benefits' }, link: '#' },
+        { name: { ko: '하이퍼리퀴드', en: 'Hyperliquid' }, logoImageUrl: '', benefit1_tag: { ko: '거래수수료', en: 'Fee Payback' }, benefit1_value: { ko: '포인트 적립', en: 'Earn Points' }, benefit2_tag: { ko: '수수료 할인', en: 'Fee Discount' }, benefit2_value: { ko: '10% 리베이트', en: '10% Rebate' }, link: '#' },
     ],
     faqs: [
         { question: { ko: '기존에 계정이 있어도 혜택을 받을 수 있나요?', en: 'Can I receive benefits if I already have an account?' }, answer: { ko: '아니요, 대부분의 거래소는 신규 가입자에 한해 레퍼럴 혜택을 제공합니다. 최대 혜택을 받으시려면 기존에 해당 거래소를 이용한 적 없는 새로운 이메일과 신분증으로 가입하시는 것을 권장합니다.', en: 'No, most exchanges only offer referral benefits to new subscribers. To receive the maximum benefits, we recommend signing up with a new email and ID that have not been previously used on that exchange.' } },
@@ -349,14 +347,25 @@ function populateExchangeGrid(gridId, exchangesData) {
         const header = document.createElement('div');
         header.className = 'card-header';
         
-        const logoTextDiv = document.createElement('div');
-        logoTextDiv.className = 'exchange-logo-text';
-        logoTextDiv.textContent = exchange.logoText;
+        const logoEl = document.createElement('div');
+        logoEl.className = 'exchange-logo';
+        
+        if (exchange.logoImageUrl) {
+            const img = document.createElement('img');
+            img.src = exchange.logoImageUrl;
+            img.alt = `${exchange.name[currentLang]} logo`;
+            img.loading = 'lazy';
+            logoEl.appendChild(img);
+        } else {
+            // Fallback to text logo if no image URL
+            logoEl.classList.add('exchange-logo-text');
+            logoEl.textContent = exchange.name[currentLang]?.substring(0, 3).toUpperCase() || 'N/A';
+        }
 
         const h4 = document.createElement('h4');
         h4.textContent = exchange.name[currentLang];
 
-        header.appendChild(logoTextDiv);
+        header.appendChild(logoEl);
         header.appendChild(h4);
 
         const benefitsList = document.createElement('ul');
