@@ -1,4 +1,3 @@
-
 // Default data structure with internationalization (i18n) support
 const defaultSiteData = {
     hero: {
@@ -148,9 +147,25 @@ function isObject(item) {
 }
 
 
-function saveData() {
-    localStorage.setItem(DATA_KEY, JSON.stringify(siteData));
-    alert('저장되었습니다!');
+function saveData(dataToSave = siteData) {
+    localStorage.setItem(DATA_KEY, JSON.stringify(dataToSave));
+    showToast('저장되었습니다!');
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 500);
+    }, 2000);
 }
 
 function renderAll() {
@@ -180,7 +195,7 @@ function renderAboutUs() {
 }
 
 
-function createBilingualFormGroup(container, baseName, labels, item, index, elType = 'input') {
+function createBilingualFormGroup(container, baseName, labels, item, elType = 'input') {
     const group = document.createElement('div');
     group.className = 'bilingual-group';
 
@@ -192,7 +207,6 @@ function createBilingualFormGroup(container, baseName, labels, item, index, elTy
     (koInput as any).value = item[baseName].ko;
     koInput.className = `item-input ${baseName}`;
     koInput.dataset.lang = 'ko';
-    koInput.dataset.index = index.toString();
     if(elType === 'textarea') (koInput as HTMLTextAreaElement).rows = 10;
     koGroup.append(koLabel, koInput);
 
@@ -204,7 +218,6 @@ function createBilingualFormGroup(container, baseName, labels, item, index, elTy
     (enInput as any).value = item[baseName].en;
     enInput.className = `item-input ${baseName}`;
     enInput.dataset.lang = 'en';
-    enInput.dataset.index = index.toString();
     if(elType === 'textarea') (enInput as HTMLTextAreaElement).rows = 10;
     enGroup.append(enLabel, enInput);
 
@@ -212,7 +225,7 @@ function createBilingualFormGroup(container, baseName, labels, item, index, elTy
     container.appendChild(group);
 }
 
-function createSingleFormGroup(container, baseName, label, item, index, elType = 'input', inputType = 'text') {
+function createSingleFormGroup(container, baseName, label, item, elType = 'input', inputType = 'text') {
     const group = document.createElement('div');
     group.className = 'form-group';
     const labelEl = document.createElement('label');
@@ -221,7 +234,6 @@ function createSingleFormGroup(container, baseName, label, item, index, elType =
     (input as any).type = inputType;
     (input as any).value = item[baseName];
     input.className = `item-input ${baseName}`;
-    input.dataset.index = index.toString();
     group.append(labelEl, input);
     container.appendChild(group);
 }
@@ -234,26 +246,29 @@ function renderList(containerId, dataList, listName, fields) {
     dataList.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'item-card';
+        card.dataset.index = index.toString();
+        card.dataset.listName = listName;
         
-        const h4 = document.createElement('h4');
-        h4.textContent = `${listName} #${index + 1}`;
-        card.appendChild(h4);
-
         fields.forEach(field => {
             if (field.bilingual) {
-                createBilingualFormGroup(card, field.name, field.labels, item, index, field.elType);
+                createBilingualFormGroup(card, field.name, field.labels, item, field.elType);
             } else {
-                createSingleFormGroup(card, field.name, field.labels.ko, item, index, field.elType, field.inputType);
+                createSingleFormGroup(card, field.name, field.labels.ko, item, field.elType, field.inputType);
             }
         });
 
         const controls = document.createElement('div');
         controls.className = 'item-controls';
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-item-button';
+        saveBtn.textContent = '항목 저장';
+        
         const deleteBtn = document.createElement('button');
-        deleteBtn.className = `delete-button delete-${listName.toLowerCase()}`;
+        deleteBtn.className = 'delete-button';
         deleteBtn.textContent = '삭제';
-        deleteBtn.dataset.index = index.toString();
-        controls.appendChild(deleteBtn);
+
+        controls.append(saveBtn, deleteBtn);
         card.appendChild(controls);
 
         fragment.appendChild(card);
@@ -265,7 +280,7 @@ function renderList(containerId, dataList, listName, fields) {
 
 
 function renderExchanges() {
-    renderList('exchanges-list', siteData.exchanges, 'CEX', [
+    renderList('exchanges-list', siteData.exchanges, 'exchanges', [
         { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
         { name: 'logoText', labels: { ko: '로고 텍스트', en: 'Logo Text' }, bilingual: false, elType: 'input' },
         { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
@@ -277,7 +292,7 @@ function renderExchanges() {
 }
 
 function renderDexExchanges() {
-     renderList('dex-exchanges-list', siteData.dexExchanges, 'DEX', [
+     renderList('dex-exchanges-list', siteData.dexExchanges, 'dexExchanges', [
         { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
         { name: 'logoText', labels: { ko: '로고 텍스트', en: 'Logo Text' }, bilingual: false, elType: 'input' },
         { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
@@ -289,14 +304,14 @@ function renderDexExchanges() {
 }
 
 function renderFaqs() {
-    renderList('faq-list', siteData.faqs, 'FAQ', [
+    renderList('faq-list', siteData.faqs, 'faqs', [
         { name: 'question', labels: { ko: '질문 (KO)', en: 'Question (EN)' }, bilingual: true, elType: 'input' },
         { name: 'answer', labels: { ko: '답변 (KO)', en: 'Answer (EN)' }, bilingual: true, elType: 'textarea' },
     ]);
 }
 
 function renderGuides() {
-    renderList('guides-list', siteData.guides, 'Guide', [
+    renderList('guides-list', siteData.guides, 'guides', [
         { name: 'title', labels: { ko: '제목 (KO)', en: 'Title (EN)' }, bilingual: true, elType: 'input' },
         { name: 'content', labels: { ko: '내용 (KO)', en: 'Content (EN)' }, bilingual: true, elType: 'textarea' },
     ]);
@@ -338,48 +353,19 @@ function renderSupport() {
 
 // Event Listeners
 function setupEventListeners() {
-    document.getElementById('save-all-button').addEventListener('click', saveData);
-
     // Data Management
     document.getElementById('export-button').addEventListener('click', exportData);
     document.getElementById('import-file').addEventListener('change', importData);
 
-    // Popup
-    document.getElementById('popup-enabled-input').addEventListener('change', e => siteData.popup.enabled = (e.target as HTMLInputElement).checked);
-    document.querySelectorAll('input[name="popup-type"]').forEach(radio => {
-        radio.addEventListener('change', e => {
-            siteData.popup.type = (e.target as HTMLInputElement).value;
-            renderPopup();
+    document.querySelectorAll('.save-section-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const section = (e.target as HTMLElement).dataset.section;
+            if (section) {
+                updateSectionDataFromDOM(section);
+                saveData(siteData);
+            }
         });
     });
-    document.getElementById('popup-content-ko-input').addEventListener('input', e => siteData.popup.content.ko = (e.target as HTMLTextAreaElement).value);
-    document.getElementById('popup-content-en-input').addEventListener('input', e => siteData.popup.content.en = (e.target as HTMLTextAreaElement).value);
-    document.getElementById('popup-image-url-input').addEventListener('input', e => siteData.popup.imageUrl = (e.target as HTMLInputElement).value);
-    document.getElementById('popup-start-date-input').addEventListener('input', e => siteData.popup.startDate = (e.target as HTMLInputElement).value);
-    document.getElementById('popup-end-date-input').addEventListener('input', e => siteData.popup.endDate = (e.target as HTMLInputElement).value);
-
-    // Hero
-    document.getElementById('hero-title-ko-input').addEventListener('input', e => siteData.hero.title.ko = (e.target as HTMLTextAreaElement).value);
-    document.getElementById('hero-title-en-input').addEventListener('input', e => siteData.hero.title.en = (e.target as HTMLTextAreaElement).value);
-    document.getElementById('hero-subtitle-ko-input').addEventListener('input', e => siteData.hero.subtitle.ko = (e.target as HTMLTextAreaElement).value);
-    document.getElementById('hero-subtitle-en-input').addEventListener('input', e => siteData.hero.subtitle.en = (e.target as HTMLTextAreaElement).value);
-
-    // About Us
-    document.getElementById('about-us-title-ko-input').addEventListener('input', e => siteData.aboutUs.title.ko = (e.target as HTMLInputElement).value);
-    document.getElementById('about-us-title-en-input').addEventListener('input', e => siteData.aboutUs.title.en = (e.target as HTMLInputElement).value);
-    document.getElementById('about-us-content-ko-input').addEventListener('input', e => siteData.aboutUs.content.ko = (e.target as HTMLTextAreaElement).value);
-    document.getElementById('about-us-content-en-input').addEventListener('input', e => siteData.aboutUs.content.en = (e.target as HTMLTextAreaElement).value);
-
-    // Support
-    document.getElementById('support-telegram-url-input')?.addEventListener('input', e => {
-        if (siteData.support) siteData.support.telegramUrl = (e.target as HTMLInputElement).value;
-    });
-
-    // Dynamic items
-    setupListListeners('exchanges-list', 'cex', siteData.exchanges, renderExchanges);
-    setupListListeners('dex-exchanges-list', 'dex', siteData.dexExchanges, renderDexExchanges);
-    setupListListeners('faq-list', 'faq', siteData.faqs, renderFaqs);
-    setupListListeners('guides-list', 'guide', siteData.guides, renderGuides);
 
     // Add buttons
     document.getElementById('add-exchange-button').addEventListener('click', () => {
@@ -398,36 +384,66 @@ function setupEventListeners() {
         siteData.guides.push({ title: {ko:'', en:''}, content: {ko:'', en:''} });
         renderGuides();
     });
-}
 
-function setupListListeners(containerId, listName, dataArray, renderFunc) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+    // Listen for clicks on the main content area for item-level actions
+    document.getElementById('main-content').addEventListener('click', e => {
+        const target = e.target as HTMLButtonElement;
+        const card = target.closest('.item-card');
+        if (!card) return;
 
-    container.addEventListener('input', e => {
-        const target = e.target as HTMLInputElement | HTMLTextAreaElement;
-        const key = Array.from(target.classList).find(c => c.startsWith('item-input')) ? target.classList[1] : null;
-        if (!key) return;
-        
-        const index = parseInt(target.dataset.index, 10);
-        if (isNaN(index) || !dataArray[index]) return;
-        
-        const lang = target.dataset.lang;
-        if (lang) { // Bilingual field
-            if(dataArray[index][key]) dataArray[index][key][lang] = target.value;
-        } else { // Single field
-            if(key in dataArray[index]) dataArray[index][key] = target.value;
+        const listName = card.dataset.listName;
+        const index = parseInt(card.dataset.index, 10);
+        const dataArray = siteData[listName];
+
+        if (isNaN(index) || !dataArray || !dataArray[index]) return;
+
+        if (target.classList.contains('delete-button')) {
+             if (confirm('정말로 삭제하시겠습니까?')) {
+                dataArray.splice(index, 1);
+                saveData(siteData);
+                renderAll(); // Re-render all to update indexes
+            }
+        } else if (target.classList.contains('save-item-button')) {
+            updateItemDataFromDOM(card, dataArray[index]);
+            saveData(siteData);
         }
     });
+}
 
-    container.addEventListener('click', e => {
-        const target = e.target as HTMLButtonElement;
-        if (target.classList.contains(`delete-${listName}`)) {
-            if (confirm('정말로 삭제하시겠습니까?')) {
-                const index = parseInt(target.dataset.index, 10);
-                dataArray.splice(index, 1);
-                renderFunc();
-            }
+// Update functions to read from DOM before saving
+function updateSectionDataFromDOM(section) {
+    if (section === 'popup') {
+        siteData.popup.enabled = (document.getElementById('popup-enabled-input') as HTMLInputElement).checked;
+        siteData.popup.type = (document.querySelector('input[name="popup-type"]:checked') as HTMLInputElement).value;
+        siteData.popup.content.ko = (document.getElementById('popup-content-ko-input') as HTMLTextAreaElement).value;
+        siteData.popup.content.en = (document.getElementById('popup-content-en-input') as HTMLTextAreaElement).value;
+        siteData.popup.imageUrl = (document.getElementById('popup-image-url-input') as HTMLInputElement).value;
+        siteData.popup.startDate = (document.getElementById('popup-start-date-input') as HTMLInputElement).value;
+        siteData.popup.endDate = (document.getElementById('popup-end-date-input') as HTMLInputElement).value;
+    } else if (section === 'hero') {
+        siteData.hero.title.ko = (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value;
+        siteData.hero.title.en = (document.getElementById('hero-title-en-input') as HTMLTextAreaElement).value;
+        siteData.hero.subtitle.ko = (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value;
+        siteData.hero.subtitle.en = (document.getElementById('hero-subtitle-en-input') as HTMLTextAreaElement).value;
+    } else if (section === 'aboutUs') {
+        siteData.aboutUs.title.ko = (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value;
+        siteData.aboutUs.title.en = (document.getElementById('about-us-title-en-input') as HTMLInputElement).value;
+        siteData.aboutUs.content.ko = (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value;
+        siteData.aboutUs.content.en = (document.getElementById('about-us-content-en-input') as HTMLTextAreaElement).value;
+    } else if (section === 'support') {
+         if (siteData.support) siteData.support.telegramUrl = (document.getElementById('support-telegram-url-input') as HTMLInputElement).value;
+    }
+}
+
+function updateItemDataFromDOM(cardElement, itemData) {
+    cardElement.querySelectorAll('.item-input').forEach(input => {
+        const key = input.classList[1];
+        const lang = (input as HTMLElement).dataset.lang;
+        
+        if (lang) { // Bilingual field
+            if(itemData[key]) itemData[key][lang] = (input as HTMLInputElement).value;
+        } else { // Single field
+            if(key in itemData) itemData[key] = (input as HTMLInputElement).value;
         }
     });
 }
@@ -487,7 +503,7 @@ function importData(event) {
             if (importedData.hero && importedData.exchanges && importedData.faqs) {
                  siteData = deepMerge(defaultSiteData, importedData);
                  renderAll();
-                 alert('데이터를 성공적으로 불러왔습니다! "변경사항 저장" 버튼을 눌러 적용해주세요.');
+                 showToast('데이터를 성공적으로 불러왔습니다! 화면의 각 저장 버튼을 눌러 적용해주세요.');
             } else {
                 throw new Error('Invalid file structure');
             }

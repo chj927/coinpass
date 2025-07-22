@@ -1,4 +1,3 @@
-
 const defaultSiteData = {
     guides: [
         { 
@@ -20,8 +19,8 @@ const uiStrings = {
         'nav.guidesSubtitle': '사용안내 및 이벤트',
         'nav.faq': '자주 묻는 질문',
         'footer.disclaimer': '본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.',
-        'guides.pageTitle': '거래소 이용 가이드',
-        'guides.pageSubtitle': '초보자도 쉽게 따라할 수 있는 상세 가이드를 확인해보세요.',
+        'guides.pageTitle': '이용 가이드',
+        'guides.pageSubtitle': '초보자용 상세 가이드와 거래소 이벤트를 확인해보세요.',
     },
     en: {
         skipLink: 'Skip to main content',
@@ -34,8 +33,8 @@ const uiStrings = {
         'nav.guidesSubtitle': 'Info & Events',
         'nav.faq': 'FAQ',
         'footer.disclaimer': 'This service is for informational purposes only and does not constitute an investment recommendation or guarantee. The final decision and responsibility for all investments lie with the investor.',
-        'guides.pageTitle': 'Exchange User Guides',
-        'guides.pageSubtitle': 'Check out our detailed guides that even beginners can easily follow.',
+        'guides.pageTitle': 'User Guides',
+        'guides.pageSubtitle': 'Check out our detailed guides and exchange events for beginners.',
     }
 };
 
