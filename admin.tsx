@@ -1,79 +1,28 @@
-// Default data structure with internationalization (i18n) support
+import { supabase } from '../src/supabaseClient';
+
+// 기본 데이터 구조는 유지합니다.
 const defaultSiteData = {
-    hero: {
-        title: {
-            ko: `최대 50%까지 거래수수료 할인!
-최고의 혜택을 누구나 무료로!
-한번 등록하고 평생 혜택받기!`,
-            en: `Up to 50% discount on transaction fees!
-Enjoy the best benefits for free!
-Register once and get lifetime benefits!`
-        },
-        subtitle: {
-            ko: '최고의 혜택을 제공하는 암호화폐 거래소를 한눈에 비교하고 가입하세요.',
-            en: 'Compare and sign up for cryptocurrency exchanges that offer the best benefits at a glance.'
-        }
-    },
-    aboutUs: {
-        title: {
-            ko: '코인패스 : 소수만 독점하던 혜택을 모두에게',
-            en: 'Coinpass: Bringing Exclusive Benefits to Everyone'
-        },
-        content: {
-            ko: `소수에게만 허락됐던 거래 수수료 혜택, 코인패스가 모두에게 돌려드립니다.
-
-빠르게 변화하는 암호화폐 시장에서는 정보의 비대칭성이 만연합니다. 부정확한 정보와 무분별한 마케팅 속에서, 내가 받는 혜택이 최선인지 확신하기란 어려운 일입니다. 코인패스는 바로 이 문제의식에서 출발했습니다.
-
-많은 투자자들이 무심코 사용한 추천인 코드로 인해 정당한 혜택을 놓치거나, 페이백을 약속했던 서비스로부터 제대로 된 보상을 받지 못하는 일을 겪습니다. 미미해 보이던 거래 수수료는 어느새 투자 수익을 잠식하는 무시할 수 없는 비용이 됩니다.
-
-코인패스의 미션은 명확합니다. 모든 투자자가 투명한 정보에 기반하여 거래 비용을 최소화하고, 투자의 본질에만 집중할 수 있는 환경을 만드는 것. 저희는 신뢰할 수 있는 파트너십을 통해 업계 최고 수준의 수수료 혜택을 확보하고, 이를 모든 사용자에게 공정하게 제공합니다.
-
-코인패스는 수익 극대화가 아닌 '혜택의 공유'를 최우선 가치로 삼습니다. 최소한의 운영비를 제외한 수익은 사용자에게 돌아가는 선순환 구조를 지향합니다.
-
-이제 코인패스와 함께 당신의 Web3 여정을 시작하세요. 거래소를 넘어 다양한 프로젝트와의 연계를 통해, 가장 든든한 파트너가 되어 드리겠습니다.`,
-            en: `The trading fee benefits that were once exclusive to a select few are now being returned to everyone by Coinpass.
-
-In the fast-paced cryptocurrency market, information asymmetry is rampant. Amid inaccurate information and indiscriminate marketing, it's difficult to be sure if the benefits you're receiving are the best possible. Coinpass was born from this very concern.
-
-Many investors miss out on rightful benefits due to casually used referral codes or fail to receive proper compensation from services that promised payback. What seemed like a negligible transaction fee gradually becomes a significant cost that erodes investment returns.
-
-Coinpass's mission is clear: to create an environment where all investors can minimize trading costs based on transparent information and focus solely on the essence of investing. We secure the industry's highest level of fee benefits through trusted partnerships and provide them fairly to all users.
-
-Coinpass prioritizes 'sharing benefits' over profit maximization. We aim for a virtuous cycle where profits, excluding minimal operating costs, are returned to the users.
-
-Start your Web3 journey with Coinpass now. Beyond exchanges, we will become your most reliable partner through connections with various projects.`
-        }
-    },
+    hero: { title: { ko: '', en: '' }, subtitle: { ko: '', en: '' }},
+    aboutUs: { title: { ko: '', en: '' }, content: { ko: '', en: '' }},
     exchanges: [],
     dexExchanges: [],
     faqs: [],
     guides: [],
-    popup: {
-        enabled: false,
-        type: 'text', // 'text' or 'image'
-        content: { ko: '', en: '' },
-        imageUrl: '',
-        startDate: '', // ISO string
-        endDate: '',   // ISO string
-    },
-    support: {
-        telegramUrl: '#'
-    }
+    popup: { enabled: false, type: 'text', content: { ko: '', en: '' }, imageUrl: '', startDate: '', endDate: '' },
+    support: { telegramUrl: '#' }
 };
 
+let siteData = JSON.parse(JSON.stringify(defaultSiteData));
 
-let siteData = { ...defaultSiteData };
-const DATA_KEY = 'coinpass-content';
-
-async function sha256(message) {
+async function sha256(message: string): Promise<string> {
     const msgBuffer = new TextEncoder().encode(message);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 로그인 로직은 동일합니다.
     const loginContainer = document.getElementById('login-container') as HTMLDivElement;
     const adminPanel = document.getElementById('admin-panel') as HTMLDivElement;
     const loginButton = document.getElementById('login-button') as HTMLButtonElement;
@@ -101,144 +50,102 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function initializeApp() {
-    loadData();
+async function initializeApp() {
+    await fetchDataFromSupabase(); // 데이터를 Supabase에서 불러옵니다.
     renderAll();
     setupEventListeners();
     setupNavigation();
 }
 
-function loadData() {
-    const savedData = localStorage.getItem(DATA_KEY);
-    if (savedData) {
-        try {
-            const parsed = JSON.parse(savedData);
-            // Deep merge to keep default structure for new sections
-            siteData = deepMerge(defaultSiteData, parsed);
-        } catch (e) {
-            console.error('Failed to parse data from localStorage, using default.', e);
-            siteData = { ...defaultSiteData };
-        }
+// --- Supabase 데이터 통신 함수들 ---
+
+async function fetchDataFromSupabase() {
+    showToast('데이터를 불러오는 중...');
+    const { data: exchanges, error: exchangesError } = await supabase.from('exchanges').select('*').order('id');
+    const { data: dexExchanges, error: dexError } = await supabase.from('dex_exchanges').select('*').order('id');
+    const { data: faqs, error: faqsError } = await supabase.from('faqs').select('*').order('id');
+    const { data: guides, error: guidesError } = await supabase.from('guides').select('*').order('id');
+    
+    // TODO: hero, aboutUs 등 단일 섹션 데이터 가져오는 로직 추가 필요 (별도 테이블 생성 후)
+    // 지금은 목록형 데이터만 가져옵니다.
+
+    if (exchangesError) console.error('Error fetching exchanges:', exchangesError);
+    if (dexError) console.error('Error fetching dex_exchanges:', dexError);
+    if (faqsError) console.error('Error fetching faqs:', faqsError);
+    if (guidesError) console.error('Error fetching guides:', guidesError);
+
+    siteData.exchanges = exchanges || [];
+    siteData.dexExchanges = dexExchanges || [];
+    siteData.faqs = faqs || [];
+    siteData.guides = guides || [];
+    
+    showToast('데이터 로딩 완료!');
+}
+
+async function saveItem(tableName: string, itemData: any, id?: number) {
+    let response;
+    if (id) {
+        // ID가 있으면 기존 데이터 업데이트
+        response = await supabase.from(tableName).update(itemData).eq('id', id);
+    } else {
+        // ID가 없으면 새 데이터 추가
+        response = await supabase.from(tableName).insert(itemData);
     }
-}
 
-function deepMerge(target, source) {
-    const output = { ...target };
-    if (isObject(target) && isObject(source)) {
-        Object.keys(source).forEach(key => {
-            if (isObject(source[key])) {
-                if (!(key in target)) {
-                    Object.assign(output, { [key]: source[key] });
-                } else {
-                    output[key] = deepMerge(target[key], source[key]);
-                }
-            } else if (Array.isArray(source[key])) {
-                 output[key] = source[key]; // Overwrite arrays
-            } else {
-                Object.assign(output, { [key]: source[key] });
-            }
-        });
+    if (response.error) {
+        console.error(`Error saving to ${tableName}:`, response.error);
+        showToast(`오류: ${tableName} 저장 실패`, 'error');
+    } else {
+        showToast(`${tableName} 항목이 저장되었습니다.`);
     }
-    return output;
+    await fetchDataFromSupabase(); // 데이터를 다시 불러와 화면 갱신
+    renderAll();
 }
 
-function isObject(item) {
-    return (item && typeof item === 'object' && !Array.isArray(item));
+async function deleteItem(tableName: string, id: number) {
+    if (!confirm('정말로 삭제하시겠습니까?')) return;
+
+    const { error } = await supabase.from(tableName).delete().eq('id', id);
+
+    if (error) {
+        console.error(`Error deleting from ${tableName}:`, error);
+        showToast(`오류: ${tableName} 삭제 실패`, 'error');
+    } else {
+        showToast(`${tableName} 항목이 삭제되었습니다.`);
+    }
+    await fetchDataFromSupabase();
+    renderAll();
 }
 
 
-function saveData(dataToSave = siteData) {
-    localStorage.setItem(DATA_KEY, JSON.stringify(dataToSave));
-    showToast('저장되었습니다!');
-}
+// --- 기존 렌더링 함수들 (수정됨) ---
 
-function showToast(message) {
+function showToast(message: string, type: 'success' | 'error' = 'success') {
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast ${type}`;
     toast.textContent = message;
     document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 10);
+    setTimeout(() => toast.classList.add('show'), 10);
     setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 500);
-    }, 2000);
+        setTimeout(() => document.body.removeChild(toast), 500);
+    }, 3000);
 }
 
 function renderAll() {
+    // 단일 섹션 렌더링 (아직 DB 연동 안됨)
     renderHero();
     renderAboutUs();
+    renderPopup();
+    renderSupport();
+    // 목록 렌더링 (DB 연동됨)
     renderExchanges();
     renderDexExchanges();
     renderFaqs();
     renderGuides();
-    renderPopup();
-    renderSupport();
 }
 
-// Render functions
-function renderHero() {
-    (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value = siteData.hero.title.ko;
-    (document.getElementById('hero-title-en-input') as HTMLTextAreaElement).value = siteData.hero.title.en;
-    (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value = siteData.hero.subtitle.ko;
-    (document.getElementById('hero-subtitle-en-input') as HTMLTextAreaElement).value = siteData.hero.subtitle.en;
-}
-
-function renderAboutUs() {
-    (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value = siteData.aboutUs.title.ko;
-    (document.getElementById('about-us-title-en-input') as HTMLInputElement).value = siteData.aboutUs.title.en;
-    (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value = siteData.aboutUs.content.ko;
-    (document.getElementById('about-us-content-en-input') as HTMLTextAreaElement).value = siteData.aboutUs.content.en;
-}
-
-
-function createBilingualFormGroup(container, baseName, labels, item, elType = 'input') {
-    const group = document.createElement('div');
-    group.className = 'bilingual-group';
-
-    const koGroup = document.createElement('div');
-    koGroup.className = 'form-group';
-    const koLabel = document.createElement('label');
-    koLabel.textContent = labels.ko;
-    const koInput = document.createElement(elType);
-    (koInput as any).value = item[baseName].ko;
-    koInput.className = `item-input ${baseName}`;
-    koInput.dataset.lang = 'ko';
-    if(elType === 'textarea') (koInput as HTMLTextAreaElement).rows = 10;
-    koGroup.append(koLabel, koInput);
-
-    const enGroup = document.createElement('div');
-    enGroup.className = 'form-group';
-    const enLabel = document.createElement('label');
-    enLabel.textContent = labels.en;
-    const enInput = document.createElement(elType);
-    (enInput as any).value = item[baseName].en;
-    enInput.className = `item-input ${baseName}`;
-    enInput.dataset.lang = 'en';
-    if(elType === 'textarea') (enInput as HTMLTextAreaElement).rows = 10;
-    enGroup.append(enLabel, enInput);
-
-    group.append(koGroup, enGroup);
-    container.appendChild(group);
-}
-
-function createSingleFormGroup(container, baseName, label, item, elType = 'input', inputType = 'text') {
-    const group = document.createElement('div');
-    group.className = 'form-group';
-    const labelEl = document.createElement('label');
-    labelEl.textContent = label;
-    const input = document.createElement(elType);
-    (input as any).type = inputType;
-    (input as any).value = item[baseName];
-    input.className = `item-input ${baseName}`;
-    group.append(labelEl, input);
-    container.appendChild(group);
-}
-
-function renderList(containerId, dataList, listName, fields) {
+function renderList(containerId: string, dataList: any[], listName: string, fields: any[]) {
     const container = document.getElementById(containerId);
     if (!container) return;
     const fragment = document.createDocumentFragment();
@@ -248,10 +155,13 @@ function renderList(containerId, dataList, listName, fields) {
         card.className = 'item-card';
         card.dataset.index = index.toString();
         card.dataset.listName = listName;
-        
+        card.dataset.itemId = item.id; // Supabase의 id를 저장
+
         fields.forEach(field => {
             if (field.bilingual) {
-                createBilingualFormGroup(card, field.name, field.labels, item, field.elType);
+                createBilingualFormGroup(card, field.name, field.labels, {
+                    [field.name]: { ko: item[`${field.name}_ko`], en: item[`${field.name}_en`] }
+                }, field.elType);
             } else {
                 createSingleFormGroup(card, field.name, field.labels.ko, item, field.elType, field.inputType);
             }
@@ -278,6 +188,49 @@ function renderList(containerId, dataList, listName, fields) {
     container.appendChild(fragment);
 }
 
+function createBilingualFormGroup(container: HTMLElement, baseName: string, labels: { ko: string, en: string }, item: any, elType = 'input') {
+    const group = document.createElement('div');
+    group.className = 'bilingual-group';
+
+    const koGroup = document.createElement('div');
+    koGroup.className = 'form-group';
+    const koLabel = document.createElement('label');
+    koLabel.textContent = labels.ko;
+    const koInput = document.createElement(elType) as HTMLInputElement | HTMLTextAreaElement;
+    koInput.value = item[baseName]?.ko || '';
+    koInput.className = `item-input ${baseName}`;
+    koInput.dataset.lang = 'ko';
+    if(elType === 'textarea') (koInput as HTMLTextAreaElement).rows = 10;
+    koGroup.append(koLabel, koInput);
+
+    const enGroup = document.createElement('div');
+    enGroup.className = 'form-group';
+    const enLabel = document.createElement('label');
+    enLabel.textContent = labels.en;
+    const enInput = document.createElement(elType) as HTMLInputElement | HTMLTextAreaElement;
+    enInput.value = item[baseName]?.en || '';
+    enInput.className = `item-input ${baseName}`;
+    enInput.dataset.lang = 'en';
+    if(elType === 'textarea') (enInput as HTMLTextAreaElement).rows = 10;
+    enGroup.append(enLabel, enInput);
+
+    group.append(koGroup, enGroup);
+    container.appendChild(group);
+}
+
+function createSingleFormGroup(container: HTMLElement, baseName: string, label: string, item: any, elType = 'input', inputType = 'text') {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    const labelEl = document.createElement('label');
+    labelEl.textContent = label;
+    const input = document.createElement(elType) as HTMLInputElement;
+    input.type = inputType;
+    input.value = item[baseName] || '';
+    input.className = `item-input ${baseName}`;
+    group.append(labelEl, input);
+    container.appendChild(group);
+}
+
 
 function renderExchanges() {
     renderList('exchanges-list', siteData.exchanges, 'exchanges', [
@@ -292,7 +245,7 @@ function renderExchanges() {
 }
 
 function renderDexExchanges() {
-     renderList('dex-exchanges-list', siteData.dexExchanges, 'dexExchanges', [
+     renderList('dex-exchanges-list', siteData.dexExchanges, 'dex_exchanges', [
         { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
         { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
         { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
@@ -317,135 +270,63 @@ function renderGuides() {
     ]);
 }
 
-function renderPopup() {
-    const popup = siteData.popup;
-    if (!popup) return;
-    (document.getElementById('popup-enabled-input') as HTMLInputElement).checked = popup.enabled;
-    document.querySelectorAll<HTMLInputElement>('input[name="popup-type"]').forEach(radio => {
-        radio.checked = radio.value === popup.type;
-    });
-    (document.getElementById('popup-content-ko-input') as HTMLTextAreaElement).value = popup.content.ko;
-    (document.getElementById('popup-content-en-input') as HTMLTextAreaElement).value = popup.content.en;
-    (document.getElementById('popup-image-url-input') as HTMLInputElement).value = popup.imageUrl;
-    (document.getElementById('popup-start-date-input') as HTMLInputElement).value = popup.startDate;
-    (document.getElementById('popup-end-date-input') as HTMLInputElement).value = popup.endDate;
-
-    const textGroup = document.getElementById('popup-text-group');
-    const imageGroup = document.getElementById('popup-image-group');
-    if (!textGroup || !imageGroup) return;
-
-    if (popup.type === 'text') {
-        textGroup.style.display = 'block';
-        imageGroup.style.display = 'none';
-    } else {
-        textGroup.style.display = 'none';
-        imageGroup.style.display = 'block';
-    }
-}
-
-function renderSupport() {
-    const input = document.getElementById('support-telegram-url-input') as HTMLInputElement;
-    if (input && siteData.support) {
-        input.value = siteData.support.telegramUrl;
-    }
-}
+function renderHero() { /* 단일 섹션은 추후 구현 */ }
+function renderAboutUs() { /* 단일 섹션은 추후 구현 */ }
+function renderPopup() { /* 단일 섹션은 추후 구현 */ }
+function renderSupport() { /* 단일 섹션은 추후 구현 */ }
 
 
-// Event Listeners
 function setupEventListeners() {
-    // Data Management
-    document.getElementById('export-button').addEventListener('click', exportData);
-    document.getElementById('import-file').addEventListener('change', importData);
-
+    // 단일 섹션 저장 버튼 (현재는 비활성화)
     document.querySelectorAll('.save-section-button').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const section = (e.target as HTMLElement).dataset.section;
-            if (section) {
-                updateSectionDataFromDOM(section);
-                saveData(siteData);
-            }
-        });
+        button.addEventListener('click', () => alert('이 기능은 추후 구현될 예정입니다.'));
     });
 
-    // Add buttons
-    document.getElementById('add-exchange-button').addEventListener('click', () => {
-        siteData.exchanges.push({ name: {ko:'', en:''}, logoImageUrl: '', benefit1_tag: {ko:'', en:''}, benefit1_value: {ko:'', en:''}, benefit2_tag: {ko:'', en:''}, benefit2_value: {ko:'', en:''}, link: '' });
-        renderExchanges();
-    });
-    document.getElementById('add-dex-exchange-button').addEventListener('click', () => {
-        siteData.dexExchanges.push({ name: {ko:'', en:''}, logoImageUrl: '', benefit1_tag: {ko:'', en:''}, benefit1_value: {ko:'', en:''}, benefit2_tag: {ko:'', en:''}, benefit2_value: {ko:'', en:''}, link: '' });
-        renderDexExchanges();
-    });
-    document.getElementById('add-faq-button').addEventListener('click', () => {
-        siteData.faqs.push({ question: {ko:'', en:''}, answer: {ko:'', en:''} });
-        renderFaqs();
-    });
-    document.getElementById('add-guide-button').addEventListener('click', () => {
-        siteData.guides.push({ title: {ko:'', en:''}, content: {ko:'', en:''} });
-        renderGuides();
-    });
+    // 목록형 데이터 추가 버튼
+    document.getElementById('add-exchange-button').addEventListener('click', () => createNewItem('exchanges'));
+    document.getElementById('add-dex-exchange-button').addEventListener('click', () => createNewItem('dex_exchanges'));
+    document.getElementById('add-faq-button').addEventListener('click', () => createNewItem('faqs'));
+    document.getElementById('add-guide-button').addEventListener('click', () => createNewItem('guides'));
 
-    // Listen for clicks on the main content area for item-level actions
+    // 목록형 데이터 저장/삭제 이벤트 리스너 (이벤트 위임)
     document.getElementById('main-content').addEventListener('click', e => {
         const target = e.target as HTMLButtonElement;
         const card = target.closest('.item-card');
         if (!card) return;
 
-        const listName = card.dataset.listName;
-        const index = parseInt(card.dataset.index, 10);
-        const dataArray = siteData[listName];
-
-        if (isNaN(index) || !dataArray || !dataArray[index]) return;
-
-        if (target.classList.contains('delete-button')) {
-             if (confirm('정말로 삭제하시겠습니까?')) {
-                dataArray.splice(index, 1);
-                saveData(siteData);
-                renderAll(); // Re-render all to update indexes
-            }
-        } else if (target.classList.contains('save-item-button')) {
-            updateItemDataFromDOM(card, dataArray[index]);
-            saveData(siteData);
-        }
-    });
-}
-
-// Update functions to read from DOM before saving
-function updateSectionDataFromDOM(section) {
-    if (section === 'popup') {
-        siteData.popup.enabled = (document.getElementById('popup-enabled-input') as HTMLInputElement).checked;
-        siteData.popup.type = (document.querySelector('input[name="popup-type"]:checked') as HTMLInputElement).value;
-        siteData.popup.content.ko = (document.getElementById('popup-content-ko-input') as HTMLTextAreaElement).value;
-        siteData.popup.content.en = (document.getElementById('popup-content-en-input') as HTMLTextAreaElement).value;
-        siteData.popup.imageUrl = (document.getElementById('popup-image-url-input') as HTMLInputElement).value;
-        siteData.popup.startDate = (document.getElementById('popup-start-date-input') as HTMLInputElement).value;
-        siteData.popup.endDate = (document.getElementById('popup-end-date-input') as HTMLInputElement).value;
-    } else if (section === 'hero') {
-        siteData.hero.title.ko = (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value;
-        siteData.hero.title.en = (document.getElementById('hero-title-en-input') as HTMLTextAreaElement).value;
-        siteData.hero.subtitle.ko = (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value;
-        siteData.hero.subtitle.en = (document.getElementById('hero-subtitle-en-input') as HTMLTextAreaElement).value;
-    } else if (section === 'aboutUs') {
-        siteData.aboutUs.title.ko = (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value;
-        siteData.aboutUs.title.en = (document.getElementById('about-us-title-en-input') as HTMLInputElement).value;
-        siteData.aboutUs.content.ko = (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value;
-        siteData.aboutUs.content.en = (document.getElementById('about-us-content-en-input') as HTMLTextAreaElement).value;
-    } else if (section === 'support') {
-         if (siteData.support) siteData.support.telegramUrl = (document.getElementById('support-telegram-url-input') as HTMLInputElement).value;
-    }
-}
-
-function updateItemDataFromDOM(cardElement, itemData) {
-    cardElement.querySelectorAll('.item-input').forEach(input => {
-        const key = input.classList[1];
-        const lang = (input as HTMLElement).dataset.lang;
+        const tableName = card.dataset.listName;
+        const itemId = parseInt(card.dataset.itemId, 10);
         
-        if (lang) { // Bilingual field
-            if(itemData[key]) itemData[key][lang] = (input as HTMLInputElement).value;
-        } else { // Single field
-            if(key in itemData) itemData[key] = (input as HTMLInputElement).value;
+        if (target.classList.contains('delete-button')) {
+            deleteItem(tableName, itemId);
+        } else if (target.classList.contains('save-item-button')) {
+            const itemData = readDataFromCard(card);
+            saveItem(tableName, itemData, itemId);
         }
     });
+}
+
+async function createNewItem(tableName: string) {
+    let newItemData = {};
+    if (tableName === 'exchanges' || tableName === 'dex_exchanges') {
+        newItemData = { name_ko: '새 항목', name_en: 'New Item' };
+    } else if (tableName === 'faqs') {
+        newItemData = { question_ko: '새 질문', question_en: 'New Question', answer_ko: '', answer_en: '' };
+    } else if (tableName === 'guides') {
+        newItemData = { title_ko: '새 제목', title_en: 'New Title', content_ko: '', content_en: '' };
+    }
+    await saveItem(tableName, newItemData);
+}
+
+function readDataFromCard(cardElement: HTMLElement): any {
+    const data = {};
+    cardElement.querySelectorAll('.item-input').forEach(input => {
+        const key = (input as HTMLElement).classList[1];
+        const lang = (input as HTMLElement).dataset.lang;
+        const dbKey = lang ? `${key}_${lang}` : key;
+        data[dbKey] = (input as HTMLInputElement).value;
+    });
+    return data;
 }
 
 function setupNavigation() {
@@ -453,7 +334,7 @@ function setupNavigation() {
     const editorSections = document.querySelectorAll('.editor-section');
     const mainContentTitle = document.getElementById('main-content-title');
 
-    function switchTab(targetId) {
+    function switchTab(targetId: string) {
         const activeLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
         if (activeLink && mainContentTitle) {
             const titleSpan = activeLink.querySelector('span');
@@ -475,45 +356,7 @@ function setupNavigation() {
     if (initialTarget) switchTab(initialTarget);
 }
 
+function exportData() {}
+function importData() {}
 
-// Data export/import functions
-function exportData() {
-    const dataStr = JSON.stringify(siteData, null, 2);
-    const blob = new Blob([dataStr], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const date = new Date().toISOString().slice(0, 10);
-    a.download = `coinpass-backup-${date}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function importData(event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const importedData = JSON.parse(e.target.result as string);
-            // Basic validation
-            if (importedData.hero && importedData.exchanges && importedData.faqs) {
-                 siteData = deepMerge(defaultSiteData, importedData);
-                 renderAll();
-                 showToast('데이터를 성공적으로 불러왔습니다! 화면의 각 저장 버튼을 눌러 적용해주세요.');
-            } else {
-                throw new Error('Invalid file structure');
-            }
-        } catch (error) {
-            console.error('Error parsing JSON file:', error);
-            alert('오류: 파일을 읽을 수 없거나 형식이 올바르지 않습니다.');
-        } finally {
-            (event.target as HTMLInputElement).value = '';
-        }
-    };
-    reader.readAsText(file);
-}
 export {};
