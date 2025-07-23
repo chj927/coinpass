@@ -95,7 +95,6 @@ async function loadRemoteContent() {
     });
 }
 
-
 function renderContent() {
     if (!siteData) return;
     setupHero(siteData.hero);
@@ -215,7 +214,7 @@ function setupHero(heroData) {
         }
     }
     
-    if (subtitleEl) subtitleEl.textContent = heroData.subtitle[currentLang];
+    if (subtitleEl && heroData.subtitle) subtitleEl.textContent = heroData.subtitle[currentLang];
 }
 
 function updateAboutUs(aboutUsData) {
@@ -223,8 +222,8 @@ function updateAboutUs(aboutUsData) {
     const contentEl = document.getElementById('about-us-content');
     if (!aboutUsData) return;
 
-    if (titleEl) titleEl.textContent = aboutUsData.title[currentLang];
-    if (contentEl) {
+    if (titleEl && aboutUsData.title) titleEl.textContent = aboutUsData.title[currentLang];
+    if (contentEl && aboutUsData.content) {
         contentEl.innerHTML = '';
         const fragment = document.createDocumentFragment();
         const paragraphs = aboutUsData.content[currentLang].split(/\n\s*\n/).filter(p => p.trim() !== '');
@@ -246,7 +245,6 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
         const card = document.createElement('div');
         card.className = 'exchange-card anim-fade-in';
         
-        // 데이터베이스의 열 이름(`name_ko`)에 직접 접근하도록 수정
         const name = exchange[`name_${currentLang}`];
         const benefit1Tag = exchange[`benefit1_tag_${currentLang}`];
         const benefit1Value = exchange[`benefit1_value_${currentLang}`];
@@ -287,12 +285,10 @@ function updateFaqs(faqsData: any[]) {
         const details = document.createElement('details');
         details.className = 'anim-fade-in';
         const summary = document.createElement('summary');
-        // 데이터베이스의 열 이름(`question_ko`)에 직접 접근하도록 수정
         summary.textContent = faq[`question_${currentLang}`];
         const contentDiv = document.createElement('div');
         contentDiv.className = 'faq-content';
         const p = document.createElement('p');
-        // 데이터베이스의 열 이름(`answer_ko`)에 직접 접근하도록 수정
         p.textContent = faq[`answer_${currentLang}`];
         contentDiv.appendChild(p);
         details.appendChild(summary);
@@ -373,12 +369,14 @@ function setupPopup() {
     const overlay = container?.querySelector('.popup-overlay');
     if (!container || !imageEl || !textEl || !closeBtn || !close24hBtn) return;
     
+    const contentToDisplay = siteData.popup.content ? siteData.popup.content[currentLang] : '';
+
     if (siteData.popup.type === 'image' && siteData.popup.imageUrl) {
         (imageEl as HTMLImageElement).src = siteData.popup.imageUrl;
         (imageEl as HTMLElement).style.display = 'block';
         (textEl as HTMLElement).style.display = 'none';
-    } else if (siteData.popup.type === 'text' && siteData.popup.content[currentLang]) {
-        textEl.textContent = siteData.popup.content[currentLang];
+    } else if (siteData.popup.type === 'text' && contentToDisplay) {
+        textEl.textContent = contentToDisplay;
         (textEl as HTMLElement).style.display = 'block';
         (imageEl as HTMLElement).style.display = 'none';
     } else return;
