@@ -1,4 +1,4 @@
-import { supabase } from './src/supabaseClient';
+import { supabase } from '../src/supabaseClient';
 
 // 기본 데이터 구조는 유지합니다.
 const defaultSiteData = {
@@ -61,15 +61,12 @@ async function initializeApp() {
 
 async function fetchDataFromSupabase() {
     showToast('데이터를 불러오는 중...');
-    const { data: exchanges, error: exchangesError } = await supabase.from('exchanges').select('*').order('id');
+    const { data: exchanges, error: exchangesError } = await supabase.from('cex_exchanges').select('*').order('id');
     const { data: dexExchanges, error: dexError } = await supabase.from('dex_exchanges').select('*').order('id');
     const { data: faqs, error: faqsError } = await supabase.from('faqs').select('*').order('id');
     const { data: guides, error: guidesError } = await supabase.from('guides').select('*').order('id');
-    
-    // TODO: hero, aboutUs 등 단일 섹션 데이터 가져오는 로직 추가 필요 (별도 테이블 생성 후)
-    // 지금은 목록형 데이터만 가져옵니다.
 
-    if (exchangesError) console.error('Error fetching exchanges:', exchangesError);
+    if (exchangesError) console.error('Error fetching cex_exchanges:', exchangesError);
     if (dexError) console.error('Error fetching dex_exchanges:', dexError);
     if (faqsError) console.error('Error fetching faqs:', faqsError);
     if (guidesError) console.error('Error fetching guides:', guidesError);
@@ -89,7 +86,7 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
         response = await supabase.from(tableName).update(itemData).eq('id', id);
     } else {
         // ID가 없으면 새 데이터 추가
-        response = await supabase.from(tableName).insert(itemData);
+        response = await supabase.from(tableName).insert(itemData).select();
     }
 
     if (response.error) {
@@ -233,7 +230,7 @@ function createSingleFormGroup(container: HTMLElement, baseName: string, label: 
 
 
 function renderExchanges() {
-    renderList('exchanges-list', siteData.exchanges, 'exchanges', [
+    renderList('exchanges-list', siteData.exchanges, 'cex_exchanges', [
         { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
         { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
         { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
@@ -283,7 +280,7 @@ function setupEventListeners() {
     });
 
     // 목록형 데이터 추가 버튼
-    document.getElementById('add-exchange-button').addEventListener('click', () => createNewItem('exchanges'));
+    document.getElementById('add-exchange-button').addEventListener('click', () => createNewItem('cex_exchanges'));
     document.getElementById('add-dex-exchange-button').addEventListener('click', () => createNewItem('dex_exchanges'));
     document.getElementById('add-faq-button').addEventListener('click', () => createNewItem('faqs'));
     document.getElementById('add-guide-button').addEventListener('click', () => createNewItem('guides'));
@@ -308,7 +305,7 @@ function setupEventListeners() {
 
 async function createNewItem(tableName: string) {
     let newItemData = {};
-    if (tableName === 'exchanges' || tableName === 'dex_exchanges') {
+    if (tableName === 'cex_exchanges' || tableName === 'dex_exchanges') {
         newItemData = { name_ko: '새 항목', name_en: 'New Item' };
     } else if (tableName === 'faqs') {
         newItemData = { question_ko: '새 질문', question_en: 'New Question', answer_ko: '', answer_en: '' };
