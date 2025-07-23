@@ -815,7 +815,17 @@ footer {
     .popup-box {
         width: 90vw;
     }
-
+ /* Mobile Logo Size Adjustment */
+    .card-header {
+        gap: 0.75rem; /* 로고와 텍스트 사이 간격 줄임 */
+    }
+    .exchange-logo {
+        width: 40px;
+        height: 40px;
+    }
+    .card-header h4 {
+        font-size: 1.3rem; /* 제목 폰트 크기 약간 줄임 */
+    }
     
 }
 /* Exchange Card Logo Image Size Fix */
