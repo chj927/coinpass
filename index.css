@@ -815,4 +815,22 @@ footer {
     .popup-box {
         width: 90vw;
     }
+
+    
+}
+/* Exchange Card Logo Image Size Fix */
+.exchange-logo {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden; /* Prevent image overflow */
+}
+
+.exchange-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Make image fit without distortion */
 }
