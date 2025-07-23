@@ -88,7 +88,6 @@ function renderGuides(guides: any[]) {
     if (!container) return;
 
     const fragment = document.createDocumentFragment();
-
     guides.forEach(guide => {
         const item = document.createElement('details');
         item.className = 'guide-item anim-fade-in';
@@ -96,15 +95,14 @@ function renderGuides(guides: any[]) {
         const title = document.createElement('summary');
         title.className = 'guide-title';
         title.textContent = guide[`title_${currentLang}`];
-        item.appendChild(title);
 
         const contentDiv = document.createElement('div');
         contentDiv.className = 'guide-content';
-        
         const p = document.createElement('p');
         p.textContent = guide[`content_${currentLang}`];
         contentDiv.appendChild(p);
         
+        item.appendChild(title);
         item.appendChild(contentDiv);
         fragment.appendChild(item);
     });
@@ -114,9 +112,31 @@ function renderGuides(guides: any[]) {
 }
 
 function setupScrollAnimations() {
-    // ... (기존과 동일)
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.anim-fade-in').forEach(el => observer.observe(el));
 }
 
 function setupMobileMenu() {
-    // ... (기존과 동일)
+    const hamburgerBtn = document.querySelector('.hamburger-button');
+    const nav = document.getElementById('main-nav');
+    if (!hamburgerBtn || !nav) return;
+    hamburgerBtn.addEventListener('click', () => {
+        const isActive = hamburgerBtn.classList.toggle('is-active');
+        nav.classList.toggle('is-active', isActive);
+        hamburgerBtn.setAttribute('aria-expanded', isActive.toString());
+    });
+    nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburgerBtn.classList.remove('is-active');
+            nav.classList.remove('is-active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
 }

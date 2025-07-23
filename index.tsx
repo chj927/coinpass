@@ -89,9 +89,12 @@ async function loadRemoteContent() {
     };
     
     singlePages?.forEach(page => {
-        siteData[page.page_name] = page.content;
+        if(page.page_name && page.content) {
+            siteData[page.page_name] = page.content;
+        }
     });
 }
+
 
 function renderContent() {
     if (!siteData) return;
@@ -138,15 +141,100 @@ function translateUI() {
     });
 }
 
-class TypingAnimator { /* ... (기존과 동일, 생략 가능) ... */ }
-let heroAnimator;
+class TypingAnimator {
+    private el: HTMLElement;
+    private phrases: string[];
+    private loopNum: number = 0;
+    private typingSpeed: number = 100;
+    private erasingSpeed: number = 50;
+    private delayBetweenPhrases: number = 2000;
+    private isPaused: boolean = false;
+    private timeoutId: number | null = null;
 
+    constructor(el: HTMLElement, phrases: string[]) {
+        if (!el || !phrases || phrases.length === 0) return;
+        this.el = el;
+        this.phrases = phrases;
+        this.tick();
+    }
+
+    public setPhrases(phrases: string[]) {
+        this.phrases = phrases;
+        this.loopNum = 0;
+        if(this.timeoutId) clearTimeout(this.timeoutId);
+        this.el.textContent = '';
+        if(!this.isPaused) this.tick();
+    }
+
+    private tick = async () => {
+        if (this.isPaused || !this.el.isConnected) return;
+        const i = this.loopNum % this.phrases.length;
+        const fullTxt = this.phrases[i];
+        for (let j = 0; j < fullTxt.length; j++) {
+            if (this.isPaused || !this.el.isConnected) return;
+            this.el.textContent = fullTxt.substring(0, j + 1);
+            await this.sleep(this.typingSpeed);
+        }
+        await this.sleep(this.delayBetweenPhrases);
+        for (let j = fullTxt.length; j > 0; j--) {
+            if (this.isPaused || !this.el.isConnected) return;
+            this.el.textContent = fullTxt.substring(0, j - 1);
+            await this.sleep(this.erasingSpeed);
+        }
+        await this.sleep(500);
+        this.loopNum++;
+        this.timeoutId = window.setTimeout(this.tick, 0);
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => { this.timeoutId = window.setTimeout(resolve, ms); });
+    }
+    public pause() { this.isPaused = true; if(this.timeoutId) clearTimeout(this.timeoutId); }
+    public resume() { if(this.isPaused) { this.isPaused = false; this.tick(); } }
+}
+
+let heroAnimator;
 function setupHero(heroData) {
-    // ... (기존과 동일)
+    const titleEl = document.getElementById('hero-title');
+    const subtitleEl = document.getElementById('hero-subtitle');
+    const heroSection = document.querySelector('.hero');
+    if (!heroData) return;
+
+    if (titleEl && heroData.title && heroData.title[currentLang]) {
+        const phrases = heroData.title[currentLang].split('\n').filter(p => p.trim() !== '');
+        if (!heroAnimator) {
+             heroAnimator = new TypingAnimator(titleEl as HTMLElement, phrases);
+             if(heroSection){
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => entry.isIntersecting ? heroAnimator.resume() : heroAnimator.pause());
+                });
+                observer.observe(heroSection);
+            }
+        } else {
+            heroAnimator.setPhrases(phrases);
+        }
+    }
+    
+    if (subtitleEl) subtitleEl.textContent = heroData.subtitle[currentLang];
 }
 
 function updateAboutUs(aboutUsData) {
-    // ... (기존과 동일)
+    const titleEl = document.getElementById('about-us-title');
+    const contentEl = document.getElementById('about-us-content');
+    if (!aboutUsData) return;
+
+    if (titleEl) titleEl.textContent = aboutUsData.title[currentLang];
+    if (contentEl) {
+        contentEl.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+        const paragraphs = aboutUsData.content[currentLang].split(/\n\s*\n/).filter(p => p.trim() !== '');
+        paragraphs.forEach(pText => {
+            const p = document.createElement('p');
+            p.textContent = pText;
+            fragment.appendChild(p);
+        });
+        contentEl.appendChild(fragment);
+    }
 }
 
 function populateExchangeGrid(gridId: string, exchangesData: any[]) {
@@ -157,81 +245,146 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
     exchangesData.forEach(exchange => {
         const card = document.createElement('div');
         card.className = 'exchange-card anim-fade-in';
+        const name = exchange[`name_${currentLang}`];
+        const benefit1Tag = exchange[`benefit1_tag_${currentLang}`];
+        const benefit1Value = exchange[`benefit1_value_${currentLang}`];
+        const benefit2Tag = exchange[`benefit2_tag_${currentLang}`];
+        const benefit2Value = exchange[`benefit2_value_${currentLang}`];
 
-        const header = document.createElement('div');
-        header.className = 'card-header';
-        
-        const logoEl = document.createElement('div');
-        logoEl.className = 'exchange-logo';
-        
+        let logoHtml = '';
         if (exchange.logoImageUrl) {
-            const img = document.createElement('img');
-            img.src = exchange.logoImageUrl;
-            img.alt = `${exchange[`name_${currentLang}`]} logo`;
-            img.loading = 'lazy';
-            logoEl.appendChild(img);
+            logoHtml = `<div class="exchange-logo"><img src="${exchange.logoImageUrl}" alt="${name} logo" loading="lazy"></div>`;
         } else {
-            logoEl.classList.add('exchange-logo-text');
-            logoEl.textContent = exchange[`name_${currentLang}`]?.substring(0, 3).toUpperCase() || 'N/A';
+            logoHtml = `<div class="exchange-logo exchange-logo-text">${name?.substring(0, 3).toUpperCase() || 'N/A'}</div>`;
         }
 
-        const h4 = document.createElement('h4');
-        h4.textContent = exchange[`name_${currentLang}`];
-
-        header.appendChild(logoEl);
-        header.appendChild(h4);
-
-        const benefitsList = document.createElement('ul');
-        benefitsList.className = 'benefits-list';
-
-        const benefit1 = document.createElement('li');
-        benefit1.innerHTML = `<span class="tag">${exchange[`benefit1_tag_${currentLang}`]}</span> <strong>${exchange[`benefit1_value_${currentLang}`]}</strong>`;
-        
-        const benefit2 = document.createElement('li');
-        benefit2.innerHTML = `<span class="tag">${exchange[`benefit2_tag_${currentLang}`]}</span> <strong>${exchange[`benefit2_value_${currentLang}`]}</strong>`;
-        
-        benefitsList.appendChild(benefit1);
-        benefitsList.appendChild(benefit2);
-
-        const ctaLink = document.createElement('a');
-        ctaLink.href = exchange.link;
-        ctaLink.className = 'card-cta';
-        ctaLink.target = '_blank';
-        ctaLink.rel = 'noopener noreferrer nofollow';
-        ctaLink.textContent = uiStrings[currentLang]['card.cta'];
-
-        card.appendChild(header);
-        card.appendChild(benefitsList);
-        card.appendChild(ctaLink);
-        
+        card.innerHTML = `
+            <div class="card-header">
+                ${logoHtml}
+                <h4>${name}</h4>
+            </div>
+            <ul class="benefits-list">
+                <li><span class="tag">${benefit1Tag}</span> <strong>${benefit1Value}</strong></li>
+                <li><span class="tag">${benefit2Tag}</span> <strong>${benefit2Value}</strong></li>
+            </ul>
+            <a href="${exchange.link}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow">${uiStrings[currentLang]['card.cta']}</a>
+        `;
         fragment.appendChild(card);
     });
     gridEl.innerHTML = '';
     gridEl.appendChild(fragment);
 }
 
+
 function updateFaqs(faqsData: any[]) {
-    // ... (기존과 동일)
+    const faqContainerEl = document.getElementById('faq-container');
+    if (!faqContainerEl || !faqsData) return;
+    
+    const fragment = document.createDocumentFragment();
+    faqsData.forEach(faq => {
+        const details = document.createElement('details');
+        details.className = 'anim-fade-in';
+        const summary = document.createElement('summary');
+        summary.textContent = faq[`question_${currentLang}`];
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'faq-content';
+        const p = document.createElement('p');
+        p.textContent = faq[`answer_${currentLang}`];
+        contentDiv.appendChild(p);
+        details.appendChild(summary);
+        details.appendChild(contentDiv);
+        fragment.appendChild(details);
+    });
+    faqContainerEl.innerHTML = '';
+    faqContainerEl.appendChild(fragment);
 }
 
-function updateSupportSection(supportData: any) {
-    // ... (기존과 동일)
+function updateSupportSection(supportData) {
+    const linkEl = document.getElementById('telegram-support-link');
+    if (linkEl && supportData?.telegramUrl) {
+        linkEl.setAttribute('href', supportData.telegramUrl);
+    }
 }
 
 function setupScrollAnimations() {
-    // ... (기존과 동일)
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.anim-fade-in').forEach(el => observer.observe(el));
 }
 
 function setupMobileMenu() {
-    // ... (기존과 동일)
+    const hamburgerBtn = document.querySelector('.hamburger-button');
+    const nav = document.getElementById('main-nav');
+    if (!hamburgerBtn || !nav) return;
+    hamburgerBtn.addEventListener('click', () => {
+        const isActive = hamburgerBtn.classList.toggle('is-active');
+        nav.classList.toggle('is-active', isActive);
+        hamburgerBtn.setAttribute('aria-expanded', isActive.toString());
+    });
+    nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburgerBtn.classList.remove('is-active');
+            nav.classList.remove('is-active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
 }
 
 function setupNavigation() {
-    // ... (기존과 동일)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if(href && href !== '#') {
+                e.preventDefault();
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+    });
 }
 
 function setupPopup() {
-    // ... (기존과 동일)
-}
+    if (!siteData.popup || !siteData.popup.enabled) return;
+    const hideUntil = localStorage.getItem('coinpass-popup-hide-until');
+    if (hideUntil && Date.now() < parseInt(hideUntil, 10)) return;
 
-// export {}; // 불필요하므로 제거
+    const now = new Date();
+    const startDate = siteData.popup.startDate ? new Date(siteData.popup.startDate) : null;
+    const endDate = siteData.popup.endDate ? new Date(siteData.popup.endDate) : null;
+    if ((startDate && now < startDate) || (endDate && now > endDate)) return;
+
+    const container = document.getElementById('popup-container');
+    const imageEl = document.getElementById('popup-image');
+    const textEl = document.getElementById('popup-text');
+    const closeBtn = document.getElementById('popup-close');
+    const close24hBtn = document.getElementById('popup-close-24h');
+    const overlay = container?.querySelector('.popup-overlay');
+    if (!container || !imageEl || !textEl || !closeBtn || !close24hBtn) return;
+    
+    if (siteData.popup.type === 'image' && siteData.popup.imageUrl) {
+        (imageEl as HTMLImageElement).src = siteData.popup.imageUrl;
+        (imageEl as HTMLElement).style.display = 'block';
+        (textEl as HTMLElement).style.display = 'none';
+    } else if (siteData.popup.type === 'text' && siteData.popup.content[currentLang]) {
+        textEl.textContent = siteData.popup.content[currentLang];
+        (textEl as HTMLElement).style.display = 'block';
+        (imageEl as HTMLElement).style.display = 'none';
+    } else return;
+    
+    container.style.display = 'flex';
+    const closePopup = () => container.style.display = 'none';
+    closeBtn.onclick = closePopup;
+    if(overlay) overlay.addEventListener('click', closePopup);
+    close24hBtn.onclick = () => {
+        localStorage.setItem('coinpass-popup-hide-until', (Date.now() + 24 * 60 * 60 * 1000).toString());
+        closePopup();
+    };
+}
