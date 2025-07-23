@@ -1,4 +1,4 @@
-import { supabase } from '../src/supabaseClient';
+import { supabase } from './supabaseClient';
 
 // 기본 데이터 구조는 유지합니다.
 const defaultSiteData = {

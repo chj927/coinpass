@@ -1,9 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
-
-// Supabase 클라이언트 초기화
-const supabaseUrl = 'https://znixozrpthqcrvgdkgry.supabase.co'
-const supabaseAnonKey = 'YOUR_SUPABAeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuaXhvenJwdGhxY3J2Z2RrZ3J5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxODU0MjIsImV4cCI6MjA2ODc2MTQyMn0.YIxAe9FHqaFSUk7uIqtKf9jgR5tzUoA6bhIq9QyEepI'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+import { supabase } from './supabaseClient';
 
 let siteData = {};
 let currentLang = 'ko';
