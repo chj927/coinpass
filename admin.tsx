@@ -79,7 +79,10 @@ async function fetchDataFromSupabase() {
 
     singlePages?.forEach(page => {
         if (siteData[page.page_name]) {
-            siteData[page.page_name] = page.content;
+            // content가 null이 아닐 경우에만 병합
+            if (page.content && typeof page.content === 'object') {
+                 siteData[page.page_name] = { ...siteData[page.page_name], ...page.content };
+            }
         }
     });
     
@@ -88,10 +91,15 @@ async function fetchDataFromSupabase() {
 
 async function saveItem(tableName: string, itemData: any, id?: number) {
     let response;
+    // id 필드는 자동 생성되므로 insert/update 데이터에서 제외
+    const dataToSave = { ...itemData };
+    delete dataToSave.id;
+    delete dataToSave.created_at;
+
     if (id) {
-        response = await supabase.from(tableName).update(itemData).eq('id', id);
+        response = await supabase.from(tableName).update(dataToSave).eq('id', id);
     } else {
-        response = await supabase.from(tableName).insert(itemData).select();
+        response = await supabase.from(tableName).insert(dataToSave).select();
     }
 
     if (response.error) {
@@ -132,7 +140,15 @@ async function deleteItem(tableName: string, id: number) {
 // --- 렌더링 함수들 ---
 
 function showToast(message: string, type: 'success' | 'error' = 'success') {
-    // ... (기존과 동일)
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => document.body.removeChild(toast), 500);
+    }, 3000);
 }
 
 function renderAll() {
@@ -144,6 +160,93 @@ function renderAll() {
     renderDexExchanges();
     renderFaqs();
     renderGuides();
+}
+
+function createBilingualFormGroup(container: HTMLElement, baseName: string, labels: { ko: string, en: string }, item: any, elType = 'input') {
+    const group = document.createElement('div');
+    group.className = 'bilingual-group';
+
+    const koGroup = document.createElement('div');
+    koGroup.className = 'form-group';
+    const koLabel = document.createElement('label');
+    koLabel.textContent = labels.ko;
+    const koInput = document.createElement(elType) as HTMLInputElement | HTMLTextAreaElement;
+    koInput.value = item[baseName]?.ko || '';
+    koInput.className = `item-input ${baseName}`;
+    koInput.dataset.lang = 'ko';
+    if(elType === 'textarea') (koInput as HTMLTextAreaElement).rows = 10;
+    koGroup.append(koLabel, koInput);
+
+    const enGroup = document.createElement('div');
+    enGroup.className = 'form-group';
+    const enLabel = document.createElement('label');
+    enLabel.textContent = labels.en;
+    const enInput = document.createElement(elType) as HTMLInputElement | HTMLTextAreaElement;
+    enInput.value = item[baseName]?.en || '';
+    enInput.className = `item-input ${baseName}`;
+    enInput.dataset.lang = 'en';
+    if(elType === 'textarea') (enInput as HTMLTextAreaElement).rows = 10;
+    enGroup.append(enLabel, enInput);
+
+    group.append(koGroup, enGroup);
+    container.appendChild(group);
+}
+
+function createSingleFormGroup(container: HTMLElement, baseName: string, label: string, item: any, elType = 'input', inputType = 'text') {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    const labelEl = document.createElement('label');
+    labelEl.textContent = label;
+    const input = document.createElement(elType) as HTMLInputElement;
+    input.type = inputType;
+    input.value = item[baseName] || '';
+    input.className = `item-input ${baseName}`;
+    group.append(labelEl, input);
+    container.appendChild(group);
+}
+
+
+function renderList(containerId: string, dataList: any[], listName: string, fields: any[]) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const fragment = document.createDocumentFragment();
+
+    dataList.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.dataset.index = index.toString();
+        card.dataset.listName = listName;
+        card.dataset.itemId = item.id;
+
+        fields.forEach(field => {
+            if (field.bilingual) {
+                createBilingualFormGroup(card, field.name, field.labels, {
+                    [field.name]: { ko: item[`${field.name}_ko`], en: item[`${field.name}_en`] }
+                }, field.elType);
+            } else {
+                createSingleFormGroup(card, field.name, field.labels.ko, item, field.elType, field.inputType);
+            }
+        });
+
+        const controls = document.createElement('div');
+        controls.className = 'item-controls';
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-item-button';
+        saveBtn.textContent = '항목 저장';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-button';
+        deleteBtn.textContent = '삭제';
+
+        controls.append(saveBtn, deleteBtn);
+        card.appendChild(controls);
+
+        fragment.appendChild(card);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(fragment);
 }
 
 function renderHero() {
@@ -161,23 +264,24 @@ function renderAboutUs() {
 }
 
 function renderPopup() {
-    // ... (기존과 동일)
+    const popup = siteData.popup;
+    if (!popup) return;
+    (document.getElementById('popup-enabled-input') as HTMLInputElement).checked = popup.enabled;
+    document.querySelectorAll<HTMLInputElement>('input[name="popup-type"]').forEach(radio => {
+        radio.checked = radio.value === popup.type;
+    });
+    (document.getElementById('popup-content-ko-input') as HTMLTextAreaElement).value = popup.content.ko;
+    (document.getElementById('popup-content-en-input') as HTMLTextAreaElement).value = popup.content.en;
+    (document.getElementById('popup-image-url-input') as HTMLInputElement).value = popup.imageUrl;
+    (document.getElementById('popup-start-date-input') as HTMLInputElement).value = popup.startDate;
+    (document.getElementById('popup-end-date-input') as HTMLInputElement).value = popup.endDate;
 }
 
 function renderSupport() {
-    // ... (기존과 동일)
-}
-
-function renderList(containerId: string, dataList: any[], listName: string, fields: any[]) {
-    // ... (기존과 동일)
-}
-
-function createBilingualFormGroup(container: HTMLElement, baseName: string, labels: { ko: string, en: string }, item: any, elType = 'input') {
-    // ... (기존과 동일)
-}
-
-function createSingleFormGroup(container: HTMLElement, baseName: string, label: string, item: any, elType = 'input', inputType = 'text') {
-    // ... (기존과 동일)
+    const input = document.getElementById('support-telegram-url-input') as HTMLInputElement;
+    if (input && siteData.support) {
+        input.value = siteData.support.telegramUrl;
+    }
 }
 
 function renderExchanges() {
@@ -194,30 +298,32 @@ function renderExchanges() {
 
 function renderDexExchanges() {
      renderList('dex-exchanges-list', siteData.dexExchanges, 'dex_exchanges', [
-        // ... (기존과 동일)
+        { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
+        { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit2_value', labels: { ko: '혜택 2 값 (KO)', en: 'Benefit 2 Value (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'link', labels: { ko: '가입 링크', en: 'Signup Link' }, bilingual: false, elType: 'input', inputType: 'url' },
     ]);
 }
 
 function renderFaqs() {
     renderList('faq-list', siteData.faqs, 'faqs', [
-        // ... (기존과 동일)
+        { name: 'question', labels: { ko: '질문 (KO)', en: 'Question (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'answer', labels: { ko: '답변 (KO)', en: 'Answer (EN)' }, bilingual: true, elType: 'textarea' },
     ]);
 }
 
 function renderGuides() {
     renderList('guides-list', siteData.guides, 'guides', [
-        // ... (기존과 동일)
+        { name: 'title', labels: { ko: '제목 (KO)', en: 'Title (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'content', labels: { ko: '내용 (KO)', en: 'Content (EN)' }, bilingual: true, elType: 'textarea' },
     ]);
 }
 
-// --- 이벤트 리스너 설정 ---
 
 function setupEventListeners() {
-    // Data Management (이제 사용 안함)
-    document.getElementById('export-button').addEventListener('click', () => alert('이 기능은 더 이상 사용되지 않습니다.'));
-    document.getElementById('import-file').addEventListener('change', () => alert('이 기능은 더 이상 사용되지 않습니다.'));
-
-    // 단일 섹션 저장 버튼
     document.querySelectorAll('.save-section-button').forEach(button => {
         button.addEventListener('click', (e) => {
             const section = (e.target as HTMLElement).dataset.section;
@@ -228,13 +334,11 @@ function setupEventListeners() {
         });
     });
 
-    // 목록형 데이터 추가 버튼
     document.getElementById('add-exchange-button').addEventListener('click', () => createNewItem('cex_exchanges'));
     document.getElementById('add-dex-exchange-button').addEventListener('click', () => createNewItem('dex_exchanges'));
     document.getElementById('add-faq-button').addEventListener('click', () => createNewItem('faqs'));
     document.getElementById('add-guide-button').addEventListener('click', () => createNewItem('guides'));
 
-    // 목록형 데이터 저장/삭제 이벤트 리스너
     document.getElementById('main-content').addEventListener('click', e => {
         const target = e.target as HTMLButtonElement;
         const card = target.closest('.item-card');
@@ -252,7 +356,7 @@ function setupEventListeners() {
     });
 }
 
-function readDataFromSection(section: string) {
+function readDataFromSection(section: string): any {
     if (section === 'popup') {
         return {
             enabled: (document.getElementById('popup-enabled-input') as HTMLInputElement).checked,
@@ -296,19 +400,53 @@ function readDataFromSection(section: string) {
 }
 
 async function createNewItem(tableName: string) {
-    // ... (기존과 동일)
+    let newItemData = {};
+    if (tableName === 'cex_exchanges' || tableName === 'dex_exchanges') {
+        newItemData = { name_ko: '새 항목', name_en: 'New Item' };
+    } else if (tableName === 'faqs') {
+        newItemData = { question_ko: '새 질문', question_en: 'New Question', answer_ko: '', answer_en: '' };
+    } else if (tableName === 'guides') {
+        newItemData = { title_ko: '새 제목', title_en: 'New Title', content_ko: '', content_en: '' };
+    }
+    await saveItem(tableName, newItemData);
 }
 
 function readDataFromCard(cardElement: HTMLElement): any {
-    // ... (기존과 동일)
+    const data = {};
+    cardElement.querySelectorAll('.item-input').forEach(input => {
+        const key = (input as HTMLElement).classList[1];
+        const lang = (input as HTMLElement).dataset.lang;
+        const dbKey = lang ? `${key}_${lang}` : key;
+        data[dbKey] = (input as HTMLInputElement).value;
+    });
+    return data;
 }
 
 function setupNavigation() {
-    // ... (기존과 동일)
+    const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+    const editorSections = document.querySelectorAll('.editor-section');
+    const mainContentTitle = document.getElementById('main-content-title');
+
+    function switchTab(targetId: string) {
+        const activeLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
+        if (activeLink && mainContentTitle) {
+            const titleSpan = activeLink.querySelector('span');
+            if (titleSpan) mainContentTitle.textContent = titleSpan.textContent;
+        }
+        navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('data-target') === targetId));
+        editorSections.forEach(section => section.classList.toggle('active', section.id === targetId));
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = (e.currentTarget as HTMLElement).getAttribute('data-target');
+            if (targetId) switchTab(targetId);
+        });
+    });
+
+    const initialTarget = (navLinks[0] as HTMLElement)?.getAttribute('data-target');
+    if (initialTarget) switchTab(initialTarget);
 }
 
 export {};
-
-// Helper functions (기존 코드에서 복사)
-function isObject(item: any): boolean { return (item && typeof item === 'object' && !Array.isArray(item)); }
-function deepMerge(target: any, source: any): any { /* ... */ }
