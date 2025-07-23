@@ -245,6 +245,8 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
     exchangesData.forEach(exchange => {
         const card = document.createElement('div');
         card.className = 'exchange-card anim-fade-in';
+        
+        // 데이터베이스의 열 이름(`name_ko`)에 직접 접근하도록 수정
         const name = exchange[`name_${currentLang}`];
         const benefit1Tag = exchange[`benefit1_tag_${currentLang}`];
         const benefit1Value = exchange[`benefit1_value_${currentLang}`];
@@ -285,10 +287,12 @@ function updateFaqs(faqsData: any[]) {
         const details = document.createElement('details');
         details.className = 'anim-fade-in';
         const summary = document.createElement('summary');
+        // 데이터베이스의 열 이름(`question_ko`)에 직접 접근하도록 수정
         summary.textContent = faq[`question_${currentLang}`];
         const contentDiv = document.createElement('div');
         contentDiv.className = 'faq-content';
         const p = document.createElement('p');
+        // 데이터베이스의 열 이름(`answer_ko`)에 직접 접근하도록 수정
         p.textContent = faq[`answer_${currentLang}`];
         contentDiv.appendChild(p);
         details.appendChild(summary);
