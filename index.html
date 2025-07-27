@@ -83,20 +83,23 @@
         </header>
 
         <main id="main-content">
-            <!-- Hero Section -->
             <section class="hero" aria-labelledby="hero-title">
                 <div class="hero-banner anim-fade-in">
-                    <h1 id="hero-title"></h1>
-                    <p id="hero-subtitle">거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서</p>
-                    <div class="main-cta-buttons">
-                        <a href="exchange.html" class="cta-button">수수료 혜택 받기</a>
-                        <a href="compare.html" class="cta-button">시세 비교하기</a>
+                    <div class="hero-content">
+                        <h1 id="hero-title"></h1>
+                        <p id="hero-subtitle">거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서</p>
+                        <div class="main-cta-buttons">
+                            <a href="exchange.html" class="cta-button">수수료 혜택 받기</a>
+                            <a href="compare.html" class="cta-button">시세 비교하기</a>
+                        </div>
+                    </div>
+                    <div class="hero-3d-container">
+                        <canvas id="webgl-canvas"></canvas>
                     </div>
                 </div>
             </section>
 
 
-            <!-- Features Section -->
             <section class="features-section">
                 <div class="container">
                     <h2 class="section-title anim-fade-in">코인패스가 제공하는 서비스</h2>
@@ -132,7 +135,6 @@
                 </div>
             </section>
 
-            <!-- Why CoinPass -->
             <section class="why-coinpass">
                 <div class="container">
                     <h2 class="section-title anim-fade-in">왜 코인패스를 선택해야 할까요?</h2>
@@ -179,6 +181,8 @@
             </div>
         </footer>
     </div>
+
+    <script async src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
 
     <script type="module" src="index.tsx"></script>
 </body>

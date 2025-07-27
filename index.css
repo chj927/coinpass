@@ -198,7 +198,10 @@ main {
 }
 
 .hero-banner {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
     padding: 4rem 2rem;
     border-radius: 16px;
     background-color: var(--card-bg);
@@ -209,6 +212,24 @@ main {
     overflow: hidden;
     position: relative;
     margin: 2rem;
+}
+
+.hero-content {
+    flex: 1.2;
+    text-align: left;
+}
+
+.hero-3d-container {
+    flex: 0.8;
+    min-width: 300px;
+    height: 350px;
+    position: relative;
+}
+
+#webgl-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
 }
 
 .hero-banner::before {
@@ -248,13 +269,13 @@ main {
     font-size: 1.2rem;
     color: var(--text-muted);
     max-width: 600px;
-    margin: 0 auto 2rem auto;
+    margin: 0 0 2rem 0;
 }
 
 .main-cta-buttons {
     display: flex;
     gap: 1rem;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
 }
 
@@ -512,17 +533,35 @@ footer::before {
         bottom: 0;
     }
 
-    .hero-banner h1 {
-        font-size: 2.5rem;
+    .hero-banner {
+        flex-direction: column;
+        text-align: center;
+        margin: 1rem;
+        padding: 3rem 1.5rem;
     }
 
+    .hero-content {
+        text-align: center;
+    }
+
+    .hero-3d-container {
+        display: none;
+    }
+    
+    .hero-banner h1 {
+        font-size: 2.2rem;
+        min-height: 5.8rem;
+    }
+    
     .hero-banner p {
         font-size: 1.1rem;
+        margin: 0 auto 2rem auto;
     }
-
+    
     .main-cta-buttons {
         flex-direction: column;
         align-items: center;
+        justify-content: center;
     }
 
     .cta-button {
@@ -532,16 +571,6 @@ footer::before {
 
     .header-container {
         padding: 1rem;
-    }
-
-    .hero-banner {
-        margin: 1rem;
-        padding: 3rem 1.5rem;
-    }
-    
-    .hero-banner h1 {
-        font-size: 2.2rem;
-        min-height: 5.8rem;
     }
 
     .features-section,
