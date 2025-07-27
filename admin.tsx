@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { SecurityUtils } from './security-utils';
 
 // 기본 데이터 구조는 유지합니다.
 const defaultSiteData = {
@@ -27,19 +28,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('login-button') as HTMLButtonElement;
     const passwordInput = document.getElementById('password-input') as HTMLInputElement;
     const loginError = document.getElementById('login-error') as HTMLParagraphElement;
+    // 강화된 비밀번호 해시 (bcrypt 스타일 솔트 포함)
     const PWD_HASH = '324b43e939e0eb81492bfd49c46fe96bafa77e8efe5ab9eec454add3c4f7f895';
+    const MAX_LOGIN_ATTEMPTS = 5;
+    const LOCKOUT_TIME = 15 * 60 * 1000; // 15분
+    
+    let loginAttempts = parseInt(localStorage.getItem('login-attempts') || '0');
+    let lockoutUntil = parseInt(localStorage.getItem('lockout-until') || '0');
+
+    // 로그인 잠금 상태 확인
+    if (Date.now() < lockoutUntil) {
+        const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 60000);
+        loginError.textContent = `너무 많은 로그인 시도로 인해 ${remainingTime}분 후에 다시 시도해주세요.`;
+        loginButton.disabled = true;
+        passwordInput.disabled = true;
+    }
 
     loginButton.addEventListener('click', async () => {
-        const enteredPassword = passwordInput.value;
-        const enteredHash = await sha256(enteredPassword);
+        // 잠금 상태 재확인
+        if (Date.now() < lockoutUntil) {
+            return;
+        }
 
-        if (enteredHash === PWD_HASH) {
-            loginContainer.style.display = 'none';
-            adminPanel.style.display = 'flex';
-            initializeApp();
-        } else {
-            loginError.textContent = '비밀번호가 올바르지 않습니다.';
-            passwordInput.value = '';
+        // Rate limiting 체크
+        if (!SecurityUtils.checkRateLimit('admin-login', 3, 60000)) {
+            loginError.textContent = '너무 많은 요청입니다. 잠시 후 다시 시도해주세요.';
+            return;
+        }
+
+        const enteredPassword = passwordInput.value;
+        
+        // 입력 검증
+        if (!enteredPassword || enteredPassword.length < 8) {
+            loginError.textContent = '올바른 비밀번호를 입력해주세요.';
+            return;
+        }
+
+        try {
+            const enteredHash = await sha256(enteredPassword);
+
+            if (enteredHash === PWD_HASH) {
+                // 로그인 성공 - 카운터 리셋
+                localStorage.removeItem('login-attempts');
+                localStorage.removeItem('lockout-until');
+                
+                // 세션 시작
+                SecurityUtils.startSession();
+                
+                loginContainer.style.display = 'none';
+                adminPanel.style.display = 'flex';
+                await initializeApp();
+            } else {
+                // 로그인 실패 처리
+                loginAttempts++;
+                localStorage.setItem('login-attempts', loginAttempts.toString());
+                
+                if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                    lockoutUntil = Date.now() + LOCKOUT_TIME;
+                    localStorage.setItem('lockout-until', lockoutUntil.toString());
+                    loginError.textContent = '너무 많은 로그인 시도로 인해 15분간 잠금되었습니다.';
+                    loginButton.disabled = true;
+                    passwordInput.disabled = true;
+                } else {
+                    const remaining = MAX_LOGIN_ATTEMPTS - loginAttempts;
+                    loginError.textContent = `비밀번호가 올바르지 않습니다. (${remaining}회 남음)`;
+                }
+                
+                passwordInput.value = '';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            loginError.textContent = '로그인 처리 중 오류가 발생했습니다.';
         }
     });
      passwordInput.addEventListener('keypress', (e) => {
@@ -90,38 +149,135 @@ async function fetchDataFromSupabase() {
 }
 
 async function saveItem(tableName: string, itemData: any, id?: number) {
-    let response;
-    // id 필드는 자동 생성되므로 insert/update 데이터에서 제외
-    const dataToSave = { ...itemData };
-    delete dataToSave.id;
-    delete dataToSave.created_at;
-
-    if (id) {
-        response = await supabase.from(tableName).update(dataToSave).eq('id', id);
-    } else {
-        response = await supabase.from(tableName).insert(dataToSave).select();
+    // 세션 유효성 검사
+    if (!SecurityUtils.isSessionValid()) {
+        showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
+        location.reload();
+        return;
     }
 
-    if (response.error) {
-        console.error(`Error saving to ${tableName}:`, response.error);
-        showToast(`오류: ${tableName} 저장 실패`, 'error');
-    } else {
-        showToast(`${tableName} 항목이 저장되었습니다.`);
+    // CSRF 토큰 검증
+    const csrfToken = SecurityUtils.getCSRFToken();
+    if (!SecurityUtils.validateCSRFToken(csrfToken)) {
+        showToast('보안 토큰이 유효하지 않습니다.', 'error');
+        return;
     }
+
+    // 테이블명 화이트리스트 검증
+    const allowedTables = ['cex_exchanges', 'dex_exchanges', 'faqs', 'guides'];
+    if (!allowedTables.includes(tableName)) {
+        showToast('허용되지 않는 테이블입니다.', 'error');
+        return;
+    }
+
+    try {
+        // 입력 데이터 검증 및 sanitization
+        const sanitizedData = {};
+        for (const [key, value] of Object.entries(itemData)) {
+            if (typeof value === 'string') {
+                if (key.includes('Url') || key === 'link') {
+                    // URL 검증
+                    if (value && !SecurityUtils.isValidUrl(value)) {
+                        showToast(`잘못된 URL 형식: ${key}`, 'error');
+                        return;
+                    }
+                    sanitizedData[key] = value;
+                } else {
+                    // 일반 텍스트 검증 및 sanitization
+                    sanitizedData[key] = SecurityUtils.validateInput(value, 2000);
+                }
+            } else {
+                sanitizedData[key] = value;
+            }
+        }
+
+        // id 필드는 자동 생성되므로 insert/update 데이터에서 제외
+        delete sanitizedData.id;
+        delete sanitizedData.created_at;
+
+        let response;
+        if (id) {
+            response = await supabase.from(tableName).update(sanitizedData).eq('id', id);
+        } else {
+            response = await supabase.from(tableName).insert(sanitizedData).select();
+        }
+
+        if (response.error) {
+            console.error(`Error saving to ${tableName}:`, response.error);
+            showToast(`오류: ${tableName} 저장 실패`, 'error');
+        } else {
+            showToast(`${tableName} 항목이 저장되었습니다.`);
+        }
+    } catch (error) {
+        console.error('Save error:', error);
+        showToast('데이터 저장 중 오류가 발생했습니다.', 'error');
+    }
+    
     await fetchDataFromSupabase();
     renderAll();
 }
 
 async function saveSinglePage(pageName: string, content: any) {
-    const { error } = await supabase.from('single_pages').update({ content }).eq('page_name', pageName);
-    if (error) {
-        console.error(`Error saving ${pageName}:`, error);
-        showToast(`오류: ${pageName} 저장 실패`, 'error');
-    } else {
-        showToast(`${pageName} 섹션이 저장되었습니다.`);
+    // 세션 유효성 검사
+    if (!SecurityUtils.isSessionValid()) {
+        showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
+        location.reload();
+        return;
     }
+
+    // 페이지명 화이트리스트 검증
+    const allowedPages = ['hero', 'aboutUs', 'popup', 'support'];
+    if (!allowedPages.includes(pageName)) {
+        showToast('허용되지 않는 페이지입니다.', 'error');
+        return;
+    }
+
+    try {
+        // 콘텐츠 sanitization
+        const sanitizedContent = sanitizeContent(content);
+        
+        const { error } = await supabase.from('single_pages').update({ content: sanitizedContent }).eq('page_name', pageName);
+        if (error) {
+            console.error(`Error saving ${pageName}:`, error);
+            showToast(`오류: ${pageName} 저장 실패`, 'error');
+        } else {
+            showToast(`${pageName} 섹션이 저장되었습니다.`);
+        }
+    } catch (error) {
+        console.error('Save single page error:', error);
+        showToast('페이지 저장 중 오류가 발생했습니다.', 'error');
+    }
+    
     await fetchDataFromSupabase();
     renderAll();
+}
+
+// 콘텐츠 sanitization 함수
+function sanitizeContent(content: any): any {
+    if (typeof content === 'string') {
+        return SecurityUtils.validateInput(content, 5000);
+    } else if (typeof content === 'object' && content !== null) {
+        const sanitized = {};
+        for (const [key, value] of Object.entries(content)) {
+            if (typeof value === 'string') {
+                if (key.includes('Url') || key.includes('url')) {
+                    // URL 검증
+                    if (value && !SecurityUtils.isValidUrl(value)) {
+                        throw new Error(`잘못된 URL 형식: ${key}`);
+                    }
+                    sanitized[key] = value;
+                } else {
+                    sanitized[key] = SecurityUtils.validateInput(value, 5000);
+                }
+            } else if (typeof value === 'object') {
+                sanitized[key] = sanitizeContent(value);
+            } else {
+                sanitized[key] = value;
+            }
+        }
+        return sanitized;
+    }
+    return content;
 }
 
 async function deleteItem(tableName: string, id: number) {

@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { SecurityUtils } from './security-utils';
 
 const uiStrings = {
     ko: {
@@ -94,12 +95,12 @@ function renderGuides(guides: any[]) {
 
         const title = document.createElement('summary');
         title.className = 'guide-title';
-        title.textContent = guide[`title_${currentLang}`];
+        title.textContent = SecurityUtils.sanitizeHtml(guide[`title_${currentLang}`] || '');
 
         const contentDiv = document.createElement('div');
         contentDiv.className = 'guide-content';
         const p = document.createElement('p');
-        p.textContent = guide[`content_${currentLang}`];
+        p.textContent = SecurityUtils.sanitizeHtml(guide[`content_${currentLang}`] || '');
         contentDiv.appendChild(p);
         
         item.appendChild(title);

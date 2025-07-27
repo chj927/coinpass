@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(timeout 10 npm run dev)",
+      "mcp__ide__getDiagnostics",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

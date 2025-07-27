@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { SecurityUtils } from './security-utils';
 
 const uiStrings = {
     ko: {
@@ -200,7 +201,8 @@ function setupHero(heroData) {
     if (!heroData) return;
 
     if (titleEl && heroData.title && heroData.title[currentLang]) {
-        const phrases = heroData.title[currentLang].split('\n').filter(p => p.trim() !== '');
+        const sanitizedTitle = SecurityUtils.sanitizeHtml(heroData.title[currentLang]);
+        const phrases = sanitizedTitle.split('\n').filter(p => p.trim() !== '');
         if (!heroAnimator) {
              heroAnimator = new TypingAnimator(titleEl as HTMLElement, phrases);
              if(heroSection){
@@ -222,11 +224,14 @@ function updateAboutUs(aboutUsData) {
     const contentEl = document.getElementById('about-us-content');
     if (!aboutUsData) return;
 
-    if (titleEl && aboutUsData.title) titleEl.textContent = aboutUsData.title[currentLang];
+    if (titleEl && aboutUsData.title) {
+        titleEl.textContent = SecurityUtils.sanitizeHtml(aboutUsData.title[currentLang] || '');
+    }
     if (contentEl && aboutUsData.content) {
         contentEl.innerHTML = '';
         const fragment = document.createDocumentFragment();
-        const paragraphs = aboutUsData.content[currentLang].split(/\n\s*\n/).filter(p => p.trim() !== '');
+        const sanitizedContent = SecurityUtils.sanitizeHtml(aboutUsData.content[currentLang] || '');
+        const paragraphs = sanitizedContent.split(/\n\s*\n/).filter(p => p.trim() !== '');
         paragraphs.forEach(pText => {
             const p = document.createElement('p');
             p.textContent = pText;
@@ -245,15 +250,17 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
         const card = document.createElement('div');
         card.className = 'exchange-card anim-fade-in';
         
-        const name = exchange[`name_${currentLang}`];
-        const benefit1Tag = exchange[`benefit1_tag_${currentLang}`];
-        const benefit1Value = exchange[`benefit1_value_${currentLang}`];
-        const benefit2Tag = exchange[`benefit2_tag_${currentLang}`];
-        const benefit2Value = exchange[`benefit2_value_${currentLang}`];
+        // XSS 방지를 위한 데이터 sanitization
+        const name = SecurityUtils.sanitizeHtml(exchange[`name_${currentLang}`] || '');
+        const benefit1Tag = SecurityUtils.sanitizeHtml(exchange[`benefit1_tag_${currentLang}`] || '');
+        const benefit1Value = SecurityUtils.sanitizeHtml(exchange[`benefit1_value_${currentLang}`] || '');
+        const benefit2Tag = SecurityUtils.sanitizeHtml(exchange[`benefit2_tag_${currentLang}`] || '');
+        const benefit2Value = SecurityUtils.sanitizeHtml(exchange[`benefit2_value_${currentLang}`] || '');
 
         let logoHtml = '';
-        if (exchange.logoImageUrl) {
-            logoHtml = `<div class="exchange-logo"><img src="${exchange.logoImageUrl}" alt="${name} logo" loading="lazy"></div>`;
+        if (exchange.logoImageUrl && SecurityUtils.isValidUrl(exchange.logoImageUrl)) {
+            const sanitizedUrl = SecurityUtils.sanitizeHtml(exchange.logoImageUrl);
+            logoHtml = `<div class="exchange-logo"><img src="${sanitizedUrl}" alt="${name} logo" loading="lazy" onerror="this.style.display='none'"></div>`;
         } else {
             logoHtml = `<div class="exchange-logo exchange-logo-text">${name?.substring(0, 3).toUpperCase() || 'N/A'}</div>`;
         }
@@ -267,7 +274,7 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
                 <li><span class="tag">${benefit1Tag}</span> <strong>${benefit1Value}</strong></li>
                 <li><span class="tag">${benefit2Tag}</span> <strong>${benefit2Value}</strong></li>
             </ul>
-            <a href="${exchange.link}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow">${uiStrings[currentLang]['card.cta']}</a>
+            <a href="${SecurityUtils.isValidUrl(exchange.link) ? SecurityUtils.sanitizeHtml(exchange.link) : '#'}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow">${uiStrings[currentLang]['card.cta']}</a>
         `;
         fragment.appendChild(card);
     });
@@ -285,11 +292,11 @@ function updateFaqs(faqsData: any[]) {
         const details = document.createElement('details');
         details.className = 'anim-fade-in';
         const summary = document.createElement('summary');
-        summary.textContent = faq[`question_${currentLang}`];
+        summary.textContent = SecurityUtils.sanitizeHtml(faq[`question_${currentLang}`] || '');
         const contentDiv = document.createElement('div');
         contentDiv.className = 'faq-content';
         const p = document.createElement('p');
-        p.textContent = faq[`answer_${currentLang}`];
+        p.textContent = SecurityUtils.sanitizeHtml(faq[`answer_${currentLang}`] || '');
         contentDiv.appendChild(p);
         details.appendChild(summary);
         details.appendChild(contentDiv);
