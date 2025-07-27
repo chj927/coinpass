@@ -5,13 +5,16 @@ import { supabase } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
 let heroData: any = null;
+let popupData: any = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadHeroData();
+    await loadPopupData();
     setupEventListeners();
     setupScrollAnimations();
     startTypingAnimation();
-    setupThreeJSScene(); 
+    setupThreeJSScene();
+    setupPopup();
 });
 
 async function loadHeroData() {
@@ -42,6 +45,26 @@ async function loadHeroData() {
             title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
             subtitle: { ko: '' }
         };
+    }
+}
+
+async function loadPopupData() {
+    try {
+        const { data, error } = await supabase
+            .from('single_pages')
+            .select('content')
+            .eq('page_name', 'indexPopup')
+            .single();
+
+        if (error) {
+            console.error('Failed to load popup data:', error);
+            popupData = null;
+        } else {
+            popupData = data?.content || null;
+        }
+    } catch (error) {
+        console.error('Error loading popup data:', error);
+        popupData = null;
     }
 }
 
@@ -238,4 +261,45 @@ function initThreeJSScene() {
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }
     });
+}
+
+function setupPopup() {
+    if (!popupData || !popupData.enabled) return;
+    
+    const hideUntil = localStorage.getItem('coinpass-index-popup-hide-until');
+    if (hideUntil && Date.now() < parseInt(hideUntil, 10)) return;
+
+    const now = new Date();
+    const startDate = popupData.startDate ? new Date(popupData.startDate) : null;
+    const endDate = popupData.endDate ? new Date(popupData.endDate) : null;
+    if ((startDate && now < startDate) || (endDate && now > endDate)) return;
+
+    const container = document.getElementById('popup-container');
+    const imageEl = document.getElementById('popup-image');
+    const textEl = document.getElementById('popup-text');
+    const closeBtn = document.getElementById('popup-close');
+    const close24hBtn = document.getElementById('popup-close-24h');
+    const overlay = container?.querySelector('.popup-overlay');
+    if (!container || !imageEl || !textEl || !closeBtn || !close24hBtn) return;
+    
+    const contentToDisplay = popupData.content ? popupData.content.ko : '';
+
+    if (popupData.type === 'image' && popupData.imageUrl) {
+        (imageEl as HTMLImageElement).src = popupData.imageUrl;
+        (imageEl as HTMLElement).style.display = 'block';
+        (textEl as HTMLElement).style.display = 'none';
+    } else if (popupData.type === 'text' && contentToDisplay) {
+        textEl.textContent = SecurityUtils.sanitizeHtml(contentToDisplay);
+        (textEl as HTMLElement).style.display = 'block';
+        (imageEl as HTMLElement).style.display = 'none';
+    } else return;
+    
+    container.style.display = 'flex';
+    const closePopup = () => container.style.display = 'none';
+    closeBtn.onclick = closePopup;
+    if(overlay) overlay.addEventListener('click', closePopup);
+    close24hBtn.onclick = () => {
+        localStorage.setItem('coinpass-index-popup-hide-until', (Date.now() + 24 * 60 * 60 * 1000).toString());
+        closePopup();
+    };
 }

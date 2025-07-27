@@ -98,50 +98,104 @@
                 <section class="editor-section" id="popup-editor">
                     <div class="section-header">
                         <h2>팝업 관리</h2>
+                        <div class="popup-tabs">
+                            <button class="popup-tab active" data-popup-page="exchange">Exchange 페이지</button>
+                            <button class="popup-tab" data-popup-page="index">Index 페이지</button>
+                        </div>
                         <button class="save-section-button" data-section="popup">팝업 저장</button>
                     </div>
-                    <div class="form-group">
-                        <label>팝업 활성화</label>
-                        <label class="switch">
-                            <input type="checkbox" id="popup-enabled-input">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label>팝업 유형</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="popup-type" value="text"> 텍스트</label>
-                            <label><input type="radio" name="popup-type" value="image"> 이미지</label>
+                    <div class="popup-content-container" id="exchange-popup-content">
+                        <div class="form-group">
+                            <label>팝업 활성화</label>
+                            <label class="switch">
+                                <input type="checkbox" id="exchange-popup-enabled-input">
+                                <span class="slider round"></span>
+                            </label>
                         </div>
-                    </div>
-                    
-                    <div class="form-group" id="popup-text-group">
-                        <div class="bilingual-group">
-                            <div class="form-group">
-                                <label for="popup-content-ko-input">팝업 내용 (KO)</label>
-                                <textarea id="popup-content-ko-input" class="popup-content" data-lang="ko" rows="5"></textarea>
+                        <div class="form-group">
+                            <label>팝업 유형</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="exchange-popup-type" value="text"> 텍스트</label>
+                                <label><input type="radio" name="exchange-popup-type" value="image"> 이미지</label>
                             </div>
-                            <div class="form-group">
-                                <label for="popup-content-en-input">Popup Content (EN)</label>
-                                <textarea id="popup-content-en-input" class="popup-content" data-lang="en" rows="5"></textarea>
+                        </div>
+                        
+                        <div class="form-group" id="exchange-popup-text-group">
+                            <div class="bilingual-group">
+                                <div class="form-group">
+                                    <label for="exchange-popup-content-ko-input">팝업 내용 (KO)</label>
+                                    <textarea id="exchange-popup-content-ko-input" class="popup-content" data-lang="ko" rows="5"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exchange-popup-content-en-input">Popup Content (EN)</label>
+                                    <textarea id="exchange-popup-content-en-input" class="popup-content" data-lang="en" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="exchange-popup-image-group">
+                            <label for="exchange-popup-image-url-input">이미지 URL</label>
+                            <input type="url" id="exchange-popup-image-url-input" placeholder="https://example.com/image.png">
+                        </div>
+                        <div class="form-group">
+                            <label>팝업 노출 기간 (비워두면 항상 노출)</label>
+                            <div class="grid-2">
+                                 <div>
+                                    <label for="exchange-popup-start-date-input" class="sub-label">시작일</label>
+                                    <input type="datetime-local" id="exchange-popup-start-date-input">
+                                </div>
+                                <div>
+                                    <label for="exchange-popup-end-date-input" class="sub-label">종료일</label>
+                                    <input type="datetime-local" id="exchange-popup-end-date-input">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group" id="popup-image-group">
-                        <label for="popup-image-url-input">이미지 URL</label>
-                        <input type="url" id="popup-image-url-input" placeholder="https://example.com/image.png">
-                    </div>
-                    <div class="form-group">
-                        <label>팝업 노출 기간 (비워두면 항상 노출)</label>
-                        <div class="grid-2">
-                             <div>
-                                <label for="popup-start-date-input" class="sub-label">시작일</label>
-                                <input type="datetime-local" id="popup-start-date-input">
+                    <div class="popup-content-container" id="index-popup-content" style="display: none;">
+                        <div class="form-group">
+                            <label>팝업 활성화</label>
+                            <label class="switch">
+                                <input type="checkbox" id="index-popup-enabled-input">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>팝업 유형</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="index-popup-type" value="text"> 텍스트</label>
+                                <label><input type="radio" name="index-popup-type" value="image"> 이미지</label>
                             </div>
-                            <div>
-                                <label for="popup-end-date-input" class="sub-label">종료일</label>
-                                <input type="datetime-local" id="popup-end-date-input">
+                        </div>
+                        
+                        <div class="form-group" id="index-popup-text-group">
+                            <div class="bilingual-group">
+                                <div class="form-group">
+                                    <label for="index-popup-content-ko-input">팝업 내용 (KO)</label>
+                                    <textarea id="index-popup-content-ko-input" class="popup-content" data-lang="ko" rows="5"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="index-popup-content-en-input">Popup Content (EN)</label>
+                                    <textarea id="index-popup-content-en-input" class="popup-content" data-lang="en" rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="index-popup-image-group">
+                            <label for="index-popup-image-url-input">이미지 URL</label>
+                            <input type="url" id="index-popup-image-url-input" placeholder="https://example.com/image.png">
+                        </div>
+                        <div class="form-group">
+                            <label>팝업 노출 기간 (비워두면 항상 노출)</label>
+                            <div class="grid-2">
+                                 <div>
+                                    <label for="index-popup-start-date-input" class="sub-label">시작일</label>
+                                    <input type="datetime-local" id="index-popup-start-date-input">
+                                </div>
+                                <div>
+                                    <label for="index-popup-end-date-input" class="sub-label">종료일</label>
+                                    <input type="datetime-local" id="index-popup-end-date-input">
+                                </div>
                             </div>
                         </div>
                     </div>

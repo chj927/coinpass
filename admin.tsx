@@ -17,6 +17,7 @@ const defaultSiteData = {
     faqs: [],
     guides: [],
     popup: { enabled: false, type: 'text', content: { ko: '', en: '' }, imageUrl: '', startDate: '', endDate: '' },
+    indexPopup: { enabled: false, type: 'text', content: { ko: '', en: '' }, imageUrl: '', startDate: '', endDate: '' },
     support: { telegramUrl: '#' }
 };
 
@@ -233,7 +234,7 @@ async function saveSinglePage(pageName: string, content: any) {
     }
 
     // 페이지명 화이트리스트 검증
-    const allowedPages = ['hero', 'aboutUs', 'popup', 'support'];
+    const allowedPages = ['hero', 'aboutUs', 'popup', 'indexPopup', 'support'];
     if (!allowedPages.includes(pageName)) {
         showToast('허용되지 않는 페이지입니다.', 'error');
         return;
@@ -427,17 +428,33 @@ function renderAboutUs() {
 }
 
 function renderPopup() {
+    // Exchange 팝업 렌더링
     const popup = siteData.popup;
-    if (!popup) return;
-    (document.getElementById('popup-enabled-input') as HTMLInputElement).checked = popup.enabled;
-    document.querySelectorAll<HTMLInputElement>('input[name="popup-type"]').forEach(radio => {
-        radio.checked = radio.value === popup.type;
-    });
-    (document.getElementById('popup-content-ko-input') as HTMLTextAreaElement).value = popup.content.ko;
-    (document.getElementById('popup-content-en-input') as HTMLTextAreaElement).value = popup.content.en;
-    (document.getElementById('popup-image-url-input') as HTMLInputElement).value = popup.imageUrl;
-    (document.getElementById('popup-start-date-input') as HTMLInputElement).value = popup.startDate;
-    (document.getElementById('popup-end-date-input') as HTMLInputElement).value = popup.endDate;
+    if (popup) {
+        (document.getElementById('exchange-popup-enabled-input') as HTMLInputElement).checked = popup.enabled;
+        document.querySelectorAll<HTMLInputElement>('input[name="exchange-popup-type"]').forEach(radio => {
+            radio.checked = radio.value === popup.type;
+        });
+        (document.getElementById('exchange-popup-content-ko-input') as HTMLTextAreaElement).value = popup.content.ko;
+        (document.getElementById('exchange-popup-content-en-input') as HTMLTextAreaElement).value = popup.content.en;
+        (document.getElementById('exchange-popup-image-url-input') as HTMLInputElement).value = popup.imageUrl;
+        (document.getElementById('exchange-popup-start-date-input') as HTMLInputElement).value = popup.startDate;
+        (document.getElementById('exchange-popup-end-date-input') as HTMLInputElement).value = popup.endDate;
+    }
+    
+    // Index 팝업 렌더링
+    const indexPopup = siteData.indexPopup;
+    if (indexPopup) {
+        (document.getElementById('index-popup-enabled-input') as HTMLInputElement).checked = indexPopup.enabled;
+        document.querySelectorAll<HTMLInputElement>('input[name="index-popup-type"]').forEach(radio => {
+            radio.checked = radio.value === indexPopup.type;
+        });
+        (document.getElementById('index-popup-content-ko-input') as HTMLTextAreaElement).value = indexPopup.content.ko;
+        (document.getElementById('index-popup-content-en-input') as HTMLTextAreaElement).value = indexPopup.content.en;
+        (document.getElementById('index-popup-image-url-input') as HTMLInputElement).value = indexPopup.imageUrl;
+        (document.getElementById('index-popup-start-date-input') as HTMLInputElement).value = indexPopup.startDate;
+        (document.getElementById('index-popup-end-date-input') as HTMLInputElement).value = indexPopup.endDate;
+    }
 }
 
 function renderSupport() {
@@ -500,7 +517,22 @@ function setupEventListeners() {
             const section = (e.target as HTMLElement).dataset.section;
             if (section) {
                 const content = readDataFromSection(section);
-                saveSinglePage(section, content);
+                if (section === 'popup' && content.pageName && content.data) {
+                    saveSinglePage(content.pageName, content.data);
+                } else {
+                    saveSinglePage(section, content);
+                }
+            }
+        });
+    });
+
+    // 팝업 탭 전환 이벤트 리스너
+    document.querySelectorAll('.popup-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const page = target.getAttribute('data-popup-page');
+            if (page) {
+                switchPopupTab(page);
             }
         });
     });
@@ -529,17 +561,40 @@ function setupEventListeners() {
 
 function readDataFromSection(section: string): any {
     if (section === 'popup') {
-        return {
-            enabled: (document.getElementById('popup-enabled-input') as HTMLInputElement).checked,
-            type: (document.querySelector('input[name="popup-type"]:checked') as HTMLInputElement).value,
-            content: {
-                ko: (document.getElementById('popup-content-ko-input') as HTMLTextAreaElement).value,
-                en: (document.getElementById('popup-content-en-input') as HTMLTextAreaElement).value
-            },
-            imageUrl: (document.getElementById('popup-image-url-input') as HTMLInputElement).value,
-            startDate: (document.getElementById('popup-start-date-input') as HTMLInputElement).value,
-            endDate: (document.getElementById('popup-end-date-input') as HTMLInputElement).value
-        };
+        // 현재 활성 탭에 따라 다른 팝업 데이터 반환
+        const activeTab = document.querySelector('.popup-tab.active')?.getAttribute('data-popup-page') || 'exchange';
+        
+        if (activeTab === 'exchange') {
+            return {
+                pageName: 'popup',
+                data: {
+                    enabled: (document.getElementById('exchange-popup-enabled-input') as HTMLInputElement).checked,
+                    type: (document.querySelector('input[name="exchange-popup-type"]:checked') as HTMLInputElement)?.value || 'text',
+                    content: {
+                        ko: (document.getElementById('exchange-popup-content-ko-input') as HTMLTextAreaElement).value,
+                        en: (document.getElementById('exchange-popup-content-en-input') as HTMLTextAreaElement).value
+                    },
+                    imageUrl: (document.getElementById('exchange-popup-image-url-input') as HTMLInputElement).value,
+                    startDate: (document.getElementById('exchange-popup-start-date-input') as HTMLInputElement).value,
+                    endDate: (document.getElementById('exchange-popup-end-date-input') as HTMLInputElement).value
+                }
+            };
+        } else {
+            return {
+                pageName: 'indexPopup',
+                data: {
+                    enabled: (document.getElementById('index-popup-enabled-input') as HTMLInputElement).checked,
+                    type: (document.querySelector('input[name="index-popup-type"]:checked') as HTMLInputElement)?.value || 'text',
+                    content: {
+                        ko: (document.getElementById('index-popup-content-ko-input') as HTMLTextAreaElement).value,
+                        en: (document.getElementById('index-popup-content-en-input') as HTMLTextAreaElement).value
+                    },
+                    imageUrl: (document.getElementById('index-popup-image-url-input') as HTMLInputElement).value,
+                    startDate: (document.getElementById('index-popup-start-date-input') as HTMLInputElement).value,
+                    endDate: (document.getElementById('index-popup-end-date-input') as HTMLInputElement).value
+                }
+            };
+        }
     } else if (section === 'hero') {
         return {
             title: {
@@ -727,6 +782,18 @@ async function loadBannerData() {
     } catch (error) {
         console.error('Banner load error:', error);
     }
+}
+
+function switchPopupTab(page: string) {
+    // 탭 활성화 상태 업데이트
+    document.querySelectorAll('.popup-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`[data-popup-page="${page}"]`)?.classList.add('active');
+    
+    // 팝업 콘텐츠 컨테이너 표시/숨김
+    document.getElementById('exchange-popup-content')!.style.display = page === 'exchange' ? 'block' : 'none';
+    document.getElementById('index-popup-content')!.style.display = page === 'index' ? 'block' : 'none';
 }
 
 export {};

@@ -177,6 +177,21 @@
         </footer>
     </div>
 
+    <!-- Popup Container -->
+    <div id="popup-container" class="popup-container" style="display: none;">
+        <div class="popup-overlay"></div>
+        <div class="popup-box">
+            <div class="popup-content">
+                <img id="popup-image" src="" alt="Popup Image" style="display: none;" loading="lazy">
+                <p id="popup-text" style="display: none;"></p>
+            </div>
+            <div class="popup-actions">
+                <button id="popup-close-24h">24시간 보지않기</button>
+                <button id="popup-close">닫기</button>
+            </div>
+        </div>
+    </div>
+
     <script async src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
 
     <script type="module" src="index.tsx"></script>
