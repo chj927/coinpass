@@ -2,10 +2,71 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupScrollAnimations();
     setupLanguage();
+    startTypingAnimation();
 });
 
 function setupEventListeners() {
     setupMobileMenu();
+}
+
+class TypingAnimator {
+    private element: HTMLElement;
+    private texts: { ko: string; en: string };
+    private currentLang: string = 'ko';
+    private typingSpeed: number = 100;
+    private erasingSpeed: number = 50;
+    private delayBetweenCycles: number = 2000;
+    private isTyping: boolean = false;
+
+    constructor(element: HTMLElement, texts: { ko: string; en: string }) {
+        this.element = element;
+        this.texts = texts;
+        this.currentLang = localStorage.getItem('coinpass-lang') || 'ko';
+    }
+
+    public updateLanguage(lang: string) {
+        this.currentLang = lang;
+        if (!this.isTyping) {
+            this.startTyping();
+        }
+    }
+
+    public startTyping() {
+        this.isTyping = true;
+        this.typeText(this.texts[this.currentLang as keyof typeof this.texts]);
+    }
+
+    private async typeText(text: string) {
+        this.element.textContent = '';
+        
+        // Typing effect
+        for (let i = 0; i <= text.length; i++) {
+            this.element.textContent = text.substring(0, i);
+            await this.sleep(this.typingSpeed);
+        }
+        
+        await this.sleep(this.delayBetweenCycles);
+        this.isTyping = false;
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+let typingAnimator: TypingAnimator | null = null;
+
+function startTypingAnimation() {
+    const heroTitle = document.getElementById('hero-title');
+    if (!heroTitle) return;
+
+    const texts = {
+        ko: '코인패스와 함께하는 스마트한 암호화폐 투자',
+        en: 'Smart Cryptocurrency Investment with CoinPass'
+    };
+
+    typingAnimator = new TypingAnimator(heroTitle as HTMLElement, texts);
+    typingAnimator.startTyping();
 }
 
 function setupLanguage() {
@@ -24,6 +85,11 @@ function setLanguage(lang: string) {
     document.getElementById('lang-ko')?.classList.toggle('active', lang === 'ko');
     document.getElementById('lang-en')?.classList.toggle('active', lang === 'en');
     
+    // Update typing animation language
+    if (typingAnimator) {
+        typingAnimator.updateLanguage(lang);
+    }
+    
     // Update content based on language
     if (lang === 'en') {
         updateContentToEnglish();
@@ -33,11 +99,9 @@ function setLanguage(lang: string) {
 }
 
 function updateContentToEnglish() {
-    // Update hero section
-    const heroTitle = document.getElementById('hero-title');
+    // Update hero section (title is handled by typing animation)
     const heroSubtitle = document.getElementById('hero-subtitle');
     
-    if (heroTitle) heroTitle.textContent = 'Smart Cryptocurrency Investment with CoinPass';
     if (heroSubtitle) heroSubtitle.textContent = 'From exchange fee discounts to real-time price analysis, all investment information in one place';
     
     // Update navigation
@@ -52,11 +116,6 @@ function updateContentToEnglish() {
     if (mainCtaButtons[0]) mainCtaButtons[0].textContent = 'Get Fee Benefits';
     if (mainCtaButtons[1]) mainCtaButtons[1].textContent = 'Compare Prices';
     
-    // Update service introduction
-    const introTitle = document.querySelector('.intro-content h2');
-    const introDesc = document.querySelector('.intro-desc');
-    if (introTitle) introTitle.textContent = 'What is CoinPass?';
-    if (introDesc) introDesc.textContent = 'CoinPass is a comprehensive information platform for cryptocurrency investors. We provide everything needed for investment, from exchange fee discounts to real-time price comparison, on-chain data analysis, and expert research.';
     
     // Update features section
     const featuresTitle = document.querySelector('.features-section .section-title');
@@ -132,53 +191,12 @@ function updateContentToEnglish() {
         }
     });
     
-    // Update how it works section
-    const howTitle = document.querySelector('.how-it-works .section-title');
-    if (howTitle) howTitle.textContent = 'How to Use CoinPass';
-    
-    const steps = document.querySelectorAll('.step');
-    const stepData = [
-        {
-            title: 'Sign Up via Affiliate Link',
-            desc: 'Register with your desired exchange through CoinPass affiliate links. Fee discounts are automatically applied.'
-        },
-        {
-            title: 'Check Market Information',
-            desc: 'Identify market conditions and find optimal investment timing through real-time price comparison and on-chain data.'
-        },
-        {
-            title: 'Utilize Research',
-            desc: 'Make better investment decisions by referring to expert project analysis and market research.'
-        }
-    ];
-    
-    steps.forEach((step, index) => {
-        if (stepData[index]) {
-            const h3 = step.querySelector('h3');
-            const p = step.querySelector('p');
-            
-            if (h3) h3.textContent = stepData[index].title;
-            if (p) p.textContent = stepData[index].desc;
-        }
-    });
-    
-    // Update CTA section
-    const ctaTitle = document.querySelector('.cta-content h2');
-    const ctaDesc = document.querySelector('.cta-content p');
-    if (ctaTitle) ctaTitle.textContent = 'Start Now!';
-    if (ctaDesc) ctaDesc.textContent = 'Experience smarter cryptocurrency investment with CoinPass.';
-    
-    const ctaButtons = document.querySelectorAll('.cta-buttons .cta-button');
-    if (ctaButtons[0]) ctaButtons[0].textContent = 'Get Exchange Benefits';
-    if (ctaButtons[1]) ctaButtons[1].textContent = 'Compare Prices';
 }
 
 function updateContentToKorean() {
-    // Update hero section
-    const heroTitle = document.getElementById('hero-title');
+    // Update hero section (title is handled by typing animation)
     const heroSubtitle = document.getElementById('hero-subtitle');
     
-    if (heroTitle) heroTitle.textContent = '코인패스와 함께하는 스마트한 암호화폐 투자';
     if (heroSubtitle) heroSubtitle.textContent = '거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서';
     
     // Update navigation
@@ -193,11 +211,6 @@ function updateContentToKorean() {
     if (mainCtaButtons[0]) mainCtaButtons[0].textContent = '수수료 혜택 받기';
     if (mainCtaButtons[1]) mainCtaButtons[1].textContent = '시세 비교하기';
     
-    // Update service introduction
-    const introTitle = document.querySelector('.intro-content h2');
-    const introDesc = document.querySelector('.intro-desc');
-    if (introTitle) introTitle.textContent = '코인패스는 무엇인가요?';
-    if (introDesc) introDesc.textContent = '코인패스는 암호화폐 투자자들을 위한 종합 정보 플랫폼입니다. 거래소 수수료 할인 혜택부터 실시간 시세 비교, 온체인 데이터 분석, 전문가 리서치까지 투자에 필요한 모든 정보를 제공합니다.';
     
     // Update features section
     const featuresTitle = document.querySelector('.features-section .section-title');
@@ -273,45 +286,6 @@ function updateContentToKorean() {
         }
     });
     
-    // Update how it works section
-    const howTitle = document.querySelector('.how-it-works .section-title');
-    if (howTitle) howTitle.textContent = '코인패스 이용 방법';
-    
-    const steps = document.querySelectorAll('.step');
-    const stepData = [
-        {
-            title: '제휴 링크로 가입',
-            desc: '코인패스에서 제공하는 제휴 링크를 통해 원하는 거래소에 가입하세요. 자동으로 수수료 할인이 적용됩니다.'
-        },
-        {
-            title: '시세 정보 확인',
-            desc: '실시간 시세 비교와 온체인 데이터를 통해 시장 상황을 파악하고 최적의 투자 타이밍을 찾으세요.'
-        },
-        {
-            title: '리서치 활용',
-            desc: '전문가가 제공하는 프로젝트 분석과 시장 리서치를 참고하여 더 나은 투자 결정을 내리세요.'
-        }
-    ];
-    
-    steps.forEach((step, index) => {
-        if (stepData[index]) {
-            const h3 = step.querySelector('h3');
-            const p = step.querySelector('p');
-            
-            if (h3) h3.textContent = stepData[index].title;
-            if (p) p.textContent = stepData[index].desc;
-        }
-    });
-    
-    // Update CTA section
-    const ctaTitle = document.querySelector('.cta-content h2');
-    const ctaDesc = document.querySelector('.cta-content p');
-    if (ctaTitle) ctaTitle.textContent = '지금 시작하세요!';
-    if (ctaDesc) ctaDesc.textContent = '코인패스와 함께 더 스마트한 암호화폐 투자를 경험해보세요.';
-    
-    const ctaButtons = document.querySelectorAll('.cta-buttons .cta-button');
-    if (ctaButtons[0]) ctaButtons[0].textContent = '거래소 혜택 받기';
-    if (ctaButtons[1]) ctaButtons[1].textContent = '시세 비교하기';
 }
 
 function setupScrollAnimations() {

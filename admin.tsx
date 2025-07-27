@@ -448,6 +448,10 @@ function renderExchanges() {
         { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit2_value', labels: { ko: '혜택 2 값 (KO)', en: 'Benefit 2 Value (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit3_tag', labels: { ko: '혜택 3 태그 (KO)', en: 'Benefit 3 Tag (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit3_value', labels: { ko: '혜택 3 값 (KO)', en: 'Benefit 3 Value (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit4_tag', labels: { ko: '혜택 4 태그 (KO)', en: 'Benefit 4 Tag (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit4_value', labels: { ko: '혜택 4 값 (KO)', en: 'Benefit 4 Value (EN)' }, bilingual: true, elType: 'input' },
         { name: 'link', labels: { ko: '가입 링크', en: 'Signup Link' }, bilingual: false, elType: 'input', inputType: 'url' },
     ]);
 }
@@ -460,6 +464,10 @@ function renderDexExchanges() {
         { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
         { name: 'benefit2_value', labels: { ko: '혜택 2 값 (KO)', en: 'Benefit 2 Value (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit3_tag', labels: { ko: '혜택 3 태그 (KO)', en: 'Benefit 3 Tag (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit3_value', labels: { ko: '혜택 3 값 (KO)', en: 'Benefit 3 Value (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit4_tag', labels: { ko: '혜택 4 태그 (KO)', en: 'Benefit 4 Tag (EN)' }, bilingual: true, elType: 'input' },
+        { name: 'benefit4_value', labels: { ko: '혜택 4 값 (KO)', en: 'Benefit 4 Value (EN)' }, bilingual: true, elType: 'input' },
         { name: 'link', labels: { ko: '가입 링크', en: 'Signup Link' }, bilingual: false, elType: 'input', inputType: 'url' },
     ]);
 }
@@ -603,6 +611,115 @@ function setupNavigation() {
 
     const initialTarget = (navLinks[0] as HTMLElement)?.getAttribute('data-target');
     if (initialTarget) switchTab(initialTarget);
+    
+    // Setup banner management
+    setupBannerManagement();
+}
+
+function setupBannerManagement() {
+    // Setup banner tabs
+    const bannerTabs = document.querySelectorAll('.banner-tabs .tab-btn');
+    const bannerPanels = document.querySelectorAll('.banner-content .tab-panel');
+    
+    bannerTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const page = tab.getAttribute('data-page');
+            if (!page) return;
+            
+            // Update active tab
+            bannerTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Update active panel
+            bannerPanels.forEach(panel => {
+                panel.classList.toggle('active', panel.getAttribute('data-page') === page);
+            });
+        });
+    });
+    
+    // Setup banner save buttons
+    const saveBannerButtons = document.querySelectorAll('[data-section$="-banner"]');
+    saveBannerButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const section = button.getAttribute('data-section');
+            if (section) {
+                await saveBannerSection(section);
+            }
+        });
+    });
+    
+    // Load existing banner data
+    loadBannerData();
+}
+
+async function saveBannerSection(section: string) {
+    try {
+        const page = section.replace('-banner', '');
+        const enabled = (document.getElementById(`${page}-banner-enabled`) as HTMLInputElement)?.checked || false;
+        const imageUrl = (document.getElementById(`${page}-banner-image`) as HTMLInputElement)?.value || '';
+        const content = (document.getElementById(`${page}-banner-content`) as HTMLTextAreaElement)?.value || '';
+        
+        const bannerData = {
+            page: page,
+            enabled: enabled,
+            image_url: imageUrl,
+            content: content,
+            updated_at: new Date().toISOString()
+        };
+        
+        // Check if banner exists
+        const { data: existingBanner } = await supabase
+            .from('banners')
+            .select('id')
+            .eq('page', page)
+            .single();
+            
+        if (existingBanner) {
+            // Update existing banner
+            const { error } = await supabase
+                .from('banners')
+                .update(bannerData)
+                .eq('page', page);
+                
+            if (error) throw error;
+        } else {
+            // Insert new banner
+            const { error } = await supabase
+                .from('banners')
+                .insert(bannerData);
+                
+            if (error) throw error;
+        }
+        
+        alert(`${page} 배너가 저장되었습니다.`);
+        
+    } catch (error) {
+        console.error('Banner save error:', error);
+        alert('배너 저장 중 오류가 발생했습니다.');
+    }
+}
+
+async function loadBannerData() {
+    try {
+        const { data: banners, error } = await supabase
+            .from('banners')
+            .select('*');
+            
+        if (error) throw error;
+        
+        banners?.forEach(banner => {
+            const enabledCheckbox = document.getElementById(`${banner.page}-banner-enabled`) as HTMLInputElement;
+            const imageInput = document.getElementById(`${banner.page}-banner-image`) as HTMLInputElement;
+            const contentTextarea = document.getElementById(`${banner.page}-banner-content`) as HTMLTextAreaElement;
+            
+            if (enabledCheckbox) enabledCheckbox.checked = banner.enabled;
+            if (imageInput) imageInput.value = banner.image_url || '';
+            if (contentTextarea) contentTextarea.value = banner.content || '';
+        });
+        
+    } catch (error) {
+        console.error('Banner load error:', error);
+    }
 }
 
 export {};

@@ -256,6 +256,10 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
         const benefit1Value = SecurityUtils.sanitizeHtml(exchange[`benefit1_value_${currentLang}`] || '');
         const benefit2Tag = SecurityUtils.sanitizeHtml(exchange[`benefit2_tag_${currentLang}`] || '');
         const benefit2Value = SecurityUtils.sanitizeHtml(exchange[`benefit2_value_${currentLang}`] || '');
+        const benefit3Tag = SecurityUtils.sanitizeHtml(exchange[`benefit3_tag_${currentLang}`] || '');
+        const benefit3Value = SecurityUtils.sanitizeHtml(exchange[`benefit3_value_${currentLang}`] || '');
+        const benefit4Tag = SecurityUtils.sanitizeHtml(exchange[`benefit4_tag_${currentLang}`] || '');
+        const benefit4Value = SecurityUtils.sanitizeHtml(exchange[`benefit4_value_${currentLang}`] || '');
 
         let logoHtml = '';
         if (exchange.logoImageUrl && SecurityUtils.isValidUrl(exchange.logoImageUrl)) {
@@ -265,14 +269,29 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
             logoHtml = `<div class="exchange-logo exchange-logo-text">${name?.substring(0, 3).toUpperCase() || 'N/A'}</div>`;
         }
 
+        // 혜택 항목들을 배열로 정리
+        const benefits = [
+            { tag: benefit1Tag, value: benefit1Value },
+            { tag: benefit2Tag, value: benefit2Value },
+            { tag: benefit3Tag, value: benefit3Value },
+            { tag: benefit4Tag, value: benefit4Value }
+        ];
+
+        // 빈 값이 아닌 혜택들만 필터링
+        const validBenefits = benefits.filter(benefit => benefit.tag && benefit.value);
+        
+        // 혜택 리스트 HTML 생성
+        const benefitsHtml = validBenefits.map(benefit => 
+            `<li><span class="tag">${benefit.tag}</span> <strong>${benefit.value}</strong></li>`
+        ).join('');
+
         card.innerHTML = `
             <div class="card-header">
                 ${logoHtml}
                 <h4>${name}</h4>
             </div>
             <ul class="benefits-list">
-                <li><span class="tag">${benefit1Tag}</span> <strong>${benefit1Value}</strong></li>
-                <li><span class="tag">${benefit2Tag}</span> <strong>${benefit2Value}</strong></li>
+                ${benefitsHtml}
             </ul>
             <a href="${SecurityUtils.isValidUrl(exchange.link) ? SecurityUtils.sanitizeHtml(exchange.link) : '#'}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow">${uiStrings[currentLang]['card.cta']}</a>
         `;
