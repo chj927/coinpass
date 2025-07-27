@@ -29,7 +29,10 @@ export default defineConfig(({ mode }) => {
           input: {
             main: path.resolve(__dirname, 'index.html'),
             admin: path.resolve(__dirname, 'admin.html'),
-            guide: path.resolve(__dirname, 'guide.html'),
+            exchange: path.resolve(__dirname, 'exchange.html'),
+            compare: path.resolve(__dirname, 'compare.html'),
+            onchain: path.resolve(__dirname, 'onchain.html'),
+            research: path.resolve(__dirname, 'research.html'),
           },
         },
       },
