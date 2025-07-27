@@ -449,6 +449,48 @@ input:checked + .slider:before {
     }
 }
 
+/* Banner Management */
+.banner-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.tab-btn.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+.tab-btn:hover {
+    color: var(--text-color);
+    background: rgba(0, 212, 170, 0.1);
+}
+
+.banner-content {
+    position: relative;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
 @media (max-width: 768px) {
     #sidebar {
         width: 60px;
@@ -459,4 +501,22 @@ input:checked + .slider:before {
      #sidebar .nav-link {
         justify-content: center;
      }
+     
+    .banner-tabs {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .tab-btn {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border-color);
+        border-right: none;
+    }
+    
+    .tab-btn.active {
+        border-bottom-color: var(--border-color);
+        border-left: 3px solid var(--accent-color);
+        background: rgba(0, 212, 170, 0.1);
+    }
 }

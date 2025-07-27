@@ -1,7 +1,38 @@
 
-/* guide.css */
+/* research.css */
 
-/* Using variables from index.css */
+/* Banner Section */
+.banner-section {
+    background: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.banner-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.banner-content {
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.banner-content.empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Using variables from exchange.css */
 .section-subtitle {
     font-size: 1.2rem;
     color: var(--secondary-text-color);

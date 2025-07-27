@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가이드 - 코인패스 (Coinpass)</title>
+    <title>리서치 - 코인패스 (Coinpass)</title>
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="guide.css">
+    <link rel="stylesheet" href="exchange.css">
+    <link rel="stylesheet" href="research.css">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 </head>
@@ -40,33 +40,23 @@
                     <nav id="main-nav">
                         <ul>
                             <li>
-                                <a href="index.html#cex-partners">
-                                    <span class="nav-title" data-lang-key="nav.partners">파트너 혜택</span>
-                                    <span class="nav-subtitle">CEX & DEX</span>
+                                <a href="compare.html">
+                                    <span class="nav-title">시세비교</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="index.html#about-us">
-                                    <span class="nav-title" data-lang-key="nav.about">서비스 소개</span>
-                                    <span class="nav-subtitle" data-lang-key="nav.aboutSubtitle">코인패스 이야기</span>
+                                <a href="onchain.html">
+                                    <span class="nav-title">온체인 데이터</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="index.html#how-it-works">
-                                    <span class="nav-title" data-lang-key="nav.howTo">사용방법</span>
-                                    <span class="nav-subtitle" data-lang-key="nav.howToSubtitle">3단계 가이드</span>
+                                <a href="exchange.html">
+                                    <span class="nav-title">거래소 혜택</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="guide.html">
-                                    <span class="nav-title" data-lang-key="nav.guides">가이드</span>
-                                    <span class="nav-subtitle" data-lang-key="nav.guidesSubtitle">사용안내 및 이벤트</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="index.html#faq">
-                                    <span class="nav-title" data-lang-key="nav.faq">자주 묻는 질문</span>
-                                    <span class="nav-subtitle">FAQ</span>
+                                <a href="research.html">
+                                    <span class="nav-title">리서치</span>
                                 </a>
                             </li>
                         </ul>
@@ -81,6 +71,15 @@
         </header>
 
         <main id="main-content">
+            <!-- Banner Section -->
+            <section class="banner-section">
+                <div class="banner-container">
+                    <div id="banner-content" class="banner-content">
+                        <!-- Banner will be populated by admin -->
+                    </div>
+                </div>
+            </section>
+
             <section id="guides-section" aria-labelledby="guides-title">
                 <h1 id="guides-title" class="section-title anim-fade-in" data-lang-key="guides.pageTitle"></h1>
                 <p id="guides-subtitle" class="section-subtitle anim-fade-in" data-lang-key="guides.pageSubtitle"></p>
@@ -96,6 +95,6 @@
             </div>
         </footer>
     </div>
-    <script type="module" src="guide.tsx"></script>
+    <script type="module" src="research.tsx"></script>
 </body>
 </html>

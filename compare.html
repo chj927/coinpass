@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시세비교 - 코인패스 (Coinpass)</title>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="description" content="바이낸스, 바이비트, OKX 등 주요 거래소별 암호화폐 시세차이와 김치 프리미엄을 실시간으로 비교하세요.">
+    <link rel="stylesheet" href="exchange.css">
+    <link rel="stylesheet" href="compare.css">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+</head>
+<body>
+    <a href="#main-content" class="skip-link">메인 콘텐츠로 건너뛰기</a>
+    <div id="app-container">
+        <header>
+            <div class="header-container">
+                <a href="/" class="logo-link">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg" role="img" aria-labelledby="logoTitle">
+                            <title id="logoTitle">코인패스 로고</title>
+                            <path d="M7 17.265C7 17.265 9 15 12 15C15 15 17 17.265 17 17.265" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 15V7" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 7C13.6569 7 15 8.34315 15 10C15 11.6569 13.6569 13 12 13" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="logo-text">CoinPass</span>
+                    </div>
+                </a>
+                <div class="nav-container">
+                    <button class="hamburger-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="main-nav">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
+                    <nav id="main-nav">
+                        <ul>
+                            <li>
+                                <a href="compare.html">
+                                    <span class="nav-title">시세비교</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="onchain.html">
+                                    <span class="nav-title">온체인 데이터</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="exchange.html">
+                                    <span class="nav-title">거래소 혜택</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="research.html">
+                                    <span class="nav-title">리서치</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="language-switcher">
+                    <button id="lang-ko" class="lang-btn">KO</button>
+                    <span>|</span>
+                    <button id="lang-en" class="lang-btn">EN</button>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <!-- Banner Section -->
+            <section class="banner-section">
+                <div class="banner-container">
+                    <div id="banner-content" class="banner-content">
+                        <!-- Banner will be populated by admin -->
+                    </div>
+                </div>
+            </section>
+
+            <section class="page-header">
+                <div class="container">
+                    <h1>시세비교</h1>
+                    <p>주요 거래소별 암호화폐 시세차이와 김치 프리미엄을 실시간으로 확인하세요</p>
+                </div>
+            </section>
+
+            <section class="price-comparison">
+                <div class="container">
+                    <div class="controls">
+                        <div class="search-box">
+                            <input type="text" id="coin-search" placeholder="코인 검색 (예: BTC, ETH)">
+                        </div>
+                        <div class="filters">
+                            <select id="sort-by">
+                                <option value="premium-desc">프리미엄 높은순</option>
+                                <option value="premium-asc">프리미엄 낮은순</option>
+                                <option value="volume-desc">거래량 높은순</option>
+                                <option value="name-asc">이름순</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-header">
+                            <div class="coin-info">코인</div>
+                            <div class="exchange-price">바이낸스</div>
+                            <div class="exchange-price">바이비트</div>
+                            <div class="exchange-price">OKX</div>
+                            <div class="exchange-price">업비트</div>
+                            <div class="exchange-price">빗썸</div>
+                            <div class="premium">김치 프리미엄</div>
+                        </div>
+
+                        <div id="comparison-list" class="comparison-list">
+                            <!-- Coming soon message -->
+                            <div class="coming-soon">
+                                <div class="coming-soon-content">
+                                    <h3>🔄 실시간 시세 데이터 준비중</h3>
+                                    <p>거래소 API 연동을 통한 실시간 시세비교 서비스를 준비하고 있습니다.</p>
+                                    <p>곧 다음 기능들을 제공할 예정입니다:</p>
+                                    <ul>
+                                        <li>실시간 가격 업데이트</li>
+                                        <li>김치 프리미엄 계산</li>
+                                        <li>거래량 비교</li>
+                                        <li>가격 알림 설정</li>
+                                        <li>과거 데이터 차트</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <h3>김치 프리미엄이란?</h3>
+                            <p>국내 거래소와 해외 거래소 간의 가격 차이를 의미합니다. 일반적으로 국내 거래소 가격이 높을 때 양의 프리미엄을 보입니다.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>거래소별 특징</h3>
+                            <p>각 거래소마다 유동성, 거래량, 수수료 구조가 다르므로 투자 전략에 맞는 거래소 선택이 중요합니다.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>주의사항</h3>
+                            <p>실시간 가격 정보는 참고용이며, 실제 거래 시 각 거래소의 호가창을 확인하시기 바랍니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                 <p>&copy; 2025 CoinPass. All rights reserved.</p>
+                 <p class="disclaimer">본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="compare.tsx"></script>
+</body>
+</html>

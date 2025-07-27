@@ -1,0 +1,388 @@
+/* Banner Section */
+.banner-section {
+    background: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.banner-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.banner-content {
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.banner-content.empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Page Header */
+.page-header {
+    padding: 3rem 2rem;
+    text-align: center;
+    background: var(--gradient-bg);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Price Comparison Section */
+.price-comparison {
+    padding: 3rem 2rem;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.filters select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.filters select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+/* Comparison Grid */
+.comparison-grid {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.comparison-header {
+    display: grid;
+    grid-template-columns: 200px repeat(5, 1fr) 150px;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--secondary-color);
+    font-weight: 600;
+    color: var(--accent-color);
+    text-align: center;
+    align-items: center;
+}
+
+.comparison-header .coin-info {
+    text-align: left;
+}
+
+.comparison-item {
+    display: grid;
+    grid-template-columns: 200px repeat(5, 1fr) 150px;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.comparison-item:hover {
+    background: rgba(0, 212, 170, 0.05);
+}
+
+.comparison-item:last-child {
+    border-bottom: none;
+}
+
+.coin-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.coin-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.coin-name {
+    font-weight: 600;
+}
+
+.coin-symbol {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.exchange-price {
+    text-align: center;
+}
+
+.price {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.price-change {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.price-change.positive {
+    color: var(--success-color);
+}
+
+.price-change.negative {
+    color: var(--error-color);
+}
+
+.premium {
+    text-align: center;
+    font-weight: 600;
+}
+
+.premium.positive {
+    color: var(--success-color);
+}
+
+.premium.negative {
+    color: var(--error-color);
+}
+
+/* Coming Soon */
+.coming-soon {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.coming-soon-content h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+.coming-soon-content p {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.coming-soon-content ul {
+    list-style: none;
+    margin-top: 2rem;
+    display: inline-block;
+    text-align: left;
+}
+
+.coming-soon-content li {
+    padding: 0.5rem 0;
+    color: var(--text-muted);
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.coming-soon-content li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Info Cards */
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.info-card h3 {
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.info-card p {
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* Loading States */
+.loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+}
+
+.loading::after {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-color);
+    border-top: 2px solid var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .comparison-header,
+    .comparison-item {
+        grid-template-columns: 150px repeat(3, 1fr) 120px;
+    }
+    
+    .comparison-header .exchange-price:nth-child(4),
+    .comparison-header .exchange-price:nth-child(5),
+    .comparison-item .exchange-price:nth-child(4),
+    .comparison-item .exchange-price:nth-child(5) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .comparison-header,
+    .comparison-item {
+        grid-template-columns: 1fr;
+        text-align: left;
+    }
+    
+    .comparison-header {
+        display: none;
+    }
+    
+    .comparison-item {
+        display: block;
+        padding: 1.5rem;
+    }
+    
+    .coin-info {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .exchange-prices {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .exchange-price {
+        background: var(--secondary-color);
+        padding: 1rem;
+        border-radius: 8px;
+    }
+    
+    .exchange-price::before {
+        content: attr(data-exchange);
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+    
+    .premium {
+        background: var(--secondary-color);
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .premium::before {
+        content: "김치 프리미엄";
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+    
+    .controls {
+        flex-direction: column;
+    }
+    
+    .search-box {
+        min-width: auto;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .info-cards {
+        grid-template-columns: 1fr;
+    }
+}

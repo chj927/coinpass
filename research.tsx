@@ -37,10 +37,44 @@ let guidesData = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     setupLanguage();
+    await loadBannerContent();
     await loadRemoteGuides();
     renderGuides(guidesData);
     setupEventListeners();
 });
+
+async function loadBannerContent() {
+    try {
+        const { data: bannerData, error } = await supabase
+            .from('banners')
+            .select('*')
+            .eq('page', 'research')
+            .eq('enabled', true)
+            .single();
+
+        const bannerContainer = document.getElementById('banner-content');
+        if (!bannerContainer) return;
+
+        if (error || !bannerData) {
+            bannerContainer.style.display = 'none';
+            return;
+        }
+
+        if (bannerData.image_url) {
+            bannerContainer.innerHTML = `<img src="${bannerData.image_url}" alt="리서치 배너" loading="lazy">`;
+        } else if (bannerData.content) {
+            bannerContainer.innerHTML = `<div class="banner-text">${bannerData.content}</div>`;
+        } else {
+            bannerContainer.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Failed to load banner content:', error);
+        const bannerContainer = document.getElementById('banner-content');
+        if (bannerContainer) {
+            bannerContainer.style.display = 'none';
+        }
+    }
+}
 
 async function loadRemoteGuides() {
     const { data, error } = await supabase.from('guides').select('*').order('id');

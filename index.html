@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -16,9 +15,7 @@
     <meta property="og:description" content="최고의 거래소 수수료 할인 혜택. 한번의 가입으로 평생 할인을 받으세요.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://coinpass.com">
-    <!-- <meta property="og:image" content="https://coinpass.com/og-image.png"> -->
     <link rel="canonical" href="https://coinpass.com">
-    <!-- <link rel="icon" href="/favicon.ico" type="image/x-icon"> -->
 
     <link rel="stylesheet" href="index.css">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -60,33 +57,23 @@
                     <nav id="main-nav">
                         <ul>
                             <li>
-                                <a href="#cex-partners">
-                                    <span class="nav-title" data-lang-key="nav.partners">파트너 혜택</span>
-                                    <span class="nav-subtitle">CEX & DEX</span>
+                                <a href="compare.html">
+                                    <span class="nav-title">시세비교</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#about-us">
-                                    <span class="nav-title" data-lang-key="nav.about">서비스 소개</span>
-                                    <span class="nav-subtitle" data-lang-key="nav.aboutSubtitle">코인패스 이야기</span>
+                                <a href="onchain.html">
+                                    <span class="nav-title">온체인 데이터</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="#how-it-works">
-                                    <span class="nav-title" data-lang-key="nav.howTo">사용방법</span>
-                                    <span class="nav-subtitle" data-lang-key="nav.howToSubtitle">3단계 가이드</span>
+                                <a href="exchange.html">
+                                    <span class="nav-title">거래소 혜택</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="guide.html">
-                                    <span class="nav-title" data-lang-key="nav.guides">가이드</span>
-                                    <span class="nav-subtitle" data-lang-key="nav.guidesSubtitle">사용안내 및 이벤트</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#faq">
-                                    <span class="nav-title" data-lang-key="nav.faq">자주 묻는 질문</span>
-                                    <span class="nav-subtitle">FAQ</span>
+                                <a href="research.html">
+                                    <span class="nav-title">리서치</span>
                                 </a>
                             </li>
                         </ul>
@@ -101,75 +88,139 @@
         </header>
 
         <main id="main-content">
+            <!-- Hero Section -->
             <section class="hero" aria-labelledby="hero-title">
                 <div class="hero-banner anim-fade-in">
-                    <h1 id="hero-title"></h1>
-                    <p id="hero-subtitle"></p>
-                    <a href="#cex-partners" class="cta-button" data-lang-key="hero.cta">파트너 혜택 보기</a>
-                </div>
-            </section>
-
-            <section id="cex-partners" aria-labelledby="cex-partners-title">
-                <h3 id="cex-partners-title" class="section-title anim-fade-in" data-lang-key="cex.title">파트너 거래소 (CEX)</h3>
-                <div class="grid-container" id="exchange-grid">
-                    <!-- CEX Cards are populated by JS -->
-                </div>
-            </section>
-
-            <section id="dex-partners" aria-labelledby="dex-partners-title">
-                <h3 id="dex-partners-title" class="section-title anim-fade-in" data-lang-key="dex.title">파트너 거래소 (DEX)</h3>
-                <div class="grid-container" id="dex-grid">
-                    <!-- DEX Cards are populated by JS -->
-                </div>
-            </section>
-
-            <section id="about-us" aria-labelledby="about-us-title">
-                <h3 id="about-us-title" class="section-title anim-fade-in"></h3>
-                <div class="about-us-content anim-fade-in" id="about-us-content">
-                </div>
-            </section>
-
-            <section id="how-it-works" aria-labelledby="how-it-works-title">
-                <h3 id="how-it-works-title" class="section-title anim-fade-in" data-lang-key="howTo.title">세 단계로 끝내는 수수료 혜택</h3>
-                <div class="steps-container">
-                    <div class="step anim-fade-in">
-                        <div class="step-icon">1</div>
-                        <h4 data-lang-key="howTo.step1.title">회원가입</h4>
-                        <p data-lang-key="howTo.step1.desc">본 사이트의 제휴 링크를 통해 원하는 거래소에 가입합니다.</p>
-                    </div>
-                    <div class="step anim-fade-in">
-                        <div class="step-icon">2</div>
-                        <h4 data-lang-key="howTo.step2.title">거래하기</h4>
-                        <p data-lang-key="howTo.step2.desc">KYC 인증 후 자유롭게 거래를 합니다.</p>
-                    </div>
-                    <div class="step anim-fade-in">
-                        <div class="step-icon">3</div>
-                        <h4 data-lang-key="howTo.step3.title">혜택 적용</h4>
-                        <p data-lang-key="howTo.step3.desc">거래할 때마다 수수료 할인이 자동으로 적용됩니다.</p>
+                    <h1 id="hero-title">코인패스와 함께하는 스마트한 암호화폐 투자</h1>
+                    <p id="hero-subtitle">거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서</p>
+                    <div class="main-cta-buttons">
+                        <a href="exchange.html" class="cta-button primary">수수료 혜택 받기</a>
+                        <a href="compare.html" class="cta-button">시세 비교하기</a>
                     </div>
                 </div>
             </section>
 
-            <section id="faq" aria-labelledby="faq-title">
-                <h3 id="faq-title" class="section-title anim-fade-in" data-lang-key="faq.title">자주 묻는 질문 (FAQ)</h3>
-                <div class="faq-container" id="faq-container">
-                    <!-- FAQ items are populated by JS -->
+            <!-- Service Introduction -->
+            <section class="service-intro">
+                <div class="container">
+                    <div class="intro-content anim-fade-in">
+                        <h2>코인패스는 무엇인가요?</h2>
+                        <p class="intro-desc">
+                            코인패스는 암호화폐 투자자들을 위한 종합 정보 플랫폼입니다. 
+                            거래소 수수료 할인 혜택부터 실시간 시세 비교, 온체인 데이터 분석, 
+                            전문가 리서치까지 투자에 필요한 모든 정보를 제공합니다.
+                        </p>
+                    </div>
                 </div>
             </section>
 
-            <section id="support" aria-labelledby="support-title">
-                <div class="support-box anim-fade-in">
-                    <h3 id="support-title" data-lang-key="support.title">고객센터</h3>
-                    <p data-lang-key="support.desc">서비스 이용 중 궁금한 점이나 불편한 점이 있으신가요?<br>텔레그램으로 문의주시면 빠르게 답변해드리겠습니다.</p>
-                    <a href="#" id="telegram-support-link" target="_blank" rel="noopener noreferrer" class="telegram-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" role="img" aria-hidden="true">
-                            <path d="M9.78 18.65l.28-4.23l7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3L3.64 12c-.88-.25-.89-1.37.2-1.64l16.74-6.3c.75-.29 1.43.25 1.15 1.25l-2.72 12.99c-.28 1.33-1.14 1.6-1.9 1.05l-4.26-3.15l-1.97 1.9a1 1 0 0 1-1.2.19z"/>
-                        </svg>
-                        <span data-lang-key="support.cta">텔레그램 문의하기</span>
-                    </a>
+            <!-- Features Section -->
+            <section class="features-section">
+                <div class="container">
+                    <h2 class="section-title anim-fade-in">코인패스가 제공하는 서비스</h2>
+                    <div class="features-grid">
+                        <div class="feature-card anim-fade-in">
+                            <div class="feature-icon">💰</div>
+                            <h3>거래소 수수료 할인</h3>
+                            <p>바이낸스, 바이비트, OKX 등 주요 거래소와의 제휴를 통해 최대 60%까지 수수료 할인 혜택을 제공합니다. 한 번의 가입으로 평생 혜택을 누리세요.</p>
+                            <a href="exchange.html" class="feature-link">혜택 보기 →</a>
+                        </div>
+                        
+                        <div class="feature-card anim-fade-in">
+                            <div class="feature-icon">📊</div>
+                            <h3>실시간 시세 비교</h3>
+                            <p>거래소별 가격 차이와 김치 프리미엄을 실시간으로 확인하여 최적의 매매 타이밍을 찾아보세요. 아비트라지 기회를 놓치지 마세요.</p>
+                            <a href="compare.html" class="feature-link">시세 확인 →</a>
+                        </div>
+                        
+                        <div class="feature-card anim-fade-in">
+                            <div class="feature-icon">⛓️</div>
+                            <h3>온체인 데이터 분석</h3>
+                            <p>블록체인별 TVL, 거래량, 활성 주소 수 등 온체인 지표를 통해 시장 트렌드를 파악하고 투자 인사이트를 얻으세요.</p>
+                            <a href="onchain.html" class="feature-link">데이터 보기 →</a>
+                        </div>
+                        
+                        <div class="feature-card anim-fade-in">
+                            <div class="feature-icon">📚</div>
+                            <h3>전문가 리서치</h3>
+                            <p>암호화폐 프로젝트 심층 분석, 에어드랍 정보, 시장 동향 등 투자 결정에 도움이 되는 전문 리서치 자료를 제공합니다.</p>
+                            <a href="research.html" class="feature-link">리서치 보기 →</a>
+                        </div>
+                    </div>
                 </div>
             </section>
 
+            <!-- Why CoinPass -->
+            <section class="why-coinpass">
+                <div class="container">
+                    <h2 class="section-title anim-fade-in">왜 코인패스를 선택해야 할까요?</h2>
+                    <div class="benefits-grid">
+                        <div class="benefit-item anim-fade-in">
+                            <div class="benefit-icon">🎯</div>
+                            <h3>원스톱 서비스</h3>
+                            <p>여러 사이트를 돌아다닐 필요 없이 코인패스 하나로 모든 투자 정보를 확인할 수 있습니다.</p>
+                        </div>
+                        
+                        <div class="benefit-item anim-fade-in">
+                            <div class="benefit-icon">💎</div>
+                            <h3>검증된 파트너십</h3>
+                            <p>글로벌 1위 거래소들과의 공식 제휴를 통해 안전하고 확실한 혜택을 보장합니다.</p>
+                        </div>
+                        
+                        <div class="benefit-item anim-fade-in">
+                            <div class="benefit-icon">⚡</div>
+                            <h3>실시간 업데이트</h3>
+                            <p>시세, 뉴스, 온체인 데이터가 실시간으로 업데이트되어 항상 최신 정보를 제공합니다.</p>
+                        </div>
+                        
+                        <div class="benefit-item anim-fade-in">
+                            <div class="benefit-icon">🛡️</div>
+                            <h3>안전한 서비스</h3>
+                            <p>개인정보 보호와 보안을 최우선으로 하여 안전한 투자 환경을 제공합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="how-it-works">
+                <div class="container">
+                    <h2 class="section-title anim-fade-in">코인패스 이용 방법</h2>
+                    <div class="steps-container">
+                        <div class="step anim-fade-in">
+                            <div class="step-number">01</div>
+                            <h3>제휴 링크로 가입</h3>
+                            <p>코인패스에서 제공하는 제휴 링크를 통해 원하는 거래소에 가입하세요. 자동으로 수수료 할인이 적용됩니다.</p>
+                        </div>
+                        
+                        <div class="step anim-fade-in">
+                            <div class="step-number">02</div>
+                            <h3>시세 정보 확인</h3>
+                            <p>실시간 시세 비교와 온체인 데이터를 통해 시장 상황을 파악하고 최적의 투자 타이밍을 찾으세요.</p>
+                        </div>
+                        
+                        <div class="step anim-fade-in">
+                            <div class="step-number">03</div>
+                            <h3>리서치 활용</h3>
+                            <p>전문가가 제공하는 프로젝트 분석과 시장 리서치를 참고하여 더 나은 투자 결정을 내리세요.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <div class="container">
+                    <div class="cta-content anim-fade-in">
+                        <h2>지금 시작하세요!</h2>
+                        <p>코인패스와 함께 더 스마트한 암호화폐 투자를 경험해보세요.</p>
+                        <div class="cta-buttons">
+                            <a href="exchange.html" class="cta-button primary">거래소 혜택 받기</a>
+                            <a href="compare.html" class="cta-button secondary">시세 비교하기</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <footer>
@@ -178,20 +229,6 @@
                  <p class="disclaimer" data-lang-key="footer.disclaimer">본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.</p>
             </div>
         </footer>
-    </div>
-    
-    <div id="popup-container" class="popup-container" style="display: none;">
-        <div class="popup-overlay"></div>
-        <div class="popup-box">
-            <div class="popup-content">
-                <img id="popup-image" src="" alt="Popup Image" style="display: none;" loading="lazy">
-                <p id="popup-text" style="display: none;"></p>
-            </div>
-            <div class="popup-actions">
-                <button id="popup-close-24h" data-lang-key="popup.close24h">24시간 보지않기</button>
-                <button id="popup-close" data-lang-key="popup.close">닫기</button>
-            </div>
-        </div>
     </div>
 
     <script type="module" src="index.tsx"></script>

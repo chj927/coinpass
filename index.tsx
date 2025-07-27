@@ -1,320 +1,321 @@
-import { supabase } from './supabaseClient';
-import { SecurityUtils } from './security-utils';
-
-const uiStrings = {
-    ko: {
-        skipLink: '메인 콘텐츠로 건너뛰기',
-        'nav.partners': '파트너 혜택',
-        'nav.about': '서비스 소개',
-        'nav.aboutSubtitle': '코인패스 이야기',
-        'nav.howTo': '사용방법',
-        'nav.howToSubtitle': '3단계 가이드',
-        'nav.guides': '가이드',
-        'nav.guidesSubtitle': '사용안내 및 이벤트',
-        'nav.faq': '자주 묻는 질문',
-        'hero.cta': '파트너 혜택 보기',
-        'cex.title': '파트너 거래소 (CEX)',
-        'dex.title': '파트너 거래소 (DEX)',
-        'howTo.title': '세 단계로 끝내는 수수료 혜택',
-        'howTo.step1.title': '회원가입',
-        'howTo.step1.desc': '본 사이트의 제휴 링크를 통해 원하는 거래소에 가입합니다.',
-        'howTo.step2.title': '거래하기',
-        'howTo.step2.desc': 'KYC 인증 후 자유롭게 거래를 합니다.',
-        'howTo.step3.title': '혜택 적용',
-        'howTo.step3.desc': '거래할 때마다 수수료 할인이 자동으로 적용됩니다.',
-        'faq.title': '자주 묻는 질문 (FAQ)',
-        'support.title': '고객센터',
-        'support.desc': '서비스 이용 중 궁금한 점이나 불편한 점이 있으신가요?\n텔레그램으로 문의주시면 빠르게 답변해드리겠습니다.',
-        'support.cta': '텔레그램 문의하기',
-        'footer.disclaimer': '본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.',
-        'popup.close24h': '24시간 보지않기',
-        'popup.close': '닫기',
-        'card.cta': '가입하고 혜택받기',
-    },
-    en: {
-        skipLink: 'Skip to main content',
-        'nav.partners': 'Partner Benefits',
-        'nav.about': 'About Us',
-        'nav.aboutSubtitle': 'The Coinpass Story',
-        'nav.howTo': 'How to Use',
-        'nav.howToSubtitle': '3-Step Guide',
-        'nav.guides': 'Guides',
-        'nav.guidesSubtitle': 'Info & Events',
-        'nav.faq': 'FAQ',
-        'hero.cta': 'View Partner Benefits',
-        'cex.title': 'Partner Exchanges (CEX)',
-        'dex.title': 'Partner Exchanges (DEX)',
-        'howTo.title': 'Fee Benefits in Three Steps',
-        'howTo.step1.title': 'Sign Up',
-        'howTo.step1.desc': 'Sign up for the desired exchange through the affiliate link on this site.',
-        'howTo.step2.title': 'Trade',
-        'howTo.step2.desc': 'Trade freely after completing KYC verification.',
-        'howTo.step3.title': 'Benefit Applied',
-        'howTo.step3.desc': 'Fee discounts are automatically applied with every trade.',
-        'faq.title': 'Frequently Asked Questions (FAQ)',
-        'support.title': 'Customer Support',
-        'support.desc': 'Have questions or issues while using the service?\nContact us on Telegram for a quick response.',
-        'support.cta': 'Contact on Telegram',
-        'footer.disclaimer': 'This service is for informational purposes only and does not constitute an investment recommendation or guarantee. The final decision and responsibility for all investments lie with the investor.',
-        'popup.close24h': 'Don\'t show for 24 hours',
-        'popup.close': 'Close',
-        'card.cta': 'Sign Up & Get Benefits',
-    }
-};
-
-let siteData = {};
-let currentLang = 'ko';
-
-document.addEventListener('DOMContentLoaded', async () => {
-    setupLanguage();
-    await loadRemoteContent();
-    renderContent();
+document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
-});
-
-async function loadRemoteContent() {
-    const { data: cex, error: cexError } = await supabase.from('cex_exchanges').select('*').order('id');
-    const { data: dex, error: dexError } = await supabase.from('dex_exchanges').select('*').order('id');
-    const { data: faqsData, error: faqsError } = await supabase.from('faqs').select('*').order('id');
-    const { data: singlePages, error: singlePagesError } = await supabase.from('single_pages').select('*');
-
-    if (cexError || dexError || faqsError || singlePagesError) {
-        console.error("Failed to load site data from Supabase", { cexError, dexError, faqsError, singlePagesError });
-        return;
-    }
-    
-    siteData = {
-        exchanges: cex || [],
-        dexExchanges: dex || [],
-        faqs: faqsData || [],
-    };
-    
-    singlePages?.forEach(page => {
-        if(page.page_name && page.content) {
-            siteData[page.page_name] = page.content;
-        }
-    });
-}
-
-function renderContent() {
-    if (!siteData) return;
-    setupHero(siteData.hero);
-    updateAboutUs(siteData.aboutUs);
-    populateExchangeGrid('exchange-grid', siteData.exchanges);
-    populateExchangeGrid('dex-grid', siteData.dexExchanges);
-    updateFaqs(siteData.faqs);
-    updateSupportSection(siteData.support);
-    setupPopup();
     setupScrollAnimations();
-}
+    setupLanguage();
+});
 
 function setupEventListeners() {
     setupMobileMenu();
-    setupNavigation();
 }
 
 function setupLanguage() {
     const savedLang = localStorage.getItem('coinpass-lang');
     const browserLang = navigator.language.startsWith('en') ? 'en' : 'ko';
-    currentLang = savedLang || browserLang;
+    const currentLang = savedLang || browserLang;
+    
     document.getElementById('lang-ko')?.addEventListener('click', () => setLanguage('ko'));
     document.getElementById('lang-en')?.addEventListener('click', () => setLanguage('en'));
     setLanguage(currentLang);
 }
 
-function setLanguage(lang) {
-    currentLang = lang;
+function setLanguage(lang: string) {
     localStorage.setItem('coinpass-lang', lang);
     document.documentElement.lang = lang;
     document.getElementById('lang-ko')?.classList.toggle('active', lang === 'ko');
     document.getElementById('lang-en')?.classList.toggle('active', lang === 'en');
-    translateUI();
-    renderContent();
+    
+    // Update content based on language
+    if (lang === 'en') {
+        updateContentToEnglish();
+    } else {
+        updateContentToKorean();
+    }
 }
 
-function translateUI() {
-    document.querySelectorAll('[data-lang-key]').forEach(el => {
-        const key = el.getAttribute('data-lang-key');
-        if (key && uiStrings[currentLang][key]) {
-            el.textContent = uiStrings[currentLang][key];
+function updateContentToEnglish() {
+    // Update hero section
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    
+    if (heroTitle) heroTitle.textContent = 'Smart Cryptocurrency Investment with CoinPass';
+    if (heroSubtitle) heroSubtitle.textContent = 'From exchange fee discounts to real-time price analysis, all investment information in one place';
+    
+    // Update navigation
+    const navItems = document.querySelectorAll('.nav-title');
+    const navTexts = ['Price Comparison', 'On-chain Data', 'Exchange Benefits', 'Research'];
+    navItems.forEach((item, index) => {
+        if (navTexts[index]) item.textContent = navTexts[index];
+    });
+    
+    // Update main CTA buttons
+    const mainCtaButtons = document.querySelectorAll('.main-cta-buttons .cta-button');
+    if (mainCtaButtons[0]) mainCtaButtons[0].textContent = 'Get Fee Benefits';
+    if (mainCtaButtons[1]) mainCtaButtons[1].textContent = 'Compare Prices';
+    
+    // Update service introduction
+    const introTitle = document.querySelector('.intro-content h2');
+    const introDesc = document.querySelector('.intro-desc');
+    if (introTitle) introTitle.textContent = 'What is CoinPass?';
+    if (introDesc) introDesc.textContent = 'CoinPass is a comprehensive information platform for cryptocurrency investors. We provide everything needed for investment, from exchange fee discounts to real-time price comparison, on-chain data analysis, and expert research.';
+    
+    // Update features section
+    const featuresTitle = document.querySelector('.features-section .section-title');
+    if (featuresTitle) featuresTitle.textContent = 'Services Provided by CoinPass';
+    
+    const featureCards = document.querySelectorAll('.features-section .feature-card');
+    const features = [
+        {
+            title: 'Exchange Fee Discounts',
+            desc: 'Get up to 60% fee discounts through partnerships with major exchanges like Binance, Bybit, and OKX. Enjoy lifetime benefits with a single signup.',
+            link: 'View Benefits →'
+        },
+        {
+            title: 'Real-time Price Comparison',
+            desc: 'Check real-time price differences and kimchi premium across exchanges to find optimal trading opportunities. Don\'t miss arbitrage chances.',
+            link: 'Check Prices →'
+        },
+        {
+            title: 'On-chain Data Analysis',
+            desc: 'Gain investment insights by tracking on-chain metrics like TVL, trading volume, and active addresses across different blockchains.',
+            link: 'View Data →'
+        },
+        {
+            title: 'Expert Research',
+            desc: 'Access professional research materials including in-depth crypto project analysis, airdrop information, and market trends to help your investment decisions.',
+            link: 'View Research →'
+        }
+    ];
+    
+    featureCards.forEach((card, index) => {
+        if (features[index]) {
+            const h3 = card.querySelector('h3');
+            const p = card.querySelector('p');
+            const link = card.querySelector('.feature-link');
+            
+            if (h3) h3.textContent = features[index].title;
+            if (p) p.textContent = features[index].desc;
+            if (link) link.textContent = features[index].link;
         }
     });
-}
-
-class TypingAnimator {
-    private el: HTMLElement;
-    private phrases: string[];
-    private loopNum: number = 0;
-    private typingSpeed: number = 100;
-    private erasingSpeed: number = 50;
-    private delayBetweenPhrases: number = 2000;
-    private isPaused: boolean = false;
-    private timeoutId: number | null = null;
-
-    constructor(el: HTMLElement, phrases: string[]) {
-        if (!el || !phrases || phrases.length === 0) return;
-        this.el = el;
-        this.phrases = phrases;
-        this.tick();
-    }
-
-    public setPhrases(phrases: string[]) {
-        this.phrases = phrases;
-        this.loopNum = 0;
-        if(this.timeoutId) clearTimeout(this.timeoutId);
-        this.el.textContent = '';
-        if(!this.isPaused) this.tick();
-    }
-
-    private tick = async () => {
-        if (this.isPaused || !this.el.isConnected) return;
-        const i = this.loopNum % this.phrases.length;
-        const fullTxt = this.phrases[i];
-        for (let j = 0; j < fullTxt.length; j++) {
-            if (this.isPaused || !this.el.isConnected) return;
-            this.el.textContent = fullTxt.substring(0, j + 1);
-            await this.sleep(this.typingSpeed);
-        }
-        await this.sleep(this.delayBetweenPhrases);
-        for (let j = fullTxt.length; j > 0; j--) {
-            if (this.isPaused || !this.el.isConnected) return;
-            this.el.textContent = fullTxt.substring(0, j - 1);
-            await this.sleep(this.erasingSpeed);
-        }
-        await this.sleep(500);
-        this.loopNum++;
-        this.timeoutId = window.setTimeout(this.tick, 0);
-    }
-
-    private sleep(ms: number): Promise<void> {
-        return new Promise(resolve => { this.timeoutId = window.setTimeout(resolve, ms); });
-    }
-    public pause() { this.isPaused = true; if(this.timeoutId) clearTimeout(this.timeoutId); }
-    public resume() { if(this.isPaused) { this.isPaused = false; this.tick(); } }
-}
-
-let heroAnimator;
-function setupHero(heroData) {
-    const titleEl = document.getElementById('hero-title');
-    const subtitleEl = document.getElementById('hero-subtitle');
-    const heroSection = document.querySelector('.hero');
-    if (!heroData) return;
-
-    if (titleEl && heroData.title && heroData.title[currentLang]) {
-        const sanitizedTitle = SecurityUtils.sanitizeHtml(heroData.title[currentLang]);
-        const phrases = sanitizedTitle.split('\n').filter(p => p.trim() !== '');
-        if (!heroAnimator) {
-             heroAnimator = new TypingAnimator(titleEl as HTMLElement, phrases);
-             if(heroSection){
-                const observer = new IntersectionObserver(entries => {
-                    entries.forEach(entry => entry.isIntersecting ? heroAnimator.resume() : heroAnimator.pause());
-                });
-                observer.observe(heroSection);
-            }
-        } else {
-            heroAnimator.setPhrases(phrases);
-        }
-    }
     
-    if (subtitleEl && heroData.subtitle) subtitleEl.textContent = heroData.subtitle[currentLang];
-}
-
-function updateAboutUs(aboutUsData) {
-    const titleEl = document.getElementById('about-us-title');
-    const contentEl = document.getElementById('about-us-content');
-    if (!aboutUsData) return;
-
-    if (titleEl && aboutUsData.title) {
-        titleEl.textContent = SecurityUtils.sanitizeHtml(aboutUsData.title[currentLang] || '');
-    }
-    if (contentEl && aboutUsData.content) {
-        contentEl.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-        const sanitizedContent = SecurityUtils.sanitizeHtml(aboutUsData.content[currentLang] || '');
-        const paragraphs = sanitizedContent.split(/\n\s*\n/).filter(p => p.trim() !== '');
-        paragraphs.forEach(pText => {
-            const p = document.createElement('p');
-            p.textContent = pText;
-            fragment.appendChild(p);
-        });
-        contentEl.appendChild(fragment);
-    }
-}
-
-function populateExchangeGrid(gridId: string, exchangesData: any[]) {
-    const gridEl = document.getElementById(gridId);
-    if (!gridEl || !exchangesData) return;
+    // Update why coinpass section
+    const whyTitle = document.querySelector('.why-coinpass .section-title');
+    if (whyTitle) whyTitle.textContent = 'Why Choose CoinPass?';
     
-    const fragment = document.createDocumentFragment();
-    exchangesData.forEach(exchange => {
-        const card = document.createElement('div');
-        card.className = 'exchange-card anim-fade-in';
-        
-        // XSS 방지를 위한 데이터 sanitization
-        const name = SecurityUtils.sanitizeHtml(exchange[`name_${currentLang}`] || '');
-        const benefit1Tag = SecurityUtils.sanitizeHtml(exchange[`benefit1_tag_${currentLang}`] || '');
-        const benefit1Value = SecurityUtils.sanitizeHtml(exchange[`benefit1_value_${currentLang}`] || '');
-        const benefit2Tag = SecurityUtils.sanitizeHtml(exchange[`benefit2_tag_${currentLang}`] || '');
-        const benefit2Value = SecurityUtils.sanitizeHtml(exchange[`benefit2_value_${currentLang}`] || '');
-
-        let logoHtml = '';
-        if (exchange.logoImageUrl && SecurityUtils.isValidUrl(exchange.logoImageUrl)) {
-            const sanitizedUrl = SecurityUtils.sanitizeHtml(exchange.logoImageUrl);
-            logoHtml = `<div class="exchange-logo"><img src="${sanitizedUrl}" alt="${name} logo" loading="lazy" onerror="this.style.display='none'"></div>`;
-        } else {
-            logoHtml = `<div class="exchange-logo exchange-logo-text">${name?.substring(0, 3).toUpperCase() || 'N/A'}</div>`;
+    const benefitItems = document.querySelectorAll('.benefit-item');
+    const benefits = [
+        {
+            title: 'One-Stop Service',
+            desc: 'No need to visit multiple sites - get all investment information from CoinPass alone.'
+        },
+        {
+            title: 'Verified Partnerships',
+            desc: 'Guaranteed safe and reliable benefits through official partnerships with top global exchanges.'
+        },
+        {
+            title: 'Real-time Updates',
+            desc: 'Always stay informed with real-time updates of prices, news, and on-chain data.'
+        },
+        {
+            title: 'Secure Service',
+            desc: 'Providing a safe investment environment with privacy protection and security as top priorities.'
         }
-
-        card.innerHTML = `
-            <div class="card-header">
-                ${logoHtml}
-                <h4>${name}</h4>
-            </div>
-            <ul class="benefits-list">
-                <li><span class="tag">${benefit1Tag}</span> <strong>${benefit1Value}</strong></li>
-                <li><span class="tag">${benefit2Tag}</span> <strong>${benefit2Value}</strong></li>
-            </ul>
-            <a href="${SecurityUtils.isValidUrl(exchange.link) ? SecurityUtils.sanitizeHtml(exchange.link) : '#'}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow">${uiStrings[currentLang]['card.cta']}</a>
-        `;
-        fragment.appendChild(card);
+    ];
+    
+    benefitItems.forEach((item, index) => {
+        if (benefits[index]) {
+            const h3 = item.querySelector('h3');
+            const p = item.querySelector('p');
+            
+            if (h3) h3.textContent = benefits[index].title;
+            if (p) p.textContent = benefits[index].desc;
+        }
     });
-    gridEl.innerHTML = '';
-    gridEl.appendChild(fragment);
-}
-
-
-function updateFaqs(faqsData: any[]) {
-    const faqContainerEl = document.getElementById('faq-container');
-    if (!faqContainerEl || !faqsData) return;
     
-    const fragment = document.createDocumentFragment();
-    faqsData.forEach(faq => {
-        const details = document.createElement('details');
-        details.className = 'anim-fade-in';
-        const summary = document.createElement('summary');
-        summary.textContent = SecurityUtils.sanitizeHtml(faq[`question_${currentLang}`] || '');
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'faq-content';
-        const p = document.createElement('p');
-        p.textContent = SecurityUtils.sanitizeHtml(faq[`answer_${currentLang}`] || '');
-        contentDiv.appendChild(p);
-        details.appendChild(summary);
-        details.appendChild(contentDiv);
-        fragment.appendChild(details);
+    // Update how it works section
+    const howTitle = document.querySelector('.how-it-works .section-title');
+    if (howTitle) howTitle.textContent = 'How to Use CoinPass';
+    
+    const steps = document.querySelectorAll('.step');
+    const stepData = [
+        {
+            title: 'Sign Up via Affiliate Link',
+            desc: 'Register with your desired exchange through CoinPass affiliate links. Fee discounts are automatically applied.'
+        },
+        {
+            title: 'Check Market Information',
+            desc: 'Identify market conditions and find optimal investment timing through real-time price comparison and on-chain data.'
+        },
+        {
+            title: 'Utilize Research',
+            desc: 'Make better investment decisions by referring to expert project analysis and market research.'
+        }
+    ];
+    
+    steps.forEach((step, index) => {
+        if (stepData[index]) {
+            const h3 = step.querySelector('h3');
+            const p = step.querySelector('p');
+            
+            if (h3) h3.textContent = stepData[index].title;
+            if (p) p.textContent = stepData[index].desc;
+        }
     });
-    faqContainerEl.innerHTML = '';
-    faqContainerEl.appendChild(fragment);
+    
+    // Update CTA section
+    const ctaTitle = document.querySelector('.cta-content h2');
+    const ctaDesc = document.querySelector('.cta-content p');
+    if (ctaTitle) ctaTitle.textContent = 'Start Now!';
+    if (ctaDesc) ctaDesc.textContent = 'Experience smarter cryptocurrency investment with CoinPass.';
+    
+    const ctaButtons = document.querySelectorAll('.cta-buttons .cta-button');
+    if (ctaButtons[0]) ctaButtons[0].textContent = 'Get Exchange Benefits';
+    if (ctaButtons[1]) ctaButtons[1].textContent = 'Compare Prices';
 }
 
-function updateSupportSection(supportData) {
-    const linkEl = document.getElementById('telegram-support-link');
-    if (linkEl && supportData?.telegramUrl) {
-        linkEl.setAttribute('href', supportData.telegramUrl);
-    }
+function updateContentToKorean() {
+    // Update hero section
+    const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    
+    if (heroTitle) heroTitle.textContent = '코인패스와 함께하는 스마트한 암호화폐 투자';
+    if (heroSubtitle) heroSubtitle.textContent = '거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서';
+    
+    // Update navigation
+    const navItems = document.querySelectorAll('.nav-title');
+    const navTexts = ['시세비교', '온체인 데이터', '거래소 혜택', '리서치'];
+    navItems.forEach((item, index) => {
+        if (navTexts[index]) item.textContent = navTexts[index];
+    });
+    
+    // Update main CTA buttons
+    const mainCtaButtons = document.querySelectorAll('.main-cta-buttons .cta-button');
+    if (mainCtaButtons[0]) mainCtaButtons[0].textContent = '수수료 혜택 받기';
+    if (mainCtaButtons[1]) mainCtaButtons[1].textContent = '시세 비교하기';
+    
+    // Update service introduction
+    const introTitle = document.querySelector('.intro-content h2');
+    const introDesc = document.querySelector('.intro-desc');
+    if (introTitle) introTitle.textContent = '코인패스는 무엇인가요?';
+    if (introDesc) introDesc.textContent = '코인패스는 암호화폐 투자자들을 위한 종합 정보 플랫폼입니다. 거래소 수수료 할인 혜택부터 실시간 시세 비교, 온체인 데이터 분석, 전문가 리서치까지 투자에 필요한 모든 정보를 제공합니다.';
+    
+    // Update features section
+    const featuresTitle = document.querySelector('.features-section .section-title');
+    if (featuresTitle) featuresTitle.textContent = '코인패스가 제공하는 서비스';
+    
+    const featureCards = document.querySelectorAll('.features-section .feature-card');
+    const features = [
+        {
+            title: '거래소 수수료 할인',
+            desc: '바이낸스, 바이비트, OKX 등 주요 거래소와의 제휴를 통해 최대 60%까지 수수료 할인 혜택을 제공합니다. 한 번의 가입으로 평생 혜택을 누리세요.',
+            link: '혜택 보기 →'
+        },
+        {
+            title: '실시간 시세 비교',
+            desc: '거래소별 가격 차이와 김치 프리미엄을 실시간으로 확인하여 최적의 매매 타이밍을 찾아보세요. 아비트라지 기회를 놓치지 마세요.',
+            link: '시세 확인 →'
+        },
+        {
+            title: '온체인 데이터 분석',
+            desc: '블록체인별 TVL, 거래량, 활성 주소 수 등 온체인 지표를 통해 시장 트렌드를 파악하고 투자 인사이트를 얻으세요.',
+            link: '데이터 보기 →'
+        },
+        {
+            title: '전문가 리서치',
+            desc: '암호화폐 프로젝트 심층 분석, 에어드랍 정보, 시장 동향 등 투자 결정에 도움이 되는 전문 리서치 자료를 제공합니다.',
+            link: '리서치 보기 →'
+        }
+    ];
+    
+    featureCards.forEach((card, index) => {
+        if (features[index]) {
+            const h3 = card.querySelector('h3');
+            const p = card.querySelector('p');
+            const link = card.querySelector('.feature-link');
+            
+            if (h3) h3.textContent = features[index].title;
+            if (p) p.textContent = features[index].desc;
+            if (link) link.textContent = features[index].link;
+        }
+    });
+    
+    // Update why coinpass section
+    const whyTitle = document.querySelector('.why-coinpass .section-title');
+    if (whyTitle) whyTitle.textContent = '왜 코인패스를 선택해야 할까요?';
+    
+    const benefitItems = document.querySelectorAll('.benefit-item');
+    const benefits = [
+        {
+            title: '원스톱 서비스',
+            desc: '여러 사이트를 돌아다닐 필요 없이 코인패스 하나로 모든 투자 정보를 확인할 수 있습니다.'
+        },
+        {
+            title: '검증된 파트너십',
+            desc: '글로벌 1위 거래소들과의 공식 제휴를 통해 안전하고 확실한 혜택을 보장합니다.'
+        },
+        {
+            title: '실시간 업데이트',
+            desc: '시세, 뉴스, 온체인 데이터가 실시간으로 업데이트되어 항상 최신 정보를 제공합니다.'
+        },
+        {
+            title: '안전한 서비스',
+            desc: '개인정보 보호와 보안을 최우선으로 하여 안전한 투자 환경을 제공합니다.'
+        }
+    ];
+    
+    benefitItems.forEach((item, index) => {
+        if (benefits[index]) {
+            const h3 = item.querySelector('h3');
+            const p = item.querySelector('p');
+            
+            if (h3) h3.textContent = benefits[index].title;
+            if (p) p.textContent = benefits[index].desc;
+        }
+    });
+    
+    // Update how it works section
+    const howTitle = document.querySelector('.how-it-works .section-title');
+    if (howTitle) howTitle.textContent = '코인패스 이용 방법';
+    
+    const steps = document.querySelectorAll('.step');
+    const stepData = [
+        {
+            title: '제휴 링크로 가입',
+            desc: '코인패스에서 제공하는 제휴 링크를 통해 원하는 거래소에 가입하세요. 자동으로 수수료 할인이 적용됩니다.'
+        },
+        {
+            title: '시세 정보 확인',
+            desc: '실시간 시세 비교와 온체인 데이터를 통해 시장 상황을 파악하고 최적의 투자 타이밍을 찾으세요.'
+        },
+        {
+            title: '리서치 활용',
+            desc: '전문가가 제공하는 프로젝트 분석과 시장 리서치를 참고하여 더 나은 투자 결정을 내리세요.'
+        }
+    ];
+    
+    steps.forEach((step, index) => {
+        if (stepData[index]) {
+            const h3 = step.querySelector('h3');
+            const p = step.querySelector('p');
+            
+            if (h3) h3.textContent = stepData[index].title;
+            if (p) p.textContent = stepData[index].desc;
+        }
+    });
+    
+    // Update CTA section
+    const ctaTitle = document.querySelector('.cta-content h2');
+    const ctaDesc = document.querySelector('.cta-content p');
+    if (ctaTitle) ctaTitle.textContent = '지금 시작하세요!';
+    if (ctaDesc) ctaDesc.textContent = '코인패스와 함께 더 스마트한 암호화폐 투자를 경험해보세요.';
+    
+    const ctaButtons = document.querySelectorAll('.cta-buttons .cta-button');
+    if (ctaButtons[0]) ctaButtons[0].textContent = '거래소 혜택 받기';
+    if (ctaButtons[1]) ctaButtons[1].textContent = '시세 비교하기';
 }
 
 function setupScrollAnimations() {
-    const observer = new IntersectionObserver((entries, observer) => {
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-visible');
@@ -322,18 +323,23 @@ function setupScrollAnimations() {
             }
         });
     }, { threshold: 0.1 });
+    
     document.querySelectorAll('.anim-fade-in').forEach(el => observer.observe(el));
 }
 
 function setupMobileMenu() {
     const hamburgerBtn = document.querySelector('.hamburger-button');
     const nav = document.getElementById('main-nav');
+    
     if (!hamburgerBtn || !nav) return;
+    
     hamburgerBtn.addEventListener('click', () => {
         const isActive = hamburgerBtn.classList.toggle('is-active');
         nav.classList.toggle('is-active', isActive);
         hamburgerBtn.setAttribute('aria-expanded', isActive.toString());
     });
+    
+    // Close menu when clicking nav links
     nav.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
             hamburgerBtn.classList.remove('is-active');
@@ -341,59 +347,4 @@ function setupMobileMenu() {
             hamburgerBtn.setAttribute('aria-expanded', 'false');
         });
     });
-}
-
-function setupNavigation() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if(href && href !== '#') {
-                e.preventDefault();
-                const targetElement = document.querySelector(href);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-        });
-    });
-}
-
-function setupPopup() {
-    if (!siteData.popup || !siteData.popup.enabled) return;
-    const hideUntil = localStorage.getItem('coinpass-popup-hide-until');
-    if (hideUntil && Date.now() < parseInt(hideUntil, 10)) return;
-
-    const now = new Date();
-    const startDate = siteData.popup.startDate ? new Date(siteData.popup.startDate) : null;
-    const endDate = siteData.popup.endDate ? new Date(siteData.popup.endDate) : null;
-    if ((startDate && now < startDate) || (endDate && now > endDate)) return;
-
-    const container = document.getElementById('popup-container');
-    const imageEl = document.getElementById('popup-image');
-    const textEl = document.getElementById('popup-text');
-    const closeBtn = document.getElementById('popup-close');
-    const close24hBtn = document.getElementById('popup-close-24h');
-    const overlay = container?.querySelector('.popup-overlay');
-    if (!container || !imageEl || !textEl || !closeBtn || !close24hBtn) return;
-    
-    const contentToDisplay = siteData.popup.content ? siteData.popup.content[currentLang] : '';
-
-    if (siteData.popup.type === 'image' && siteData.popup.imageUrl) {
-        (imageEl as HTMLImageElement).src = siteData.popup.imageUrl;
-        (imageEl as HTMLElement).style.display = 'block';
-        (textEl as HTMLElement).style.display = 'none';
-    } else if (siteData.popup.type === 'text' && contentToDisplay) {
-        textEl.textContent = contentToDisplay;
-        (textEl as HTMLElement).style.display = 'block';
-        (imageEl as HTMLElement).style.display = 'none';
-    } else return;
-    
-    container.style.display = 'flex';
-    const closePopup = () => container.style.display = 'none';
-    closeBtn.onclick = closePopup;
-    if(overlay) overlay.addEventListener('click', closePopup);
-    close24hBtn.onclick = () => {
-        localStorage.setItem('coinpass-popup-hide-until', (Date.now() + 24 * 60 * 60 * 1000).toString());
-        closePopup();
-    };
 }
