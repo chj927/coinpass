@@ -1,12 +1,49 @@
 // Three.js 타입을 사용하기 위해 선언 (TypeScript 환경)
 declare const THREE: any;
 
-document.addEventListener('DOMContentLoaded', () => {
+import { supabase } from './supabaseClient';
+import { SecurityUtils } from './security-utils';
+
+let heroData: any = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadHeroData();
     setupEventListeners();
     setupScrollAnimations();
     startTypingAnimation();
     setupThreeJSScene(); 
 });
+
+async function loadHeroData() {
+    try {
+        const { data, error } = await supabase
+            .from('single_pages')
+            .select('content')
+            .eq('page_name', 'hero')
+            .single();
+
+        if (error) {
+            console.error('Failed to load hero data:', error);
+            // 기본값 사용
+            heroData = {
+                title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
+                subtitle: { ko: '' }
+            };
+        } else {
+            heroData = data?.content || {
+                title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
+                subtitle: { ko: '' }
+            };
+        }
+    } catch (error) {
+        console.error('Error loading hero data:', error);
+        // 기본값 사용
+        heroData = {
+            title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
+            subtitle: { ko: '' }
+        };
+    }
+}
 
 function setupEventListeners() {
     setupMobileMenu();
@@ -48,12 +85,22 @@ let typingAnimator: TypingAnimator | null = null;
 
 function startTypingAnimation() {
     const heroTitle = document.getElementById('hero-title');
-    if (!heroTitle) return;
+    if (!heroTitle || !heroData) return;
 
-    const text = '코인패스와 함께하는 스마트한 암호화폐 투자';
+    // 관리자가 설정한 텍스트 사용, 없으면 기본값 사용
+    const titleText = heroData.title?.ko || '코인패스와 함께하는 스마트한 암호화폐 투자';
+    
+    // 여러 줄로 설정된 경우 첫 번째 줄만 사용하거나 전체 텍스트 사용
+    const text = typeof titleText === 'string' ? titleText : String(titleText);
 
     typingAnimator = new TypingAnimator(heroTitle as HTMLElement, text);
     typingAnimator.startTyping();
+    
+    // hero subtitle 업데이트
+    const heroSubtitle = document.getElementById('hero-subtitle');
+    if (heroSubtitle && heroData.subtitle?.ko) {
+        heroSubtitle.textContent = SecurityUtils.sanitizeHtml(heroData.subtitle.ko);
+    }
 }
 
 
