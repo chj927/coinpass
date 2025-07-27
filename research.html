@@ -66,20 +66,54 @@
         </header>
 
         <main id="main-content">
-            <!-- Banner Section -->
-            <section class="banner-section">
-                <div class="banner-container">
-                    <div id="banner-content" class="banner-content">
-                        <!-- Banner will be populated by admin -->
+            <!-- Header Section -->
+            <section class="page-header">
+                <div class="header-content">
+                    <h1>Article</h1>
+                    <p>Discover the latest market trends and industry developments to stay ahead of the curve</p>
+                </div>
+            </section>
+
+            <!-- Filter Section -->
+            <section class="filter-section">
+                <div class="filter-container">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">All</button>
+                        <button class="filter-tab" data-filter="project">Project</button>
+                        <button class="filter-tab" data-filter="insights">Insights</button>
+                    </div>
+                    <div class="filter-sidebar">
+                        <div class="filter-group">
+                            <h3>Sector</h3>
+                            <div class="filter-options">
+                                <button class="filter-option" data-category="infra">Infra</button>
+                                <button class="filter-option" data-category="consumer">Consumer</button>
+                                <button class="filter-option" data-category="defi">DeFi</button>
+                                <button class="filter-option" data-category="market">Market</button>
+                                <button class="filter-option" data-category="general">General</button>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <h3>Project</h3>
+                            <div class="filter-options">
+                                <button class="filter-option" data-project="abstract">Abstract</button>
+                                <button class="filter-option" data-project="animecoin">Animecoin</button>
+                                <button class="filter-option" data-project="arbitrum">Arbitrum</button>
+                                <button class="filter-option" data-project="astar">Astar</button>
+                                <button class="filter-option" data-project="avail">Avail</button>
+                                <button class="filter-option" data-project="base">Base</button>
+                                <button class="filter-option" data-project="bitcoin">Bitcoin</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="guides-section" aria-labelledby="guides-title">
-                <h1 id="guides-title" class="section-title anim-fade-in" data-lang-key="guides.pageTitle"></h1>
-                <p id="guides-subtitle" class="section-subtitle anim-fade-in" data-lang-key="guides.pageSubtitle"></p>
-                <div class="guides-container" id="guides-container">
-                    </div>
+            <!-- Articles Grid -->
+            <section class="articles-section">
+                <div class="articles-grid" id="articles-grid">
+                    <!-- Articles will be populated by JavaScript -->
+                </div>
             </section>
         </main>
 

@@ -1,134 +1,308 @@
 import { supabase } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
-const uiStrings = {
-    ko: {
-        skipLink: '메인 콘텐츠로 건너뛰기',
-        'nav.partners': '파트너 혜택',
-        'nav.about': '서비스 소개',
-        'nav.aboutSubtitle': '코인패스 이야기',
-        'nav.howTo': '사용방법',
-        'nav.howToSubtitle': '3단계 가이드',
-        'nav.guides': '가이드',
-        'nav.guidesSubtitle': '사용안내 및 이벤트',
-        'nav.faq': '자주 묻는 질문',
-        'footer.disclaimer': '본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.',
-        'guides.pageTitle': '이용 가이드',
-        'guides.pageSubtitle': '초보자용 상세 가이드와 거래소 이벤트를 확인해보세요.',
-    },
-};
+interface Article {
+    id: number;
+    title: string;
+    content: string;
+    category: string;
+    project?: string;
+    read_time: number;
+    created_at: string;
+    author: string;
+    image_url?: string;
+}
 
-const currentLang = 'ko';
-let guidesData = [];
+let articlesData: Article[] = [];
+let filteredArticles: Article[] = [];
+let currentFilter = 'all';
+let activeCategory = '';
+let activeProject = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    setupLanguage();
-    await loadBannerContent();
-    await loadRemoteGuides();
-    renderGuides(guidesData);
+    await loadArticles();
+    renderArticles();
     setupEventListeners();
 });
 
-async function loadBannerContent() {
+async function loadArticles() {
     try {
-        const { data: bannerData, error } = await supabase
-            .from('banners')
-            .select('*')
-            .eq('page', 'research')
-            .eq('enabled', true)
-            .single();
-
-        const bannerContainer = document.getElementById('banner-content');
-        if (!bannerContainer) return;
-
-        if (error || !bannerData) {
-            bannerContainer.style.display = 'none';
-            return;
-        }
-
-        if (bannerData.image_url) {
-            bannerContainer.innerHTML = `<img src="${bannerData.image_url}" alt="리서치 배너" loading="lazy">`;
-        } else if (bannerData.content) {
-            bannerContainer.innerHTML = `<div class="banner-text">${bannerData.content}</div>`;
-        } else {
-            bannerContainer.style.display = 'none';
-        }
+        // Mock data for demonstration - replace with actual Supabase query
+        articlesData = [
+            {
+                id: 1,
+                title: "MegaETH Ecosystem: Where No Limits Exist",
+                content: "Lorem ipsum dolor sit amet...",
+                category: "infra",
+                read_time: 30,
+                created_at: "2025-07-25",
+                author: "c4vin",
+                image_url: ""
+            },
+            {
+                id: 2,
+                title: "Stable: A Digital Nation of USDT, by USDT, for USDT",
+                content: "Lorem ipsum dolor sit amet...",
+                category: "defi",
+                read_time: 32,
+                created_at: "2025-07-24",
+                author: "100y",
+                image_url: ""
+            },
+            {
+                id: 3,
+                title: "Layer3: The Final Piece in Web3 Mass Adoption",
+                content: "Lorem ipsum dolor sit amet...",
+                category: "consumer",
+                read_time: 27,
+                created_at: "2025-07-23",
+                author: "Ingeun",
+                image_url: ""
+            },
+            {
+                id: 4,
+                title: "Are Stablecoin Payments a Threat to Banks and Card Networks?",
+                content: "Lorem ipsum dolor sit amet...",
+                category: "general",
+                read_time: 12,
+                created_at: "2025-07-17",
+                author: "100y",
+                image_url: ""
+            },
+            {
+                id: 5,
+                title: "Safe: Ownership Infra Layer For Onchain Applications",
+                content: "Lorem ipsum dolor sit amet...",
+                category: "infra",
+                read_time: 37,
+                created_at: "2025-07-16",
+                author: "c4vin, JW",
+                image_url: ""
+            },
+            {
+                id: 6,
+                title: "What if the #1 lending protocol on Sui launched a DEX?",
+                content: "Lorem ipsum dolor sit amet...",
+                category: "defi",
+                read_time: 21,
+                created_at: "2025-07-15",
+                author: "Steve",
+                image_url: ""
+            }
+        ];
+        
+        filteredArticles = [...articlesData];
     } catch (error) {
-        console.error('Failed to load banner content:', error);
-        const bannerContainer = document.getElementById('banner-content');
-        if (bannerContainer) {
-            bannerContainer.style.display = 'none';
-        }
+        console.error('Failed to load articles:', error);
     }
-}
-
-async function loadRemoteGuides() {
-    const { data, error } = await supabase.from('guides').select('*').order('id');
-    if (error) {
-        console.error("Failed to load guides from Supabase", error);
-        return;
-    }
-    guidesData = data || [];
 }
 
 function setupEventListeners() {
-    setupScrollAnimations();
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const filter = target.getAttribute('data-filter');
+            if (filter) {
+                setActiveFilter(filter);
+            }
+        });
+    });
+
+    // Category filters
+    document.querySelectorAll('[data-category]').forEach(option => {
+        option.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const category = target.getAttribute('data-category');
+            if (category) {
+                setActiveCategory(category);
+            }
+        });
+    });
+
+    // Project filters
+    document.querySelectorAll('[data-project]').forEach(option => {
+        option.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const project = target.getAttribute('data-project');
+            if (project) {
+                setActiveProject(project);
+            }
+        });
+    });
+
     setupMobileMenu();
 }
 
-function setupLanguage() {
-    document.documentElement.lang = 'ko';
-    translateUI();
-}
-
-
-function translateUI() {
-    document.querySelectorAll('[data-lang-key]').forEach(el => {
-        const key = el.getAttribute('data-lang-key');
-        if (key && uiStrings[currentLang][key]) {
-            el.textContent = uiStrings[currentLang][key];
-        }
+function setActiveFilter(filter: string) {
+    currentFilter = filter;
+    
+    // Update UI
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.remove('active');
     });
+    document.querySelector(`[data-filter="${filter}"]`)?.classList.add('active');
+    
+    filterArticles();
 }
 
-function renderGuides(guides: any[]) {
-    const container = document.getElementById('guides-container');
+function setActiveCategory(category: string) {
+    activeCategory = activeCategory === category ? '' : category;
+    
+    // Update UI
+    document.querySelectorAll('[data-category]').forEach(option => {
+        option.classList.remove('active');
+    });
+    if (activeCategory) {
+        document.querySelector(`[data-category="${category}"]`)?.classList.add('active');
+    }
+    
+    filterArticles();
+}
+
+function setActiveProject(project: string) {
+    activeProject = activeProject === project ? '' : project;
+    
+    // Update UI
+    document.querySelectorAll('[data-project]').forEach(option => {
+        option.classList.remove('active');
+    });
+    if (activeProject) {
+        document.querySelector(`[data-project="${project}"]`)?.classList.add('active');
+    }
+    
+    filterArticles();
+}
+
+function filterArticles() {
+    filteredArticles = articlesData.filter(article => {
+        // Filter by tab (all, project, insights)
+        if (currentFilter === 'project' && !article.project) return false;
+        if (currentFilter === 'insights' && article.project) return false;
+        
+        // Filter by category
+        if (activeCategory && article.category !== activeCategory) return false;
+        
+        // Filter by project
+        if (activeProject && article.project !== activeProject) return false;
+        
+        return true;
+    });
+    
+    renderArticles();
+}
+
+function renderArticles() {
+    const container = document.getElementById('articles-grid');
     if (!container) return;
 
     const fragment = document.createDocumentFragment();
-    guides.forEach(guide => {
-        const item = document.createElement('details');
-        item.className = 'guide-item anim-fade-in';
-
-        const title = document.createElement('summary');
-        title.className = 'guide-title';
-        title.textContent = SecurityUtils.sanitizeHtml(guide[`title_${currentLang}`] || '');
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'guide-content';
-        const p = document.createElement('p');
-        p.textContent = SecurityUtils.sanitizeHtml(guide[`content_${currentLang}`] || '');
-        contentDiv.appendChild(p);
+    
+    filteredArticles.forEach(article => {
+        const card = document.createElement('div');
+        card.className = 'article-card';
         
-        item.appendChild(title);
-        item.appendChild(contentDiv);
-        fragment.appendChild(item);
+        const imageSection = document.createElement('div');
+        imageSection.className = 'article-image';
+        
+        if (article.image_url) {
+            const img = document.createElement('img');
+            img.src = article.image_url;
+            img.alt = article.title;
+            img.loading = 'lazy';
+            imageSection.appendChild(img);
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'placeholder-text';
+            placeholder.textContent = getPlaceholderText(article.title);
+            imageSection.appendChild(placeholder);
+        }
+        
+        const content = document.createElement('div');
+        content.className = 'article-content';
+        
+        // Meta information
+        const meta = document.createElement('div');
+        meta.className = 'article-meta';
+        
+        const readTime = document.createElement('span');
+        readTime.className = 'article-read-time';
+        readTime.textContent = `${article.read_time} min read`;
+        
+        const date = document.createElement('span');
+        date.className = 'article-date';
+        date.textContent = formatDate(article.created_at);
+        
+        meta.appendChild(readTime);
+        meta.appendChild(date);
+        
+        // Title
+        const title = document.createElement('h3');
+        title.className = 'article-title';
+        title.textContent = SecurityUtils.sanitizeHtml(article.title);
+        
+        // Tags
+        const tags = document.createElement('div');
+        tags.className = 'article-tags';
+        
+        const categoryTag = document.createElement('span');
+        categoryTag.className = `article-tag ${article.category}`;
+        categoryTag.textContent = article.category.charAt(0).toUpperCase() + article.category.slice(1);
+        tags.appendChild(categoryTag);
+        
+        if (article.project) {
+            const projectTag = document.createElement('span');
+            projectTag.className = 'article-tag project';
+            projectTag.textContent = article.project;
+            tags.appendChild(projectTag);
+        }
+        
+        // Author
+        const author = document.createElement('div');
+        author.className = 'article-author';
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'author-avatar';
+        avatar.textContent = getAuthorInitials(article.author);
+        
+        const name = document.createElement('span');
+        name.className = 'author-name';
+        name.textContent = article.author;
+        
+        author.appendChild(avatar);
+        author.appendChild(name);
+        
+        content.appendChild(meta);
+        content.appendChild(title);
+        content.appendChild(tags);
+        content.appendChild(author);
+        
+        card.appendChild(imageSection);
+        card.appendChild(content);
+        fragment.appendChild(card);
     });
-
+    
     container.innerHTML = '';
     container.appendChild(fragment);
 }
 
-function setupScrollAnimations() {
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.anim-fade-in').forEach(el => observer.observe(el));
+function getPlaceholderText(title: string): string {
+    const words = title.split(' ');
+    return words.length > 0 ? words[0] : 'Article';
+}
+
+function getAuthorInitials(author: string): string {
+    const names = author.split(/[,\s]+/);
+    return names.map(name => name.charAt(0).toUpperCase()).join('').slice(0, 2);
+}
+
+function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+    });
 }
 
 function setupMobileMenu() {
