@@ -1,6 +1,13 @@
 import { supabase } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
+// 타입 정의
+interface DatabaseRecord {
+    id?: number;
+    created_at?: string;
+    [key: string]: any;
+}
+
 // 기본 데이터 구조는 유지합니다.
 const defaultSiteData = {
     hero: { title: { ko: '', en: '' }, subtitle: { ko: '', en: '' }},
@@ -172,7 +179,7 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
 
     try {
         // 입력 데이터 검증 및 sanitization
-        const sanitizedData = {};
+        const sanitizedData: DatabaseRecord = {};
         for (const [key, value] of Object.entries(itemData)) {
             if (typeof value === 'string') {
                 if (key.includes('Url') || key === 'link') {
@@ -257,7 +264,7 @@ function sanitizeContent(content: any): any {
     if (typeof content === 'string') {
         return SecurityUtils.validateInput(content, 5000);
     } else if (typeof content === 'object' && content !== null) {
-        const sanitized = {};
+        const sanitized: DatabaseRecord = {};
         for (const [key, value] of Object.entries(content)) {
             if (typeof value === 'string') {
                 if (key.includes('Url') || key.includes('url')) {
@@ -498,24 +505,24 @@ function setupEventListeners() {
         });
     });
 
-    document.getElementById('add-exchange-button').addEventListener('click', () => createNewItem('cex_exchanges'));
-    document.getElementById('add-dex-exchange-button').addEventListener('click', () => createNewItem('dex_exchanges'));
-    document.getElementById('add-faq-button').addEventListener('click', () => createNewItem('faqs'));
-    document.getElementById('add-guide-button').addEventListener('click', () => createNewItem('guides'));
+    document.getElementById('add-exchange-button')?.addEventListener('click', () => createNewItem('cex_exchanges'));
+    document.getElementById('add-dex-exchange-button')?.addEventListener('click', () => createNewItem('dex_exchanges'));
+    document.getElementById('add-faq-button')?.addEventListener('click', () => createNewItem('faqs'));
+    document.getElementById('add-guide-button')?.addEventListener('click', () => createNewItem('guides'));
 
-    document.getElementById('main-content').addEventListener('click', e => {
+    document.getElementById('main-content')?.addEventListener('click', e => {
         const target = e.target as HTMLButtonElement;
-        const card = target.closest('.item-card');
+        const card = target.closest('.item-card') as HTMLElement;
         if (!card) return;
 
         const tableName = card.dataset.listName;
-        const itemId = parseInt(card.dataset.itemId, 10);
+        const itemId = parseInt(card.dataset.itemId || '0', 10);
         
         if (target.classList.contains('delete-button')) {
-            deleteItem(tableName, itemId);
+            if (tableName) deleteItem(tableName, itemId);
         } else if (target.classList.contains('save-item-button')) {
             const itemData = readDataFromCard(card);
-            saveItem(tableName, itemData, itemId);
+            if (tableName) saveItem(tableName, itemData, itemId);
         }
     });
 }
@@ -575,8 +582,8 @@ async function createNewItem(tableName: string) {
     await saveItem(tableName, newItemData);
 }
 
-function readDataFromCard(cardElement: HTMLElement): any {
-    const data = {};
+function readDataFromCard(cardElement: HTMLElement): DatabaseRecord {
+    const data: DatabaseRecord = {};
     cardElement.querySelectorAll('.item-input').forEach(input => {
         const key = (input as HTMLElement).classList[1];
         const lang = (input as HTMLElement).dataset.lang;

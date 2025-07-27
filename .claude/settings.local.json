@@ -5,7 +5,14 @@
       "Bash(timeout 10 npm run dev)",
       "mcp__ide__getDiagnostics",
       "Bash(git add:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(move compare.tsx compare-old.tsx)",
+      "Bash(move compare-new.tsx compare.tsx)",
+      "Bash(grep:*)",
+      "Bash(for file in compare.html onchain.html research.html)",
+      "Bash(do sed -i '/<div class=\"\"language-switcher\"\">/,/<\\/div>/d' \"$file\")",
+      "Bash(done)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
