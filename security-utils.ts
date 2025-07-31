@@ -1,10 +1,33 @@
 // 보안 유틸리티 함수들
 export class SecurityUtils {
-    // HTML sanitization
+    // Enhanced HTML sanitization with DOMPurify-like functionality
     static sanitizeHtml(input: string): string {
+        if (!input) return '';
+        
         const div = document.createElement('div');
         div.textContent = input;
         return div.innerHTML;
+    }
+
+    // Safe innerHTML setter with sanitization
+    static setSafeInnerHTML(element: Element, content: string): void {
+        if (!element) return;
+        element.innerHTML = this.sanitizeHtml(content);
+    }
+
+    // Create safe text content
+    static createSafeTextNode(content: string): Text {
+        return document.createTextNode(this.sanitizeHtml(content));
+    }
+
+    // Advanced XSS protection
+    static stripScriptTags(input: string): string {
+        return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    }
+
+    // Content Security Policy helper
+    static generateNonce(): string {
+        return this.generateSecureToken(16);
     }
 
     // URL validation
@@ -55,20 +78,54 @@ export class SecurityUtils {
         return true;
     }
 
-    // CSRF token management
+    // Enhanced CSRF token management
     private static csrfToken: string | null = null;
+    private static csrfTokenExpiry: number = 0;
+    private static readonly CSRF_TOKEN_TTL = 30 * 60 * 1000; // 30분
     
     static getCSRFToken(): string {
-        if (!this.csrfToken) {
-            this.csrfToken = this.generateSecureToken();
-            sessionStorage.setItem('csrf-token', this.csrfToken);
+        const now = Date.now();
+        
+        // 토큰이 없거나 만료된 경우 새로 생성
+        if (!this.csrfToken || now > this.csrfTokenExpiry) {
+            this.csrfToken = this.generateSecureToken(32);
+            this.csrfTokenExpiry = now + this.CSRF_TOKEN_TTL;
+            
+            // sessionStorage 대신 메모리에만 저장 (XSS 방지)
+            // 프로덕션에서는 httpOnly 쿠키 사용 권장
         }
         return this.csrfToken;
     }
     
     static validateCSRFToken(token: string): boolean {
-        const storedToken = sessionStorage.getItem('csrf-token');
-        return storedToken === token && token === this.csrfToken;
+        const now = Date.now();
+        
+        // 토큰 만료 확인
+        if (!this.csrfToken || now > this.csrfTokenExpiry) {
+            return false;
+        }
+        
+        // 상수 시간 비교 (타이밍 공격 방지)
+        return this.constantTimeEquals(token, this.csrfToken);
+    }
+
+    // 타이밍 공격 방지를 위한 상수 시간 문자열 비교
+    private static constantTimeEquals(a: string, b: string): boolean {
+        if (a.length !== b.length) {
+            return false;
+        }
+        
+        let result = 0;
+        for (let i = 0; i < a.length; i++) {
+            result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+        }
+        
+        return result === 0;
+    }
+
+    static clearCSRFToken(): void {
+        this.csrfToken = null;
+        this.csrfTokenExpiry = 0;
     }
 
     // Enhanced password validation

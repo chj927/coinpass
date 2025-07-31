@@ -32,5 +32,89 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         headers: {
             'X-Client-Info': 'coinpass-web@1.0.0'
         }
+    },
+    realtime: {
+        params: {
+            eventsPerSecond: 2 // 실시간 업데이트 제한
+        }
     }
 })
+
+// 데이터베이스 쿼리 최적화 유틸리티
+export class DatabaseUtils {
+    // 효율적인 페이지네이션
+    static async getPaginatedData(
+        table: string, 
+        page: number = 1, 
+        limit: number = 10,
+        columns: string = '*',
+        orderBy?: { column: string; ascending?: boolean }
+    ) {
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
+        
+        let query = supabase
+            .from(table)
+            .select(columns, { count: 'exact' })
+            .range(from, to);
+            
+        if (orderBy) {
+            query = query.order(orderBy.column, { ascending: orderBy.ascending ?? true });
+        }
+        
+        return query;
+    }
+    
+    // 캐시된 데이터 가져오기
+    private static queryCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+    
+    static async getCachedQuery(
+        cacheKey: string,
+        queryFn: () => Promise<any>,
+        ttl: number = 5 * 60 * 1000 // 5분 기본 TTL
+    ) {
+        const cached = this.queryCache.get(cacheKey);
+        const now = Date.now();
+        
+        if (cached && now - cached.timestamp < cached.ttl) {
+            return cached.data;
+        }
+        
+        try {
+            const result = await queryFn();
+            this.queryCache.set(cacheKey, {
+                data: result,
+                timestamp: now,
+                ttl
+            });
+            return result;
+        } catch (error) {
+            // 캐시된 데이터가 있으면 반환 (Stale-while-revalidate 패턴)
+            if (cached) {
+                return cached.data;
+            }
+            throw error;
+        }
+    }
+    
+    // 배치 작업 최적화
+    static async batchInsert(table: string, data: any[], batchSize: number = 100) {
+        const results = [];
+        for (let i = 0; i < data.length; i += batchSize) {
+            const batch = data.slice(i, i + batchSize);
+            const result = await supabase.from(table).insert(batch);
+            results.push(result);
+        }
+        return results;
+    }
+    
+    // 연결 상태 확인
+    static async checkConnection(): Promise<boolean> {
+        try {
+            const { error } = await supabase.from('single_pages').select('id').limit(1);
+            return !error;
+        } catch {
+            return false;
+        }
+    }
+}

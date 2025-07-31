@@ -604,9 +604,79 @@ main {
     color: var(--primary-color);
 }
 
+/* 모바일 팝업 최적화 */
 @media (max-width: 768px) {
+    .popup-container {
+        padding: 1rem;
+    }
+
     .popup-box {
-        width: 90vw;
+        width: 95vw;
+        max-width: 95vw;
+        max-height: 90vh;
+        margin: 0;
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .popup-content {
+        padding: 1.5rem;
+        max-height: calc(90vh - 120px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    .popup-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .popup-content p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .popup-actions {
+        position: sticky;
+        bottom: 0;
+        background: var(--card-bg);
+        border-top: 2px solid var(--border-color);
+        padding: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-direction: column;
+    }
+    
+    .popup-actions button {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 48px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .popup-actions button:active {
+        transform: scale(0.98);
+    }
+
+    /* 스와이프로 닫기 힌트 */
+    .popup-box::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: var(--text-muted);
+        border-radius: 2px;
+        opacity: 0.5;
     }
 }
 
@@ -984,40 +1054,73 @@ footer::before {
     }
 }
 
-/* Mobile styles */
+/* Mobile styles - 완전히 새로운 모바일 친화적 디자인 */
 @media (max-width: 768px) {
+    /* 햄버거 버튼 표시 */
     .hamburger-button {
         display: block;
+        z-index: 1001;
+        position: relative;
     }
 
-    nav {
-        position: absolute;
-        top: 100%;
+    /* 전체 화면 오버레이 네비게이션 */
+    #main-nav {
+        position: fixed;
+        top: 0;
         left: 0;
-        right: 0;
+        width: 100vw;
+        height: 100vh;
         background: rgba(26, 26, 26, 0.98);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid var(--border-color);
-        transform: translateY(-100%);
+        backdrop-filter: blur(15px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
         opacity: 0;
         visibility: hidden;
-        transition: all 0.3s ease;
     }
 
-    nav.is-active {
-        transform: translateY(0);
+    #main-nav.is-active {
+        transform: translateX(0);
         opacity: 1;
         visibility: visible;
     }
 
-    nav ul {
+    #main-nav ul {
         flex-direction: column;
-        padding: 2rem;
-        gap: 1.5rem;
+        gap: 2.5rem;
+        text-align: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
 
+    #main-nav li a {
+        display: block;
+        padding: 1.5rem 2rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+        min-height: 48px;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #main-nav li a:hover,
+    #main-nav li a:focus {
+        background: rgba(0, 212, 170, 0.1);
+        color: var(--accent-color);
+        transform: translateY(-2px);
+    }
+
+    /* 햄버거 아이콘 애니메이션 */
     .hamburger-button.is-active .hamburger-inner {
         transform: rotate(45deg);
+        background-color: var(--accent-color);
     }
 
     .hamburger-button.is-active .hamburger-inner::before {
@@ -1046,8 +1149,9 @@ footer::before {
     }
     
     .hero-banner h1 {
-        font-size: 2.2rem;
-        min-height: 5.8rem;
+        font-size: clamp(1.8rem, 5vw, 2.2rem);
+        min-height: auto;
+        line-height: 1.2;
     }
     
     .hero-banner p {
@@ -1098,35 +1202,140 @@ footer::before {
         padding: 0 1rem;
     }
 
-    /* Navigation Mobile Styles */
-    .hamburger-button {
-        display: block;
-    }
-
-    #main-nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(26, 26, 26, 0.95);
-        backdrop-filter: blur(10px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 999;
-    }
-
-    #main-nav.is-active {
-        transform: translateX(0);
+    /* 터치 타겟 크기 개선 - Apple HIG 44pt 최소 권장사항 */
+    button, 
+    .cta-button,
+    .card-cta,
+    .hamburger-button,
+    #theme-toggle,
+    .popup-actions button {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px 16px;
+        font-size: 1rem;
     }
     
-    #main-nav ul {
-        flex-direction: column;
-        gap: 2rem;
-        text-align: center;
+    .nav-link {
+        min-height: 48px;
+        padding: 12px 16px;
+    }
+
+    /* 향상된 CTA 버튼 */
+    .cta-button {
+        min-height: 56px;
+        padding: 16px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .cta-button:active {
+        transform: scale(0.98);
+    }
+
+    /* 테마 토글 버튼 개선 */
+    #theme-toggle {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    /* 모바일 전용 추가 스타일 */
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+        overflow-x: hidden; /* 가로 스크롤 방지 */
+    }
+
+    /* 개선된 포커스 표시 */
+    :focus-visible {
+        outline: 3px solid var(--accent-color);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* 터치 피드백 */
+    button:active,
+    .button:active,
+    .clickable:active {
+        transform: scale(0.98);
+        opacity: 0.8;
+        transition: all 0.1s ease;
+    }
+
+    /* 모바일 타이포그래피 최적화 */
+    h1 {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+    
+    h2 {
+        font-size: clamp(1.3rem, 5vw, 2rem);
+        line-height: 1.3;
+        margin-bottom: 0.8rem;
+    }
+    
+    h3 {
+        font-size: clamp(1.1rem, 4vw, 1.5rem);
+        line-height: 1.4;
+        margin-bottom: 0.6rem;
+    }
+    
+    p, li {
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+
+    /* 섹션 제목 반응형 */
+    .section-title {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        line-height: 1.2;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    /* 카드 내 텍스트 개선 */
+    .feature-card h3,
+    .benefit-item h3 {
+        font-size: 1.2rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-card p,
+    .benefit-item p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    /* 컨테이너 간격 최적화 */
+    .container {
+        padding: 0 1rem;
+        max-width: 100%;
+    }
+
+    .hero-banner {
+        padding: 2rem 1rem;
+        margin: 1rem 0;
+    }
+
+    .features-section,
+    .why-coinpass {
+        padding: 3rem 0;
+        margin: 0;
+    }
+
+    /* 카드 간격 개선 */
+    .feature-card,
+    .benefit-item {
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 12px;
     }
     
     #main-nav li a .nav-title {

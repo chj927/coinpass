@@ -94,8 +94,70 @@ export interface CustomEventDetail {
 // 컴포넌트 상태 타입
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
-export interface ComponentState {
+export interface ComponentState<T = unknown> {
     loading: LoadingState;
     error: string | null;
-    data: any;
+    data: T | null;
+}
+
+// 더 구체적인 타입 정의
+export interface HeroContent {
+    title: {
+        ko: string;
+        en?: string;
+    };
+    subtitle: {
+        ko: string;
+        en?: string;
+    };
+}
+
+export interface PopupContent {
+    enabled: boolean;
+    type: 'text' | 'image';
+    content: {
+        ko: string;
+        en?: string;
+    };
+    imageUrl?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+// API 응답 타입 강화
+export interface SupabaseResponse<T> {
+    data: T | null;
+    error: {
+        message: string;
+        details?: string;
+        hint?: string;
+        code?: string;
+    } | null;
+}
+
+// 성능 모니터링 타입
+export interface PerformanceMetrics {
+    loadTime: number;
+    domContentLoaded: number;
+    firstPaint: number;
+    firstContentfulPaint: number;
+    largestContentfulPaint?: number;
+}
+
+// 보안 관련 타입
+export interface SecurityConfig {
+    maxRetries: number;
+    timeoutMs: number;
+    maxInputLength: number;
+    csrfTokenTTL: number;
+    rateLimitWindow: number;
+    rateLimitMax: number;
+}
+
+// 에러 타입 정의
+export interface AppError extends Error {
+    code?: string;
+    context?: string;
+    timestamp?: number;
+    userId?: string;
 }
