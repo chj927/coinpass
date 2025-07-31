@@ -4,18 +4,64 @@ declare const THREE: any;
 import { supabase } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
-let heroData: any = null;
-let popupData: any = null;
+// 타입 정의
+interface HeroData {
+    title: {
+        ko: string;
+        en: string;
+    };
+    subtitle: {
+        ko: string;
+        en: string;
+    };
+}
+
+interface PopupData {
+    enabled: boolean;
+    type: 'text' | 'image';
+    content: {
+        ko: string;
+        en: string;
+    };
+    imageUrl?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+let heroData: HeroData | null = null;
+let popupData: PopupData | null = null;
+
+// 전역 에러 핸들러
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    showErrorToast('페이지 로딩 중 오류가 발생했습니다.');
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    showErrorToast('데이터 로딩 중 오류가 발생했습니다.');
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadHeroData();
-    await loadPopupData();
-    setupEventListeners();
-    setupScrollAnimations();
-    startTypingAnimation();
-    setupThreeJSScene();
-    setupPopup();
-    setupSliders();
+    try {
+        showLoadingState(true);
+        await Promise.all([
+            loadHeroData(),
+            loadPopupData()
+        ]);
+        
+        setupEventListeners();
+        setupScrollAnimations();
+        startTypingAnimation();
+        setupThreeJSScene();
+        setupPopup();
+        setupSliders();
+    } catch (error) {
+        console.error('Initialization error:', error);
+        showErrorToast('페이지 초기화 중 오류가 발생했습니다.');
+    } finally {
+        showLoadingState(false);
+    }
 });
 
 async function loadHeroData() {
@@ -478,20 +524,132 @@ class CardSlider {
 }
 
 function setupSliders() {
-    // Only setup sliders on desktop/tablet
-    if (window.innerWidth > 768) {
-        new CardSlider('.features-section .slider-container');
-        new CardSlider('.why-coinpass .slider-container');
-    }
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth <= 768) {
-            // Reset transforms on mobile
+    // Setup sliders based on screen size
+    const setupSlidersForCurrentSize = () => {
+        const width = window.innerWidth;
+        if (width > 768) {
+            // Desktop and tablet get sliders
+            new CardSlider('.features-section .slider-container');
+            new CardSlider('.why-coinpass .slider-container');
+        } else {
+            // Mobile: reset transforms
             const grids = document.querySelectorAll('.features-grid, .benefits-grid');
             grids.forEach(grid => {
                 (grid as HTMLElement).style.transform = 'translateX(0)';
             });
         }
+    };
+
+    setupSlidersForCurrentSize();
+    
+    // Handle window resize with debouncing
+    let resizeTimeout: number;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(() => {
+            setupSlidersForCurrentSize();
+        }, 250);
     });
+}
+
+// 유틸리티 함수들
+function showErrorToast(message: string) {
+    const toast = document.createElement('div');
+    toast.className = 'error-toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff4757;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                document.body.removeChild(toast);
+            }
+        }, 300);
+    }, 4000);
+}
+
+function showLoadingState(show: boolean) {
+    const existingLoader = document.getElementById('page-loader');
+    
+    if (show && !existingLoader) {
+        const loader = document.createElement('div');
+        loader.id = 'page-loader';
+        loader.innerHTML = `
+            <div class="loader-backdrop">
+                <div class="loader-spinner">
+                    <div class="spinner"></div>
+                    <p>로딩 중...</p>
+                </div>
+            </div>
+        `;
+        loader.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            .loader-backdrop {
+                background: rgba(0, 0, 0, 0.8);
+                border-radius: 12px;
+                padding: 2rem;
+                text-align: center;
+            }
+            .loader-spinner {
+                color: white;
+            }
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 4px solid rgba(255,255,255,0.3);
+                border-left: 4px solid #00d4aa;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 1rem;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(loader);
+        
+    } else if (!show && existingLoader) {
+        existingLoader.style.opacity = '0';
+        setTimeout(() => {
+            if (existingLoader.parentNode) {
+                document.body.removeChild(existingLoader);
+            }
+        }, 300);
+    }
 }

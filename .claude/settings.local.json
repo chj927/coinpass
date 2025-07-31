@@ -12,7 +12,11 @@
       "Bash(for file in compare.html onchain.html research.html)",
       "Bash(do sed -i '/<div class=\"\"language-switcher\"\">/,/<\\/div>/d' \"$file\")",
       "Bash(done)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

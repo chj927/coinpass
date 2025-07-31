@@ -5,11 +5,85 @@ import { SecurityUtils } from './security-utils';
 interface DatabaseRecord {
     id?: number;
     created_at?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
+}
+
+interface BilingualContent {
+    ko: string;
+    en: string;
+}
+
+interface ExchangeData {
+    id?: number;
+    name_ko: string;
+    name_en: string;
+    logoImageUrl: string;
+    benefit1_tag_ko: string;
+    benefit1_tag_en: string;
+    benefit1_value_ko: string;
+    benefit1_value_en: string;
+    benefit2_tag_ko: string;
+    benefit2_tag_en: string;
+    benefit2_value_ko: string;
+    benefit2_value_en: string;
+    benefit3_tag_ko: string;
+    benefit3_tag_en: string;
+    benefit3_value_ko: string;
+    benefit3_value_en: string;
+    benefit4_tag_ko: string;
+    benefit4_tag_en: string;
+    benefit4_value_ko: string;
+    benefit4_value_en: string;
+    link: string;
+}
+
+interface FAQData {
+    id?: number;
+    question_ko: string;
+    question_en: string;
+    answer_ko: string;
+    answer_en: string;
+}
+
+interface GuideData {
+    id?: number;
+    title_ko: string;
+    title_en: string;
+    content_ko: string;
+    content_en: string;
+}
+
+interface PopupContent {
+    enabled: boolean;
+    type: 'text' | 'image';
+    content: BilingualContent;
+    imageUrl: string;
+    startDate: string;
+    endDate: string;
+}
+
+interface SiteData {
+    hero: {
+        title: BilingualContent;
+        subtitle: BilingualContent;
+    };
+    aboutUs: {
+        title: BilingualContent;
+        content: BilingualContent;
+    };
+    exchanges: ExchangeData[];
+    dexExchanges: ExchangeData[];
+    faqs: FAQData[];
+    guides: GuideData[];
+    popup: PopupContent;
+    indexPopup: PopupContent;
+    support: {
+        telegramUrl: string;
+    };
 }
 
 // 기본 데이터 구조는 유지합니다.
-const defaultSiteData = {
+const defaultSiteData: SiteData = {
     hero: { title: { ko: '', en: '' }, subtitle: { ko: '', en: '' }},
     aboutUs: { title: { ko: '', en: '' }, content: { ko: '', en: '' }},
     exchanges: [],
@@ -21,7 +95,7 @@ const defaultSiteData = {
     support: { telegramUrl: '#' }
 };
 
-let siteData = JSON.parse(JSON.stringify(defaultSiteData));
+let siteData: SiteData = JSON.parse(JSON.stringify(defaultSiteData));
 
 async function sha256(message: string): Promise<string> {
     const msgBuffer = new TextEncoder().encode(message);
