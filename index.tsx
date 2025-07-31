@@ -4,6 +4,11 @@ declare const THREE: any;
 import { supabase } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
+// 성능 최적화를 위한 상수들
+const DEBOUNCE_DELAY = 250;
+const THROTTLE_DELAY = 16;
+const MAX_RETRIES = 3;
+
 // 타입 정의
 interface HeroData {
     title: {
@@ -31,6 +36,10 @@ interface PopupData {
 let heroData: HeroData | null = null;
 let popupData: PopupData | null = null;
 
+// 캐싱을 위한 Map
+const dataCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5분
+
 // 전역 에러 핸들러
 window.addEventListener('error', (event) => {
     console.error('Global error:', event.error);
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupThreeJSScene();
         setupPopup();
         setupSliders();
-        setupThemeToggle();
+        // Theme setup is handled by theme-toggle.js
     } catch (error) {
         console.error('Initialization error:', error);
         showErrorToast('페이지 초기화 중 오류가 발생했습니다.');
@@ -65,7 +74,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// 캐시 유틸리티 함수
+function getCachedData(key: string): any | null {
+    const cached = dataCache.get(key);
+    if (cached && Date.now() - cached.timestamp < cached.ttl) {
+        return cached.data;
+    }
+    dataCache.delete(key);
+    return null;
+}
+
+function setCachedData(key: string, data: any, ttl: number = CACHE_TTL): void {
+    dataCache.set(key, { data, timestamp: Date.now(), ttl });
+}
+
 async function loadHeroData() {
+    const cacheKey = 'hero-data';
+    const cached = getCachedData(cacheKey);
+    if (cached) {
+        heroData = cached;
+        return;
+    }
+
     try {
         const { data, error } = await supabase
             .from('single_pages')
@@ -73,22 +103,20 @@ async function loadHeroData() {
             .eq('page_name', 'hero')
             .single();
 
+        const defaultData = {
+            title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
+            subtitle: { ko: '' }
+        };
+
         if (error) {
             console.error('Failed to load hero data:', error);
-            // 기본값 사용
-            heroData = {
-                title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
-                subtitle: { ko: '' }
-            };
+            heroData = defaultData;
         } else {
-            heroData = data?.content || {
-                title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
-                subtitle: { ko: '' }
-            };
+            heroData = data?.content || defaultData;
+            setCachedData(cacheKey, heroData);
         }
     } catch (error) {
         console.error('Error loading hero data:', error);
-        // 기본값 사용
         heroData = {
             title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
             subtitle: { ko: '' }
@@ -97,6 +125,13 @@ async function loadHeroData() {
 }
 
 async function loadPopupData() {
+    const cacheKey = 'popup-data';
+    const cached = getCachedData(cacheKey);
+    if (cached) {
+        popupData = cached;
+        return;
+    }
+
     try {
         const { data, error } = await supabase
             .from('single_pages')
@@ -109,6 +144,9 @@ async function loadPopupData() {
             popupData = null;
         } else {
             popupData = data?.content || null;
+            if (popupData) {
+                setCachedData(cacheKey, popupData);
+            }
         }
     } catch (error) {
         console.error('Error loading popup data:', error);
@@ -277,21 +315,25 @@ function setupMobileMenu() {
  */
 function setupThreeJSScene() {
     if (typeof THREE === 'undefined') {
-        console.log('Three.js is not loaded yet.');
-        // 최대 10초 대기 후 포기
-        const maxRetries = 100;
-        let retryCount = 0;
+        // Use window.THREE_LOADED flag for better performance
         const checkThreeJS = () => {
-            if (typeof THREE !== 'undefined') {
+            if (typeof THREE !== 'undefined' || (window as any).THREE_LOADED) {
                 initThreeJSScene();
-            } else if (retryCount < maxRetries) {
-                retryCount++;
-                setTimeout(checkThreeJS, 100);
             } else {
-                console.warn('Three.js failed to load after 10 seconds');
+                // Use requestAnimationFrame for better performance than setTimeout
+                requestAnimationFrame(checkThreeJS);
             }
         };
+        
+        // Start checking immediately
         checkThreeJS();
+        
+        // Fallback timeout
+        setTimeout(() => {
+            if (typeof THREE === 'undefined') {
+                console.warn('Three.js failed to load within timeout');
+            }
+        }, 10000);
         return;
     }
     initThreeJSScene();
@@ -549,7 +591,7 @@ function setupSliders() {
         clearTimeout(resizeTimeout);
         resizeTimeout = window.setTimeout(() => {
             setupSlidersForCurrentSize();
-        }, 250);
+        }, DEBOUNCE_DELAY);
     });
 }
 
@@ -655,50 +697,4 @@ function showLoadingState(show: boolean) {
     }
 }
 
-// Theme Management
-function setupThemeToggle() {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (!themeToggle) return;
-
-    // Load saved theme from localStorage
-    const savedTheme = localStorage.getItem('coinpass-theme') || 'dark';
-    applyTheme(savedTheme);
-
-    // Add click event listener
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        applyTheme(newTheme);
-        localStorage.setItem('coinpass-theme', newTheme);
-        
-        // Add a subtle animation effect
-        themeToggle.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            themeToggle.style.transform = 'scale(1)';
-        }, 150);
-    });
-
-    // Listen for system theme changes (optional enhancement)
-    if (window.matchMedia) {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        mediaQuery.addEventListener('change', (e) => {
-            // Only auto-switch if user hasn't manually set a preference
-            if (!localStorage.getItem('coinpass-theme')) {
-                applyTheme(e.matches ? 'dark' : 'light');
-            }
-        });
-    }
-}
-
-function applyTheme(theme: string) {
-    document.documentElement.setAttribute('data-theme', theme);
-    
-    // Update theme toggle button aria-label
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        const newLabel = theme === 'dark' ? '라이트 테마로 변경' : '다크 테마로 변경';
-        themeToggle.setAttribute('aria-label', newLabel);
-        themeToggle.setAttribute('title', newLabel);
-    }
-}
+// Theme Management (delegated to theme-toggle.js for consistency)

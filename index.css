@@ -297,6 +297,7 @@ header {
     border-radius: 8px;
     padding: 0.5rem;
     cursor: pointer;
+    will-change: transform;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
