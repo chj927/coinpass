@@ -20,10 +20,32 @@
 
 body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
-    background: var(--primary-color);
+    background: 
+        /* Subtle noise texture */
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(0, 212, 170, 0.008) 0%, transparent 50%),
+        /* Matte texture overlay */
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.003) 2px,
+            rgba(255, 255, 255, 0.003) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.002) 2px,
+            rgba(255, 255, 255, 0.002) 4px
+        ),
+        /* Base gradient */
+        linear-gradient(135deg, #1a1a1a 0%, #1e1e1e 25%, #242424 50%, #1f1f1f 75%, #1a1a1a 100%);
     color: var(--text-color);
     line-height: 1.6;
     font-size: 16px;
+    position: relative;
 }
 
 .skip-link {
@@ -243,10 +265,28 @@ main {
     gap: 2rem;
     padding: 4rem 2rem;
     border-radius: 16px;
-    background-color: var(--card-bg);
-    background-image: 
+    background: 
+        /* Luxurious matte finish */
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.015) 0%, transparent 40%),
         radial-gradient(circle at 15% 85%, rgba(0, 212, 170, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 85% 20%, rgba(0, 212, 170, 0.05) 0%, transparent 25%);
+        radial-gradient(circle at 85% 20%, rgba(0, 212, 170, 0.05) 0%, transparent 25%),
+        /* Premium paper texture */
+        repeating-linear-gradient(
+            15deg,
+            transparent,
+            transparent 4px,
+            rgba(255, 255, 255, 0.003) 4px,
+            rgba(255, 255, 255, 0.003) 8px
+        ),
+        repeating-linear-gradient(
+            105deg,
+            transparent,
+            transparent 4px,
+            rgba(255, 255, 255, 0.002) 4px,
+            rgba(255, 255, 255, 0.002) 8px
+        ),
+        var(--card-bg);
     border: 1px solid var(--border-color);
     overflow: hidden;
     position: relative;
@@ -289,6 +329,7 @@ main {
     line-height: 1.3;
     min-height: 3.7rem;
     color: var(--text-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .hero-banner h1::after {
@@ -309,6 +350,7 @@ main {
     color: var(--text-muted);
     max-width: 600px;
     margin: 0 0 2rem 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .main-cta-buttons {
@@ -463,6 +505,8 @@ main {
     font-size: 2.5rem;
     margin-bottom: 3rem;
     color: var(--accent-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
 }
 
 .slider-container {
@@ -489,12 +533,45 @@ main {
 }
 
 .feature-card {
-    background: var(--card-bg);
+    background: 
+        /* Subtle paper texture */
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.012) 0%, transparent 40%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.008) 0%, transparent 40%),
+        /* Fine grain texture */
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 1px,
+            rgba(255, 255, 255, 0.004) 1px,
+            rgba(255, 255, 255, 0.004) 2px
+        ),
+        var(--card-bg);
     border-radius: 12px;
     padding: 2rem;
     text-align: center;
     border: 1px solid var(--border-color);
     transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(1px);
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Subtle texture overlay */
+        repeating-conic-gradient(
+            from 0deg at 50% 50%,
+            transparent 0deg,
+            rgba(255, 255, 255, 0.003) 1deg,
+            transparent 2deg
+        );
+    border-radius: inherit;
+    pointer-events: none;
 }
 
 .feature-card:hover {
@@ -512,6 +589,8 @@ main {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     color: var(--accent-color);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
 }
 
 .feature-card p {
@@ -534,10 +613,28 @@ main {
 /* Why CoinPass Section */
 .why-coinpass {
     padding: 4rem 2rem;
-    background-color: var(--card-bg);
-    background-image: 
+    background: 
+        /* Matte finish texture */
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.015) 0%, transparent 45%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.01) 0%, transparent 45%),
         radial-gradient(circle at 75% 25%, rgba(0, 212, 170, 0.04) 0%, transparent 35%),
-        radial-gradient(circle at 25% 75%, rgba(0, 212, 170, 0.02) 0%, transparent 30%);
+        radial-gradient(circle at 25% 75%, rgba(0, 212, 170, 0.02) 0%, transparent 30%),
+        /* Fine fabric-like texture */
+        repeating-linear-gradient(
+            30deg,
+            transparent,
+            transparent 3px,
+            rgba(255, 255, 255, 0.003) 3px,
+            rgba(255, 255, 255, 0.003) 6px
+        ),
+        repeating-linear-gradient(
+            120deg,
+            transparent,
+            transparent 3px,
+            rgba(255, 255, 255, 0.002) 3px,
+            rgba(255, 255, 255, 0.002) 6px
+        ),
+        var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     margin: 2rem;
@@ -570,6 +667,20 @@ main {
 .benefit-item {
     text-align: center;
     padding: 2rem;
+    background: 
+        /* Soft matte surface */
+        radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.008) 0%, transparent 50%),
+        /* Micro texture */
+        repeating-linear-gradient(
+            60deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.002) 2px,
+            rgba(255, 255, 255, 0.002) 4px
+        );
+    border-radius: 8px;
+    position: relative;
+    backdrop-filter: blur(0.5px);
 }
 
 .benefit-icon {
@@ -581,6 +692,8 @@ main {
     font-size: 1.5rem;
     margin-bottom: 1rem;
     color: var(--accent-color);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
 }
 
 .benefit-item p {
