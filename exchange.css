@@ -112,8 +112,9 @@ header {
     gap: 0.75rem;
 }
 
-.logo-svg {
-    filter: drop-shadow(0 0 8px var(--shadow-color));
+.logo-img {
+    height: 32px; /* 또는 원하는 크기 */
+    width: auto;
 }
 
 .logo-text {
