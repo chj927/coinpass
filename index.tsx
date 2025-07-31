@@ -308,14 +308,14 @@ function initThreeJSScene() {
     const scene = new THREE.Scene();
 
     // 2. Object (객체)
-    const geometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+    const geometry = new THREE.BoxGeometry(2, 2, 2);
     const material = new THREE.MeshStandardMaterial({ 
         color: '#00d4aa',
-        metalness: 0.7,
-        roughness: 0.4 
+        metalness: 0.6,
+        roughness: 0.3 
     });
-    const torusKnot = new THREE.Mesh(geometry, material);
-    scene.add(torusKnot);
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
     // 3. Lights (조명)
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -347,8 +347,8 @@ function initThreeJSScene() {
     const tick = () => {
         const elapsedTime = clock.getElapsedTime();
 
-        torusKnot.rotation.y = .5 * elapsedTime;
-        torusKnot.rotation.x = .2 * elapsedTime;
+        cube.rotation.y = .5 * elapsedTime;
+        cube.rotation.x = .2 * elapsedTime;
         
         renderer.render(scene, camera);
         window.requestAnimationFrame(tick);
