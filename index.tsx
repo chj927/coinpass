@@ -359,8 +359,10 @@ class ThreeJSManager {
     private scene: any = null;
     private renderer: any = null;
     private camera: any = null;
+    private spotlight: any = null;
     private animationId: number | null = null;
     private resizeHandler: (() => void) | null = null;
+    private mouseMoveHandler: ((event: MouseEvent) => void) | null = null;
     private isDestroyed = false;
 
     init() {
@@ -370,119 +372,102 @@ class ThreeJSManager {
         const container = document.querySelector('.hero-3d-container') as HTMLElement;
         if (!container) return;
 
-        // 이미 초기화된 경우 정리 후 재초기화
         if (this.scene) {
             this.dispose();
         }
 
-        // 1. Scene (장면)
         this.scene = new THREE.Scene();
 
-        // 2. Object (객체) - 성능 최적화
-        const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); // 크기 최적화
-        const material = new THREE.MeshStandardMaterial({ 
-            color: '#00d4aa',
-            metalness: 0.6,
-            roughness: 0.3 
-        });
-        const cube = new THREE.Mesh(geometry, material);
-        this.scene.add(cube);
-
-        // 3. Lights (조명) - 최적화
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-        this.scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        directionalLight.position.set(5, 5, 5);
-        this.scene.add(directionalLight);
-
-        // 4. Camera (카메라)
         const sizes = {
             width: container.clientWidth,
             height: container.clientHeight
         };
-        this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
-        this.camera.position.z = 4;
 
-        // 5. Renderer (렌더러) - 모바일 최적화
+        this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
+        this.camera.position.z = 5;
+
         const isMobile = window.innerWidth <= 768;
         this.renderer = new THREE.WebGLRenderer({
             canvas: canvas,
             alpha: true,
-            antialias: !isMobile, // 모바일에서 안티앨리어싱 비활성화
-            powerPreference: isMobile ? 'low-power' : 'high-performance',
-            precision: isMobile ? 'mediump' : 'highp', // 모바일에서 정밀도 낮춤
-            preserveDrawingBuffer: false,
-            premultipliedAlpha: false
+            antialias: !isMobile,
+            powerPreference: 'high-performance'
         });
         this.renderer.setSize(sizes.width, sizes.height);
-        this.renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
-        this.renderer.shadowMap.enabled = false; // 그림자 비활성화로 성능 향상
-        
-        // 모바일에서 추가 최적화
-        if (isMobile) {
-            this.renderer.setSize(sizes.width * 0.8, sizes.height * 0.8); // 해상도 20% 감소
-        }
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        // 6. Animation Loop (애니메이션) - 메모리 누수 방지
-        const clock = new THREE.Clock();
+        // 조명 설정
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+        this.scene.add(ambientLight);
+
+        this.spotlight = new THREE.SpotLight(0xffffff, 1.5, 20, Math.PI / 4, 0.5, 2);
+        this.spotlight.position.set(0, 0, 5);
+        this.spotlight.target.position.set(0, 0, 0);
+        this.scene.add(this.spotlight);
+        this.scene.add(this.spotlight.target);
+
+        // 이미지 로드 및 재질 생성
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load('https://i.imgur.com/sF64B74.jpeg', (texture) => {
+            const imageAspect = texture.image.width / texture.image.height;
+            const planeHeight = 5;
+            const planeWidth = planeHeight * imageAspect;
+
+            const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+            const material = new THREE.MeshStandardMaterial({
+                map: texture,
+                metalness: 0.2,
+                roughness: 0.7
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            this.scene.add(plane);
+        }, undefined, (error) => {
+            console.error('An error happened during texture loading:', error);
+        });
+
         const tick = () => {
             if (this.isDestroyed) return;
-
-            const elapsedTime = clock.getElapsedTime();
-            cube.rotation.y = 0.3 * elapsedTime; // 회전 속도 최적화
-            cube.rotation.x = 0.1 * elapsedTime;
-            
             this.renderer.render(this.scene, this.camera);
             this.animationId = window.requestAnimationFrame(tick);
         };
         tick();
 
-        // 7. Responsive handling (반응형 처리) - 디바운스 적용
         this.resizeHandler = this.debounce(() => {
-            if (this.isDestroyed || !this.camera || !this.renderer) return;
-            
-            if (container.clientWidth > 0 && container.clientHeight > 0) {
-                sizes.width = container.clientWidth;
-                sizes.height = container.clientHeight;
-
-                this.camera.aspect = sizes.width / sizes.height;
-                this.camera.updateProjectionMatrix();
-
-                this.renderer.setSize(sizes.width, sizes.height);
-                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            }
+            if (this.isDestroyed) return;
+            sizes.width = container.clientWidth;
+            sizes.height = container.clientHeight;
+            this.camera.aspect = sizes.width / sizes.height;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(sizes.width, sizes.height);
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         }, 100);
-        
         window.addEventListener('resize', this.resizeHandler);
 
-        // 페이지 언로드 시 정리
-        window.addEventListener('beforeunload', () => {
-            this.dispose();
-        });
+        this.mouseMoveHandler = (event) => {
+            if (this.isDestroyed) return;
+            const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            const vector = new THREE.Vector3(mouseX, mouseY, 0.5);
+            vector.unproject(this.camera);
+            const dir = vector.sub(this.camera.position).normalize();
+            const distance = -this.camera.position.z / dir.z;
+            const pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+            this.spotlight.target.position.copy(pos);
+        };
+        window.addEventListener('mousemove', this.mouseMoveHandler);
+
+        window.addEventListener('beforeunload', () => this.dispose());
     }
 
-    // 메모리 누수 방지를 위한 정리 함수
     dispose() {
         this.isDestroyed = true;
+        if (this.animationId) cancelAnimationFrame(this.animationId);
+        if (this.resizeHandler) window.removeEventListener('resize', this.resizeHandler);
+        if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler);
 
-        // 애니메이션 중지
-        if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-            this.animationId = null;
-        }
-
-        // 이벤트 리스너 제거
-        if (this.resizeHandler) {
-            window.removeEventListener('resize', this.resizeHandler);
-            this.resizeHandler = null;
-        }
-
-        // Three.js 객체 정리
         if (this.scene) {
             this.scene.traverse((object: any) => {
-                if (object.geometry) {
-                    object.geometry.dispose();
-                }
+                if (object.geometry) object.geometry.dispose();
                 if (object.material) {
                     if (Array.isArray(object.material)) {
                         object.material.forEach((material: any) => material.dispose());
@@ -493,18 +478,16 @@ class ThreeJSManager {
             });
             this.scene.clear();
         }
-
         if (this.renderer) {
             this.renderer.dispose();
             this.renderer.forceContextLoss();
         }
-
         this.scene = null;
         this.renderer = null;
         this.camera = null;
+        this.spotlight = null;
     }
 
-    // 디바운스 유틸리티
     private debounce(func: Function, wait: number) {
         let timeout: number;
         return function executedFunction(...args: any[]) {
