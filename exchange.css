@@ -12,6 +12,34 @@
     --premium-negative-color: #3e86e1;
 }
 
+/* Light Theme */
+[data-theme="light"] {
+    --bg-color: #ffffff;
+    --card-bg-color: #ffffff;
+    --primary-text-color: #1a1a1a;
+    --secondary-text-color: #666666;
+    --border-color: #e0e0e0;
+    --accent-color: #00f2c3;
+    --accent-color-dark: #00c9a3;
+    --shadow-color: rgba(0, 242, 195, 0.15);
+    --premium-positive-color: #e5425a;
+    --premium-negative-color: #3e86e1;
+}
+
+/* Dark Theme (default) */
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --card-bg-color: #1e1e1e;
+    --primary-text-color: #e0e0e0;
+    --secondary-text-color: #b0b0b0;
+    --border-color: #333333;
+    --accent-color: #00f2c3;
+    --accent-color-dark: #00c9a3;
+    --shadow-color: rgba(0, 242, 195, 0.1);
+    --premium-positive-color: #e5425a;
+    --premium-negative-color: #3e86e1;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -161,6 +189,59 @@ header {
 }
 
 /* Language Switcher */
+/* Theme Switcher */
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+#theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-text-color);
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+#theme-toggle:hover {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 242, 195, 0.1);
+}
+
+.theme-icon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.theme-icon.sun-icon {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+}
+
+.theme-icon.moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-icon.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-icon.moon-icon {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+}
+
 .language-switcher {
     display: flex;
     align-items: center;

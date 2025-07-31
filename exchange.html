@@ -57,6 +57,17 @@
                     </div>
                 </a>
                 <div class="nav-container">
+                    <div class="theme-switcher">
+                        <button id="theme-toggle" aria-label="테마 변경" title="테마 변경">
+                            <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
                     <button class="hamburger-button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="main-nav">
                         <span class="hamburger-box">
                             <span class="hamburger-inner"></span>
@@ -184,6 +195,7 @@
         </div>
     </div>
 
+    <script src="theme-toggle.js"></script>
     <script type="module" src="exchange.tsx"></script>
 </body>
 </html>
