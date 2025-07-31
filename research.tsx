@@ -27,73 +27,51 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadArticles() {
     try {
-        // Mock data for demonstration - replace with actual Supabase query
-        articlesData = [
-            {
-                id: 1,
-                title: "MegaETH Ecosystem: Where No Limits Exist",
-                content: "Lorem ipsum dolor sit amet...",
-                category: "infra",
-                read_time: 30,
-                created_at: "2025-07-25",
-                author: "c4vin",
-                image_url: ""
-            },
-            {
-                id: 2,
-                title: "Stable: A Digital Nation of USDT, by USDT, for USDT",
-                content: "Lorem ipsum dolor sit amet...",
-                category: "defi",
-                read_time: 32,
-                created_at: "2025-07-24",
-                author: "100y",
-                image_url: ""
-            },
-            {
-                id: 3,
-                title: "Layer3: The Final Piece in Web3 Mass Adoption",
-                content: "Lorem ipsum dolor sit amet...",
-                category: "consumer",
-                read_time: 27,
-                created_at: "2025-07-23",
-                author: "Ingeun",
-                image_url: ""
-            },
-            {
-                id: 4,
-                title: "Are Stablecoin Payments a Threat to Banks and Card Networks?",
-                content: "Lorem ipsum dolor sit amet...",
-                category: "general",
-                read_time: 12,
-                created_at: "2025-07-17",
-                author: "100y",
-                image_url: ""
-            },
-            {
-                id: 5,
-                title: "Safe: Ownership Infra Layer For Onchain Applications",
-                content: "Lorem ipsum dolor sit amet...",
-                category: "infra",
-                read_time: 37,
-                created_at: "2025-07-16",
-                author: "c4vin, JW",
-                image_url: ""
-            },
-            {
-                id: 6,
-                title: "What if the #1 lending protocol on Sui launched a DEX?",
-                content: "Lorem ipsum dolor sit amet...",
-                category: "defi",
-                read_time: 21,
-                created_at: "2025-07-15",
-                author: "Steve",
-                image_url: ""
-            }
-        ];
+        // 관리자 페이지에서 작성한 포스팅을 localStorage에서 로드
+        const savedArticles = localStorage.getItem('coinpass-research-articles');
+        if (savedArticles) {
+            articlesData = JSON.parse(savedArticles);
+        } else {
+            // Mock data for demonstration when no articles exist
+            articlesData = [
+                {
+                    id: 1,
+                    title: "MegaETH Ecosystem: Where No Limits Exist",
+                    content: "Lorem ipsum dolor sit amet...",
+                    category: "infra",
+                    read_time: 30,
+                    created_at: "2025-07-25",
+                    author: "c4vin",
+                    image_url: ""
+                },
+                {
+                    id: 2,
+                    title: "Stable: A Digital Nation of USDT, by USDT, for USDT",
+                    content: "Lorem ipsum dolor sit amet...",
+                    category: "defi",
+                    read_time: 32,
+                    created_at: "2025-07-24",
+                    author: "100y",
+                    image_url: ""
+                },
+                {
+                    id: 3,
+                    title: "Layer3: The Final Piece in Web3 Mass Adoption",
+                    content: "Lorem ipsum dolor sit amet...",
+                    category: "consumer",
+                    read_time: 27,
+                    created_at: "2025-07-23",
+                    author: "Ingeun",
+                    image_url: ""
+                }
+            ];
+        }
         
         filteredArticles = [...articlesData];
     } catch (error) {
         console.error('Failed to load articles:', error);
+        articlesData = [];
+        filteredArticles = [];
     }
 }
 

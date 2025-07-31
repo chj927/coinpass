@@ -83,6 +83,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
                     <span>가이드</span>
                 </a></li>
+                <li><a href="#" class="nav-link" data-target="research-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><feather><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></feather></svg>
+                    <span>리서치 관리</span>
+                </a></li>
                 <li><a href="#" class="nav-link" data-target="banners-editor">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                     <span>배너 관리</span>
@@ -356,6 +360,151 @@
                                 <textarea id="research-banner-content" rows="3" placeholder="배너에 표시할 텍스트"></textarea>
                             </div>
                             <button class="save-section-button" data-section="research-banner">리서치 배너 저장</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Research Editor -->
+                <section class="editor-section" id="research-editor">
+                    <div class="section-header">
+                        <h2>리서치 포스팅 관리</h2>
+                        <div class="research-actions">
+                            <button id="new-research-button" class="primary-button">새 포스팅 작성</button>
+                            <button class="save-section-button" data-section="research">저장</button>
+                        </div>
+                    </div>
+
+                    <div class="research-container">
+                        <div class="research-list">
+                            <h3>포스팅 목록</h3>
+                            <div id="research-articles-list" class="articles-list">
+                                <!-- 포스팅 목록이 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+
+                        <div class="research-editor-panel" id="research-editor-panel">
+                            <div class="editor-header">
+                                <h3 id="research-editor-title">새 포스팅 작성</h3>
+                                <div class="editor-actions">
+                                    <button id="research-preview-button">미리보기</button>
+                                    <button id="research-save-button" class="primary-button">저장</button>
+                                    <button id="research-cancel-button">취소</button>
+                                </div>
+                            </div>
+
+                            <form id="research-form">
+                                <input type="hidden" id="research-id">
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="research-title">제목 *</label>
+                                        <input type="text" id="research-title" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="research-author">작성자 *</label>
+                                        <input type="text" id="research-author" required>
+                                    </div>
+                                    <div class="form-group half">
+                                        <label for="research-read-time">읽는 시간 (분) *</label>
+                                        <input type="number" id="research-read-time" min="1" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="research-category">카테고리 *</label>
+                                        <select id="research-category" required>
+                                            <option value="">선택하세요</option>
+                                            <option value="infra">Infra</option>
+                                            <option value="consumer">Consumer</option>
+                                            <option value="defi">DeFi</option>
+                                            <option value="market">Market</option>
+                                            <option value="general">General</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group half">
+                                        <label for="research-project">프로젝트 (선택사항)</label>
+                                        <input type="text" id="research-project" placeholder="예: Bitcoin, Ethereum">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="research-image-url">이미지 URL (선택사항)</label>
+                                    <input type="url" id="research-image-url" placeholder="https://example.com/image.jpg">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="research-content">본문 내용 *</label>
+                                    <div id="research-content-editor" class="rich-text-editor">
+                                        <div class="editor-toolbar">
+                                            <button type="button" class="editor-btn" data-command="bold" title="굵게">
+                                                <strong>B</strong>
+                                            </button>
+                                            <button type="button" class="editor-btn" data-command="italic" title="기울임">
+                                                <em>I</em>
+                                            </button>
+                                            <button type="button" class="editor-btn" data-command="underline" title="밑줄">
+                                                <u>U</u>
+                                            </button>
+                                            <div class="toolbar-separator"></div>
+                                            <select class="editor-select" data-command="formatBlock">
+                                                <option value="">스타일</option>
+                                                <option value="h1">제목 1</option>
+                                                <option value="h2">제목 2</option>
+                                                <option value="h3">제목 3</option>
+                                                <option value="p">본문</option>
+                                            </select>
+                                            <div class="toolbar-separator"></div>
+                                            <button type="button" class="editor-btn" data-command="insertUnorderedList" title="불릿 목록">
+                                                •
+                                            </button>
+                                            <button type="button" class="editor-btn" data-command="insertOrderedList" title="번호 목록">
+                                                1.
+                                            </button>
+                                            <div class="toolbar-separator"></div>
+                                            <button type="button" class="editor-btn" data-command="createLink" title="링크">
+                                                🔗
+                                            </button>
+                                            <button type="button" class="editor-btn" data-command="insertImage" title="이미지">
+                                                🖼️
+                                            </button>
+                                            <div class="toolbar-separator"></div>
+                                            <button type="button" class="editor-btn" data-command="justifyLeft" title="왼쪽 정렬">
+                                                ←
+                                            </button>
+                                            <button type="button" class="editor-btn" data-command="justifyCenter" title="가운데 정렬">
+                                                ⟷
+                                            </button>
+                                            <button type="button" class="editor-btn" data-command="justifyRight" title="오른쪽 정렬">
+                                                →
+                                            </button>
+                                        </div>
+                                        <div id="research-content-input" class="editor-content" contenteditable="true" data-placeholder="포스팅 내용을 작성하세요...">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="research-created-at">작성일 *</label>
+                                    <input type="date" id="research-created-at" required>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 미리보기 모달 -->
+                    <div id="research-preview-modal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>포스팅 미리보기</h3>
+                                <button class="modal-close" id="research-preview-close">&times;</button>
+                            </div>
+                            <div class="modal-body" id="research-preview-content">
+                                <!-- 미리보기 내용 -->
+                            </div>
                         </div>
                     </div>
                 </section>

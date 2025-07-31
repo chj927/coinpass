@@ -53,6 +53,18 @@ interface GuideData {
     content_en: string;
 }
 
+interface ResearchArticle {
+    id?: number;
+    title: string;
+    content: string;
+    category: string;
+    project?: string;
+    read_time: number;
+    created_at: string;
+    author: string;
+    image_url?: string;
+}
+
 interface PopupContent {
     enabled: boolean;
     type: 'text' | 'image';
@@ -195,6 +207,8 @@ async function initializeApp() {
     renderAll();
     setupEventListeners();
     setupNavigation();
+    setupResearchEditor();
+    loadResearchArticles();
 }
 
 // --- Supabase 데이터 통신 함수들 ---
@@ -869,5 +883,339 @@ function switchPopupTab(page: string) {
     document.getElementById('exchange-popup-content')!.style.display = page === 'exchange' ? 'block' : 'none';
     document.getElementById('index-popup-content')!.style.display = page === 'index' ? 'block' : 'none';
 }
+
+// Research Management Functions
+let researchArticles: ResearchArticle[] = [];
+let currentEditingArticle: ResearchArticle | null = null;
+
+async function loadResearchArticles() {
+    try {
+        // 실제 데이터베이스에서 로드 (나중에 구현)
+        // 현재는 localStorage에서 로드
+        const savedArticles = localStorage.getItem('coinpass-research-articles');
+        if (savedArticles) {
+            researchArticles = JSON.parse(savedArticles);
+        }
+        renderResearchList();
+    } catch (error) {
+        console.error('Research articles load error:', error);
+        researchArticles = [];
+    }
+}
+
+function renderResearchList() {
+    const articlesList = document.getElementById('research-articles-list');
+    if (!articlesList) return;
+
+    if (researchArticles.length === 0) {
+        articlesList.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">포스팅이 없습니다.</p>';
+        return;
+    }
+
+    const articlesHtml = researchArticles
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .map(article => `
+            <div class="article-item" data-id="${article.id}" onclick="editResearchArticle(${article.id})">
+                <div class="article-item-title">${SecurityUtils.sanitizeHtml(article.title)}</div>
+                <div class="article-item-meta">
+                    ${article.author} • ${article.category} • ${new Date(article.created_at).toLocaleDateString()}
+                </div>
+            </div>
+        `).join('');
+
+    articlesList.innerHTML = articlesHtml;
+}
+
+function setupResearchEditor() {
+    const newButton = document.getElementById('new-research-button');
+    const saveButton = document.getElementById('research-save-button');
+    const cancelButton = document.getElementById('research-cancel-button');
+    const previewButton = document.getElementById('research-preview-button');
+    const previewModal = document.getElementById('research-preview-modal');
+    const previewClose = document.getElementById('research-preview-close');
+
+    // 새 포스팅 작성
+    if (newButton) {
+        newButton.addEventListener('click', () => {
+            currentEditingArticle = null;
+            showResearchEditor();
+            clearResearchForm();
+            document.getElementById('research-editor-title')!.textContent = '새 포스팅 작성';
+        });
+    }
+
+    // 저장
+    if (saveButton) {
+        saveButton.addEventListener('click', saveResearchArticle);
+    }
+
+    // 취소
+    if (cancelButton) {
+        cancelButton.addEventListener('click', () => {
+            hideResearchEditor();
+            currentEditingArticle = null;
+        });
+    }
+
+    // 미리보기
+    if (previewButton) {
+        previewButton.addEventListener('click', showResearchPreview);
+    }
+
+    // 미리보기 모달 닫기
+    if (previewClose) {
+        previewClose.addEventListener('click', () => {
+            if (previewModal) previewModal.style.display = 'none';
+        });
+    }
+
+    // 모달 오버레이 클릭으로 닫기
+    if (previewModal) {
+        previewModal.addEventListener('click', (e) => {
+            if (e.target === previewModal) {
+                previewModal.style.display = 'none';
+            }
+        });
+    }
+
+    // 리치 텍스트 에디터 설정
+    setupRichTextEditor();
+}
+
+function setupRichTextEditor() {
+    const toolbar = document.querySelector('.editor-toolbar');
+    const editor = document.getElementById('research-content-input');
+
+    if (!toolbar || !editor) return;
+
+    // 툴바 버튼 이벤트
+    toolbar.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const button = target.closest('.editor-btn') as HTMLButtonElement;
+        const select = target.closest('.editor-select') as HTMLSelectElement;
+
+        if (button) {
+            e.preventDefault();
+            const command = button.getAttribute('data-command');
+            if (command) {
+                handleEditorCommand(command);
+            }
+        }
+
+        if (select) {
+            const command = select.getAttribute('data-command');
+            const value = select.value;
+            if (command && value) {
+                document.execCommand(command, false, value);
+                select.selectedIndex = 0;
+            }
+        }
+    });
+
+    // 에디터 내용 변경 시 툴바 버튼 상태 업데이트
+    editor.addEventListener('keyup', updateToolbarState);
+    editor.addEventListener('mouseup', updateToolbarState);
+}
+
+function handleEditorCommand(command: string) {
+    const editor = document.getElementById('research-content-input');
+    if (!editor) return;
+
+    editor.focus();
+
+    switch (command) {
+        case 'createLink':
+            const url = prompt('링크 URL을 입력하세요:');
+            if (url) {
+                document.execCommand(command, false, url);
+            }
+            break;
+        case 'insertImage':
+            const imageUrl = prompt('이미지 URL을 입력하세요:');
+            if (imageUrl) {
+                document.execCommand(command, false, imageUrl);
+            }
+            break;
+        default:
+            document.execCommand(command, false);
+            break;
+    }
+    
+    updateToolbarState();
+}
+
+function updateToolbarState() {
+    const buttons = document.querySelectorAll('.editor-btn[data-command]');
+    
+    buttons.forEach(button => {
+        const command = button.getAttribute('data-command');
+        if (command && ['bold', 'italic', 'underline'].includes(command)) {
+            const isActive = document.queryCommandState(command);
+            button.classList.toggle('active', isActive);
+        }
+    });
+}
+
+function showResearchEditor() {
+    const panel = document.getElementById('research-editor-panel');
+    if (panel) {
+        panel.classList.add('active');
+        // 오늘 날짜를 기본값으로 설정
+        const dateInput = document.getElementById('research-created-at') as HTMLInputElement;
+        if (dateInput && !dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    }
+}
+
+function hideResearchEditor() {
+    const panel = document.getElementById('research-editor-panel');
+    if (panel) {
+        panel.classList.remove('active');
+    }
+}
+
+function clearResearchForm() {
+    const form = document.getElementById('research-form') as HTMLFormElement;
+    if (form) {
+        form.reset();
+        const editor = document.getElementById('research-content-input');
+        if (editor) {
+            editor.innerHTML = '';
+        }
+        // 오늘 날짜를 기본값으로 설정
+        const dateInput = document.getElementById('research-created-at') as HTMLInputElement;
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    }
+}
+
+function fillResearchForm(article: ResearchArticle) {
+    (document.getElementById('research-id') as HTMLInputElement).value = article.id?.toString() || '';
+    (document.getElementById('research-title') as HTMLInputElement).value = article.title;
+    (document.getElementById('research-author') as HTMLInputElement).value = article.author;
+    (document.getElementById('research-read-time') as HTMLInputElement).value = article.read_time.toString();
+    (document.getElementById('research-category') as HTMLSelectElement).value = article.category;
+    (document.getElementById('research-project') as HTMLInputElement).value = article.project || '';
+    (document.getElementById('research-image-url') as HTMLInputElement).value = article.image_url || '';
+    (document.getElementById('research-created-at') as HTMLInputElement).value = article.created_at.split('T')[0];
+    
+    const editor = document.getElementById('research-content-input');
+    if (editor) {
+        editor.innerHTML = article.content;
+    }
+}
+
+function saveResearchArticle() {
+    const form = document.getElementById('research-form') as HTMLFormElement;
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const id = (document.getElementById('research-id') as HTMLInputElement).value;
+    const title = (document.getElementById('research-title') as HTMLInputElement).value;
+    const author = (document.getElementById('research-author') as HTMLInputElement).value;
+    const readTime = parseInt((document.getElementById('research-read-time') as HTMLInputElement).value);
+    const category = (document.getElementById('research-category') as HTMLSelectElement).value;
+    const project = (document.getElementById('research-project') as HTMLInputElement).value;
+    const imageUrl = (document.getElementById('research-image-url') as HTMLInputElement).value;
+    const createdAt = (document.getElementById('research-created-at') as HTMLInputElement).value;
+    const content = (document.getElementById('research-content-input') as HTMLElement).innerHTML;
+
+    if (!content.trim()) {
+        alert('본문 내용을 입력해주세요.');
+        return;
+    }
+
+    const article: ResearchArticle = {
+        id: id ? parseInt(id) : Date.now(),
+        title,
+        author,
+        read_time: readTime,
+        category,
+        project: project || undefined,
+        image_url: imageUrl || undefined,
+        created_at: createdAt + 'T00:00:00.000Z',
+        content
+    };
+
+    if (currentEditingArticle) {
+        // 기존 아티클 수정
+        const index = researchArticles.findIndex(a => a.id === currentEditingArticle!.id);
+        if (index !== -1) {
+            researchArticles[index] = article;
+        }
+    } else {
+        // 새 아티클 추가
+        researchArticles.push(article);
+    }
+
+    // localStorage에 저장
+    localStorage.setItem('coinpass-research-articles', JSON.stringify(researchArticles));
+
+    alert('포스팅이 저장되었습니다.');
+    hideResearchEditor();
+    renderResearchList();
+    currentEditingArticle = null;
+}
+
+function showResearchPreview() {
+    const title = (document.getElementById('research-title') as HTMLInputElement).value;
+    const author = (document.getElementById('research-author') as HTMLInputElement).value;
+    const readTime = (document.getElementById('research-read-time') as HTMLInputElement).value;
+    const category = (document.getElementById('research-category') as HTMLSelectElement).value;
+    const project = (document.getElementById('research-project') as HTMLInputElement).value;
+    const imageUrl = (document.getElementById('research-image-url') as HTMLInputElement).value;
+    const createdAt = (document.getElementById('research-created-at') as HTMLInputElement).value;
+    const content = (document.getElementById('research-content-input') as HTMLElement).innerHTML;
+
+    const previewContent = document.getElementById('research-preview-content');
+    const previewModal = document.getElementById('research-preview-modal');
+
+    if (!previewContent || !previewModal) return;
+
+    const previewHtml = `
+        <div style="max-width: 800px; margin: 0 auto;">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${title}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">` : ''}
+            <div style="margin-bottom: 1rem;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">${readTime}분 읽기 • ${new Date(createdAt).toLocaleDateString()}</span>
+            </div>
+            <h1 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-color);">${SecurityUtils.sanitizeHtml(title)}</h1>
+            <div style="margin-bottom: 1rem;">
+                <span style="background: var(--accent-color); color: var(--primary-color); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-right: 0.5rem;">${category}</span>
+                ${project ? `<span style="background: var(--secondary-color); color: var(--text-color); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${project}</span>` : ''}
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-color); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 0.75rem;">
+                    ${author.split(/[,\s]+/).map(name => name.charAt(0).toUpperCase()).join('').slice(0, 2)}
+                </div>
+                <span style="color: var(--text-color); font-weight: 600;">${author}</span>
+            </div>
+            <div style="line-height: 1.6; color: var(--text-color);">
+                ${content}
+            </div>
+        </div>
+    `;
+
+    previewContent.innerHTML = previewHtml;
+    previewModal.style.display = 'flex';
+}
+
+// 전역 함수로 만들어 HTML에서 호출할 수 있게 함
+(window as any).editResearchArticle = function(id: number) {
+    const article = researchArticles.find(a => a.id === id);
+    if (article) {
+        currentEditingArticle = article;
+        showResearchEditor();
+        fillResearchForm(article);
+        document.getElementById('research-editor-title')!.textContent = '포스팅 수정';
+        
+        // 활성 상태 표시
+        document.querySelectorAll('.article-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`[data-id="${id}"]`)?.classList.add('active');
+    }
+};
 
 export {};
