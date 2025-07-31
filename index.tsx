@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     startTypingAnimation();
     setupThreeJSScene();
     setupPopup();
+    setupSliders();
 });
 
 async function loadHeroData() {
@@ -74,29 +75,71 @@ function setupEventListeners() {
 
 class TypingAnimator {
     private element: HTMLElement;
-    private text: string;
+    private sentences: string[];
+    private currentIndex: number = 0;
     private typingSpeed: number = 100;
-    private delayBetweenCycles: number = 2000;
+    private delayBetweenSentences: number = 2000;
+    private delayBetweenCycles: number = 3000;
+    private isAnimating: boolean = false;
 
-    constructor(element: HTMLElement, text: string) {
+    constructor(element: HTMLElement, sentences: string[]) {
         this.element = element;
-        this.text = text;
+        this.sentences = sentences.filter(s => s.trim().length > 0);
     }
 
     public startTyping() {
-        this.typeText(this.text);
+        if (this.sentences.length === 0) return;
+        if (this.isAnimating) return;
+        
+        this.isAnimating = true;
+        this.animateLoop();
+    }
+
+    public stop() {
+        this.isAnimating = false;
+    }
+
+    private async animateLoop() {
+        while (this.isAnimating) {
+            const sentence = this.sentences[this.currentIndex];
+            await this.typeText(sentence);
+            
+            if (!this.isAnimating) break;
+            
+            await this.eraseText();
+            
+            if (!this.isAnimating) break;
+            
+            this.currentIndex = (this.currentIndex + 1) % this.sentences.length;
+            
+            if (this.currentIndex === 0) {
+                await this.sleep(this.delayBetweenCycles);
+            } else {
+                await this.sleep(this.delayBetweenSentences);
+            }
+        }
     }
 
     private async typeText(text: string) {
         this.element.textContent = '';
         
-        // Typing effect
         for (let i = 0; i <= text.length; i++) {
+            if (!this.isAnimating) break;
             this.element.textContent = text.substring(0, i);
             await this.sleep(this.typingSpeed);
         }
         
-        await this.sleep(this.delayBetweenCycles);
+        await this.sleep(this.delayBetweenSentences);
+    }
+
+    private async eraseText() {
+        const text = this.element.textContent || '';
+        
+        for (let i = text.length; i >= 0; i--) {
+            if (!this.isAnimating) break;
+            this.element.textContent = text.substring(0, i);
+            await this.sleep(this.typingSpeed * 0.5);
+        }
     }
 
     private sleep(ms: number): Promise<void> {
@@ -110,13 +153,31 @@ function startTypingAnimation() {
     const heroTitle = document.getElementById('hero-title');
     if (!heroTitle || !heroData) return;
 
-    // 관리자가 설정한 텍스트 사용, 없으면 기본값 사용
-    const titleText = heroData.title?.ko || '코인패스와 함께하는 스마트한 암호화폐 투자';
-    
-    // 여러 줄로 설정된 경우 첫 번째 줄만 사용하거나 전체 텍스트 사용
-    const text = typeof titleText === 'string' ? titleText : String(titleText);
+    // 기존 애니메이션이 있다면 정지
+    if (typingAnimator) {
+        typingAnimator.stop();
+    }
 
-    typingAnimator = new TypingAnimator(heroTitle as HTMLElement, text);
+    // 관리자가 설정한 문장들 사용, 없으면 기본값 사용
+    let sentences: string[] = [];
+    
+    if (heroData.title?.ko) {
+        // 줄바꿈으로 구분된 여러 문장을 배열로 변환
+        sentences = heroData.title.ko.split('\n')
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0);
+    }
+    
+    // 문장이 없으면 기본값 사용
+    if (sentences.length === 0) {
+        sentences = [
+            '최대 50%까지 수수료 할인!',
+            '최고의 혜택을 누구나 무료로!',
+            '한번 등록하고 평생 혜택받기!'
+        ];
+    }
+
+    typingAnimator = new TypingAnimator(heroTitle as HTMLElement, sentences);
     typingAnimator.startTyping();
     
     // hero subtitle 업데이트
@@ -302,4 +363,135 @@ function setupPopup() {
         localStorage.setItem('coinpass-index-popup-hide-until', (Date.now() + 24 * 60 * 60 * 1000).toString());
         closePopup();
     };
+}
+
+class CardSlider {
+    private container: HTMLElement;
+    private grid: HTMLElement;
+    private prevBtn: HTMLElement;
+    private nextBtn: HTMLElement;
+    private dots: NodeListOf<HTMLElement>;
+    private cards: NodeListOf<HTMLElement>;
+    private currentSlide: number = 0;
+    private maxSlides: number;
+    private cardsPerSlide: number = 3;
+
+    constructor(containerSelector: string) {
+        this.container = document.querySelector(containerSelector)!;
+        if (!this.container) return;
+
+        this.grid = this.container.querySelector('.features-grid, .benefits-grid')!;
+        this.prevBtn = this.container.querySelector('.slider-nav.prev')!;
+        this.nextBtn = this.container.querySelector('.slider-nav.next')!;
+        this.dots = this.container.querySelectorAll('.dot');
+        this.cards = this.grid.querySelectorAll('.feature-card, .benefit-item');
+        
+        this.maxSlides = Math.ceil(this.cards.length / this.cardsPerSlide);
+        
+        this.setupEventListeners();
+        this.updateSlider();
+        this.updateDots();
+    }
+
+    private setupEventListeners() {
+        this.prevBtn?.addEventListener('click', () => this.prevSlide());
+        this.nextBtn?.addEventListener('click', () => this.nextSlide());
+        
+        this.dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => this.goToSlide(index));
+        });
+
+        // Touch/swipe support
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+
+        this.grid.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+
+        this.grid.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            currentX = e.touches[0].clientX;
+            currentY = e.touches[0].clientY;
+        });
+
+        this.grid.addEventListener('touchend', () => {
+            const deltaX = startX - currentX;
+            const deltaY = Math.abs(startY - currentY);
+            
+            // Only if horizontal swipe is more significant than vertical
+            if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > 50) {
+                if (deltaX > 0) {
+                    this.nextSlide();
+                } else {
+                    this.prevSlide();
+                }
+            }
+        });
+    }
+
+    private prevSlide() {
+        if (this.currentSlide > 0) {
+            this.currentSlide--;
+            this.updateSlider();
+            this.updateDots();
+        }
+    }
+
+    private nextSlide() {
+        if (this.currentSlide < this.maxSlides - 1) {
+            this.currentSlide++;
+            this.updateSlider();
+            this.updateDots();
+        }
+    }
+
+    private goToSlide(slideIndex: number) {
+        if (slideIndex >= 0 && slideIndex < this.maxSlides) {
+            this.currentSlide = slideIndex;
+            this.updateSlider();
+            this.updateDots();
+        }
+    }
+
+    private updateSlider() {
+        const translateX = -(this.currentSlide * 100);
+        this.grid.style.transform = `translateX(${translateX}%)`;
+        
+        // Update navigation buttons
+        if (this.prevBtn) {
+            this.prevBtn.style.display = this.currentSlide === 0 ? 'none' : 'flex';
+        }
+        if (this.nextBtn) {
+            this.nextBtn.style.display = this.currentSlide === this.maxSlides - 1 ? 'none' : 'flex';
+        }
+    }
+
+    private updateDots() {
+        this.dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === this.currentSlide);
+        });
+    }
+}
+
+function setupSliders() {
+    // Only setup sliders on desktop/tablet
+    if (window.innerWidth > 768) {
+        new CardSlider('.features-section .slider-container');
+        new CardSlider('.why-coinpass .slider-container');
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+            // Reset transforms on mobile
+            const grids = document.querySelectorAll('.features-grid, .benefits-grid');
+            grids.forEach(grid => {
+                (grid as HTMLElement).style.transform = 'translateX(0)';
+            });
+        }
+    });
 }
