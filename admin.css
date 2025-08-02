@@ -1144,3 +1144,98 @@ body {
 .data-table tr:hover {
     background: var(--sidebar-hover-bg);
 }
+
+/* 콘텐츠 영역 개선 */
+.content-area {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 거래소 및 FAQ 리스트 그리드 */
+#exchanges-list, #faq-list {
+    display: grid;
+    gap: 24px;
+}
+
+/* 거래소 리스트 - 2열 레이아웃 */
+#exchanges-list {
+    grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+}
+
+/* FAQ 리스트 - 2열 레이아웃 */
+#faq-list {
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+}
+
+/* 거래소 카드 내부 레이아웃 */
+#exchanges-list .item-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+/* 거래소 혜택 필드 그룹화 */
+.exchange-benefits-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+/* 폼 그룹 간격 조정 */
+.editor-section .form-group {
+    margin-bottom: 16px;
+}
+
+/* 작은 화면에서 1열로 변경 */
+@media (max-width: 1200px) {
+    #exchanges-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1000px) {
+    #faq-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .exchange-benefits-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 섹션 패딩 개선 */
+.editor-section {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* 추가 버튼 스타일 개선 */
+.add-button {
+    background: var(--accent-color);
+    color: #000000;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.add-button:hover {
+    background: var(--success-hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+}
+
+/* 아이템 카드 호버 효과 개선 */
+.item-card:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow-color);
+}

@@ -274,9 +274,11 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
         delete sanitizedData.created_at;
 
         let response;
-        if (id) {
+        if (id && id > 0) {
+            // 기존 항목 업데이트
             response = await supabase.from(tableName).update(sanitizedData).eq('id', id);
         } else {
+            // 새 항목 생성
             response = await supabase.from(tableName).insert(sanitizedData).select();
         }
 
@@ -288,7 +290,7 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
             showToast(`${tableName} 항목이 저장되었습니다.`);
             console.log('Save successful:', response.data);
             // 새로 생성된 항목인 경우에만 데이터를 다시 불러옵니다
-            if (!id && response.data) {
+            if ((!id || id < 0) && response.data) {
                 await fetchDataFromSupabase();
                 renderAll();
             }
@@ -318,10 +320,34 @@ async function saveSinglePage(pageName: string, content: any) {
         // 콘텐츠 sanitization
         const sanitizedContent = sanitizeContent(content);
         
-        const { error } = await supabase.from('page_contents').update({ content: sanitizedContent }).eq('page_type', pageName);
-        if (error) {
-            console.error(`Error saving ${pageName}:`, error);
-            showToast(`오류: ${pageName} 저장 실패`, 'error');
+        // 먼저 해당 page_type의 레코드가 존재하는지 확인
+        const { data: existing, error: checkError } = await supabase
+            .from('page_contents')
+            .select('id')
+            .eq('page_type', pageName)
+            .single();
+            
+        let result;
+        if (existing) {
+            // 기존 레코드 업데이트
+            result = await supabase
+                .from('page_contents')
+                .update({ content: sanitizedContent })
+                .eq('page_type', pageName);
+        } else {
+            // 새 레코드 생성
+            result = await supabase
+                .from('page_contents')
+                .insert({ 
+                    page_type: pageName, 
+                    content: sanitizedContent 
+                });
+        }
+        
+        if (result.error) {
+            console.error(`Error saving ${pageName}:`, result.error);
+            console.error('Error details:', result.error.message);
+            showToast(`오류: ${pageName} 저장 실패 - ${result.error.message}`, 'error');
         } else {
             showToast(`${pageName} 섹션이 저장되었습니다.`);
         }
@@ -571,19 +597,92 @@ function renderSupport() {
 }
 
 function renderExchanges() {
-    renderList('exchanges-list', siteData.exchanges, 'exchange_exchanges', [
-        { name: 'name_ko', labels: { ko: '거래소 이름' }, bilingual: false, elType: 'input' },
-        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL' }, bilingual: false, elType: 'input', inputType: 'url' },
-        { name: 'benefit1_tag_ko', labels: { ko: '혜택 1 태그' }, bilingual: false, elType: 'input' },
-        { name: 'benefit1_value_ko', labels: { ko: '혜택 1 값' }, bilingual: false, elType: 'input' },
-        { name: 'benefit2_tag_ko', labels: { ko: '혜택 2 태그' }, bilingual: false, elType: 'input' },
-        { name: 'benefit2_value_ko', labels: { ko: '혜택 2 값' }, bilingual: false, elType: 'input' },
-        { name: 'benefit3_tag_ko', labels: { ko: '혜택 3 태그' }, bilingual: false, elType: 'input' },
-        { name: 'benefit3_value_ko', labels: { ko: '혜택 3 값' }, bilingual: false, elType: 'input' },
-        { name: 'benefit4_tag_ko', labels: { ko: '혜택 4 태그' }, bilingual: false, elType: 'input' },
-        { name: 'benefit4_value_ko', labels: { ko: '혜택 4 값' }, bilingual: false, elType: 'input' },
-        { name: 'link', labels: { ko: '가입 링크' }, bilingual: false, elType: 'input', inputType: 'url' },
-    ]);
+    const container = document.getElementById('exchanges-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+
+    siteData.exchanges.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.dataset.index = index.toString();
+        card.dataset.listName = 'exchange_exchanges';
+        card.dataset.itemId = item.id?.toString() || '';
+
+        // 거래소 이름과 로고 URL
+        createSingleFormGroup(card, 'name_ko', '거래소 이름', item, 'input');
+        createSingleFormGroup(card, 'logoImageUrl', '로고 이미지 URL', item, 'input', 'url');
+        
+        // 혜택 필드들을 그룹으로 묶기
+        const benefitsTitle = document.createElement('h4');
+        benefitsTitle.textContent = '거래소 혜택';
+        benefitsTitle.style.marginTop = '16px';
+        benefitsTitle.style.marginBottom = '12px';
+        benefitsTitle.style.color = 'var(--text-color)';
+        card.appendChild(benefitsTitle);
+        
+        const benefitsGroup = document.createElement('div');
+        benefitsGroup.className = 'exchange-benefits-group';
+        
+        // 혜택 1-4 그룹화
+        for (let i = 1; i <= 4; i++) {
+            const benefitContainer = document.createElement('div');
+            benefitContainer.style.display = 'grid';
+            benefitContainer.style.gap = '8px';
+            benefitContainer.style.padding = '12px';
+            benefitContainer.style.background = 'var(--input-bg)';
+            benefitContainer.style.borderRadius = '8px';
+            benefitContainer.style.border = '1px solid var(--border-color)';
+            
+            const benefitLabel = document.createElement('label');
+            benefitLabel.textContent = `혜택 ${i}`;
+            benefitLabel.style.fontWeight = '600';
+            benefitLabel.style.marginBottom = '4px';
+            benefitContainer.appendChild(benefitLabel);
+            
+            // 태그 입력
+            const tagInput = document.createElement('input');
+            tagInput.placeholder = '태그 (예: 수수료 할인)';
+            tagInput.value = item[`benefit${i}_tag_ko`] || '';
+            tagInput.className = `item-input benefit${i}_tag_ko`;
+            tagInput.style.marginBottom = '4px';
+            
+            // 값 입력
+            const valueInput = document.createElement('input');
+            valueInput.placeholder = '값 (예: 20%)';
+            valueInput.value = item[`benefit${i}_value_ko`] || '';
+            valueInput.className = `item-input benefit${i}_value_ko`;
+            
+            benefitContainer.appendChild(tagInput);
+            benefitContainer.appendChild(valueInput);
+            benefitsGroup.appendChild(benefitContainer);
+        }
+        
+        card.appendChild(benefitsGroup);
+        
+        // 가입 링크
+        createSingleFormGroup(card, 'link', '가입 링크', item, 'input', 'url');
+
+        // 컨트롤 버튼
+        const controls = document.createElement('div');
+        controls.className = 'item-controls';
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-item-button';
+        saveBtn.textContent = '항목 저장';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-button';
+        deleteBtn.textContent = '삭제';
+
+        controls.append(saveBtn, deleteBtn);
+        card.appendChild(controls);
+
+        fragment.appendChild(card);
+    });
+
+    container.appendChild(fragment);
 }
 
 

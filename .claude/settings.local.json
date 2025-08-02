@@ -22,7 +22,8 @@
       "Bash(powershell:*)",
       "Bash(dir:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(psql:*)"
     ],
     "deny": []
   }
