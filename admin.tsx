@@ -264,14 +264,16 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
             showToast(`오류: ${tableName} 저장 실패`, 'error');
         } else {
             showToast(`${tableName} 항목이 저장되었습니다.`);
+            // 새로 생성된 항목인 경우에만 데이터를 다시 불러옵니다
+            if (!id && response.data) {
+                await fetchDataFromSupabase();
+                renderAll();
+            }
         }
     } catch (error) {
         console.error('Save error:', error);
         showToast('데이터 저장 중 오류가 발생했습니다.', 'error');
     }
-    
-    await fetchDataFromSupabase();
-    renderAll();
 }
 
 async function saveSinglePage(pageName: string, content: any) {
@@ -573,7 +575,11 @@ function setupEventListeners() {
             if (tableName) deleteItem(tableName, itemId);
         } else if (target.classList.contains('save-item-button')) {
             const itemData = readDataFromCard(card);
-            if (tableName) saveItem(tableName, itemData, itemId);
+            if (tableName) {
+                // 임시 ID(음수)인 경우 ID를 제거하여 새 항목으로 저장
+                const saveId = itemId < 0 ? undefined : itemId;
+                saveItem(tableName, itemData, saveId);
+            }
         }
     });
 }
@@ -626,14 +632,39 @@ function readDataFromSection(section: string): any {
     return {};
 }
 
-async function createNewItem(tableName: string) {
-    let newItemData = {};
+function createNewItem(tableName: string) {
+    // 새 항목을 화면에만 추가하고 저장하지 않습니다
     if (tableName === 'exchange_exchanges') {
-        newItemData = { name_ko: '새 거래소' };
+        const newExchange = {
+            id: -Date.now(), // 임시 ID (음수로 설정하여 실제 ID와 구분)
+            name_ko: '새 거래소',
+            logoImageUrl: '',
+            benefit1_tag_ko: '',
+            benefit1_value_ko: '',
+            benefit2_tag_ko: '',
+            benefit2_value_ko: '',
+            benefit3_tag_ko: '',
+            benefit3_value_ko: '',
+            benefit4_tag_ko: '',
+            benefit4_value_ko: '',
+            tradingPairCount: 0,
+            tradingPairLabel_ko: '',
+            dailyVolume: 0,
+            dailyVolumeLabel_ko: '',
+            referralCode: '',
+            link: ''
+        };
+        siteData.exchanges.unshift(newExchange);
+        renderExchanges();
     } else if (tableName === 'exchange_faqs') {
-        newItemData = { question_ko: '새 질문', answer_ko: '' };
+        const newFaq = {
+            id: -Date.now(), // 임시 ID
+            question_ko: '새 질문',
+            answer_ko: ''
+        };
+        siteData.faqs.unshift(newFaq);
+        renderFaqs();
     }
-    await saveItem(tableName, newItemData);
 }
 
 function readDataFromCard(cardElement: HTMLElement): DatabaseRecord {
