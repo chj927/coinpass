@@ -12,7 +12,7 @@ interface DatabaseRecord {
 interface ExchangeData {
     id?: number;
     name_ko: string;
-    logoImageUrl: string;
+    logoimageurl: string;
     benefit1_tag_ko: string;
     benefit1_value_ko: string;
     benefit2_tag_ko: string;
@@ -612,7 +612,7 @@ function renderExchanges() {
 
         // 거래소 이름과 로고 URL
         createSingleFormGroup(card, 'name_ko', '거래소 이름', item, 'input');
-        createSingleFormGroup(card, 'logoImageUrl', '로고 이미지 URL', item, 'input', 'url');
+        createSingleFormGroup(card, 'logoimageurl', '로고 이미지 URL', item, 'input', 'url');
         
         // 혜택 필드들을 그룹으로 묶기
         const benefitsTitle = document.createElement('h4');
@@ -800,7 +800,7 @@ function createNewItem(tableName: string) {
         const newExchange = {
             id: -Date.now(), // 임시 ID (음수로 설정하여 실제 ID와 구분)
             name_ko: '새 거래소',
-            logoImageUrl: '',
+            logoimageurl: '',
             benefit1_tag_ko: '',
             benefit1_value_ko: '',
             benefit2_tag_ko: '',
