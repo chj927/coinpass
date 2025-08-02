@@ -799,7 +799,7 @@ function createNewItem(tableName: string) {
     if (tableName === 'exchange_exchanges') {
         const newExchange = {
             id: -Date.now(), // 임시 ID (음수로 설정하여 실제 ID와 구분)
-            name_ko: '새 거래소',
+            name_ko: '',
             logoimageurl: '',
             benefit1_tag_ko: '',
             benefit1_value_ko: '',
@@ -809,23 +809,32 @@ function createNewItem(tableName: string) {
             benefit3_value_ko: '',
             benefit4_tag_ko: '',
             benefit4_value_ko: '',
-            tradingPairCount: 0,
-            tradingPairLabel_ko: '',
-            dailyVolume: 0,
-            dailyVolumeLabel_ko: '',
-            referralCode: '',
             link: ''
         };
-        siteData.exchanges.unshift(newExchange);
+        siteData.exchanges.push(newExchange);
         renderExchanges();
+        // 새로 생성된 카드로 스크롤
+        setTimeout(() => {
+            const newCard = document.querySelector(`[data-item-id="${newExchange.id}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
     } else if (tableName === 'exchange_faqs') {
         const newFaq = {
             id: -Date.now(), // 임시 ID
-            question_ko: '새 질문',
+            question_ko: '',
             answer_ko: ''
         };
-        siteData.faqs.unshift(newFaq);
+        siteData.faqs.push(newFaq);
         renderFaqs();
+        // 새로 생성된 카드로 스크롤
+        setTimeout(() => {
+            const newCard = document.querySelector(`[data-item-id="${newFaq.id}"]`);
+            if (newCard) {
+                newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
     }
 }
 

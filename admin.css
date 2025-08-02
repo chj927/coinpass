@@ -309,14 +309,7 @@ body {
     color: #000000;
 }
 
-/* 메인 콘텐츠 */
-.main-content {
-    flex: 1;
-    overflow-y: auto;
-    background: var(--admin-bg);
-    padding: 30px;
-    min-width: 0;
-}
+/* 메인 콘텐츠 - 삭제 (아래에 새로 정의) */
 
 .content-header {
     display: flex;
@@ -338,6 +331,7 @@ body {
 .editor-section {
     display: none;
     animation: fadeIn 0.3s ease;
+    padding: 0;
 }
 
 .editor-section.active {
@@ -685,10 +679,6 @@ body {
         display: block;
     }
     
-    .main-content {
-        padding: 20px;
-        padding-top: 60px;
-    }
     
     .content-header {
         flex-direction: column;
@@ -726,10 +716,6 @@ body {
         padding: 30px 20px;
     }
     
-    .main-content {
-        padding: 15px;
-        padding-top: 60px;
-    }
     
     .card {
         padding: 16px;
@@ -1148,8 +1134,8 @@ body {
 /* 콘텐츠 영역 개선 */
 .content-area {
     max-width: 100%;
-    margin: 0 auto;
-    padding: 0 20px;
+    margin: 0;
+    padding: 0;
 }
 
 /* 거래소 및 FAQ 리스트 그리드 */
@@ -1158,14 +1144,16 @@ body {
     gap: 24px;
 }
 
-/* 거래소 리스트 - 2열 레이아웃 */
+/* 거래소 리스트 - 3열 레이아웃 */
 #exchanges-list {
-    grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 100%;
 }
 
-/* FAQ 리스트 - 2열 레이아웃 */
+/* FAQ 리스트 - 3열 레이아웃 */
 #faq-list {
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 100%;
 }
 
 /* 거래소 카드 내부 레이아웃 */
@@ -1187,44 +1175,22 @@ body {
     margin-bottom: 16px;
 }
 
-/* 작은 화면에서 1열로 변경 */
-@media (max-width: 1200px) {
-    #exchanges-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 1000px) {
-    #faq-list {
-        grid-template-columns: 1fr;
-    }
-    
-    .exchange-benefits-group {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* 섹션 패딩 개선 */
-.editor-section {
-    padding-left: 0;
-    padding-right: 0;
-}
 
 /* 추가 버튼 스타일 개선 */
 .add-button {
     background: var(--accent-color);
     color: #000000;
     border: none;
-    padding: 14px 28px;
+    padding: 12px 24px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: 20px;
+    margin: 0;
 }
 
 .add-button:hover {
@@ -1238,4 +1204,95 @@ body {
     border-color: var(--accent-color);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+/* 메인 콘텐츠 영역 확장 */
+#main-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--admin-bg);
+    padding: 40px 60px;
+    min-width: 0;
+    width: 100%;
+}
+
+/* 에디터 섹션 패딩 제거 */
+.editor-section {
+    padding: 0;
+}
+
+/* 섹션 헤더 스타일 개선 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-header h2 {
+    margin: 0;
+}
+
+/* 사이드바 리스트 스타일 */
+.sidebar-nav {
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    list-style: none;
+}
+
+/* 추가 버튼 스타일 개선 */
+.add-button {
+    margin: 0;
+}
+
+/* 미디어 쿼리 */
+@media (max-width: 1600px) {
+    #exchanges-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    #faq-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    #exchanges-list {
+        grid-template-columns: 1fr;
+    }
+    #faq-list {
+        grid-template-columns: 1fr;
+    }
+    
+    #main-content {
+        padding: 30px 40px;
+    }
+    
+    .exchange-benefits-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    #main-content {
+        padding: 20px;
+        padding-top: 60px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    #main-content {
+        padding: 15px;
+        padding-top: 60px;
+    }
 }
