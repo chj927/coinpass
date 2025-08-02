@@ -340,6 +340,19 @@ function sanitizeContent(content: any): any {
 }
 
 async function deleteItem(tableName: string, id: number) {
+    // 임시 ID(음수)인 경우 로컬에서만 삭제
+    if (id < 0) {
+        if (tableName === 'exchange_exchanges') {
+            siteData.exchanges = siteData.exchanges.filter(item => item.id !== id);
+            renderExchanges();
+        } else if (tableName === 'exchange_faqs') {
+            siteData.faqs = siteData.faqs.filter(item => item.id !== id);
+            renderFaqs();
+        }
+        showToast('항목이 삭제되었습니다.');
+        return;
+    }
+    
     if (!confirm('정말로 삭제하시겠습니까?')) return;
     const { error } = await supabase.from(tableName).delete().eq('id', id);
     if (error) {
@@ -347,9 +360,9 @@ async function deleteItem(tableName: string, id: number) {
         showToast(`오류: ${tableName} 삭제 실패`, 'error');
     } else {
         showToast(`${tableName} 항목이 삭제되었습니다.`);
+        await fetchDataFromSupabase();
+        renderAll();
     }
-    await fetchDataFromSupabase();
-    renderAll();
 }
 
 // --- 렌더링 함수들 ---
@@ -687,6 +700,9 @@ function setupNavigation() {
     const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
     const editorSections = document.querySelectorAll('.editor-section');
     const mainContentTitle = document.getElementById('main-content-title');
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
 
     function switchTab(targetId: string) {
         const activeLink = document.querySelector(`.nav-link[data-target="${targetId}"]`);
@@ -696,7 +712,24 @@ function setupNavigation() {
         }
         navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('data-target') === targetId));
         editorSections.forEach(section => section.classList.toggle('active', section.id === targetId));
+        
+        // Close mobile menu when switching tabs
+        closeMobileMenu();
     }
+
+    function closeMobileMenu() {
+        sidebar?.classList.remove('mobile-open');
+        sidebarOverlay?.classList.remove('active');
+    }
+
+    function toggleMobileMenu() {
+        sidebar?.classList.toggle('mobile-open');
+        sidebarOverlay?.classList.toggle('active');
+    }
+
+    // Mobile menu toggle
+    mobileMenuToggle?.addEventListener('click', toggleMobileMenu);
+    sidebarOverlay?.addEventListener('click', closeMobileMenu);
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {

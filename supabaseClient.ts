@@ -111,7 +111,8 @@ export class DatabaseUtils {
     // 연결 상태 확인
     static async checkConnection(): Promise<boolean> {
         try {
-            const { error } = await supabase.from('single_pages').select('id').limit(1);
+            // page_contents 테이블로 변경 (single_pages 테이블이 없을 수 있음)
+            const { error } = await supabase.from('page_contents').select('id').limit(1);
             return !error;
         } catch {
             return false;
