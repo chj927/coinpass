@@ -45,8 +45,6 @@ export default defineConfig(({ mode }) => {
             admin: path.resolve(__dirname, 'admin.html'),
             exchange: path.resolve(__dirname, 'exchange.html'),
             compare: path.resolve(__dirname, 'compare.html'),
-            onchain: path.resolve(__dirname, 'onchain.html'),
-            research: path.resolve(__dirname, 'research.html'),
           },
           output: {
             manualChunks: {

@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient';
-import { SecurityUtils } from './security-utils';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadBannerContent();
@@ -69,13 +68,13 @@ function setupSearchAndFilters() {
 function handleSearch(event: Event) {
     const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
     // TODO: Implement search functionality when real data is available
-    console.log('Searching for:', searchTerm);
+    // Search functionality - TODO: implement filtering logic
 }
 
 function handleSort(event: Event) {
     const sortBy = (event.target as HTMLSelectElement).value;
     // TODO: Implement sort functionality when real data is available
-    console.log('Sorting by:', sortBy);
+    // Sort functionality - TODO: implement sorting logic
 }
 
 function initializePriceComparison() {
@@ -99,7 +98,7 @@ function initializePriceComparison() {
         }
     ];
     
-    console.log('Price comparison initialized with placeholder data');
+    // Price comparison initialized with placeholder data
 }
 
 function setupMobileMenu() {

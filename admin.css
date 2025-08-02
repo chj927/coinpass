@@ -789,14 +789,6 @@ input[type="checkbox"] {
         grid-template-columns: 1fr;
     }
     
-    .research-container {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .research-list {
-        max-height: 300px;
-    }
     
     .form-row {
         flex-direction: column;
@@ -812,102 +804,6 @@ input[type="checkbox"] {
         gap: 0.25rem;
     }
     
-    .research-actions {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-}
-
-/* Research Editor Styles */
-.research-container {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 2rem;
-    height: calc(100vh - 200px);
-}
-
-.research-list {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1rem;
-    overflow-y: auto;
-}
-
-.research-list h3 {
-    margin-bottom: 1rem;
-    color: var(--text-color);
-}
-
-.articles-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.article-item {
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--card-bg);
-}
-
-.article-item:hover {
-    border-color: var(--accent-color);
-    background: rgba(0, 212, 170, 0.05);
-}
-
-.article-item.active {
-    border-color: var(--accent-color);
-    background: rgba(0, 212, 170, 0.1);
-}
-
-.article-item-title {
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.25rem;
-}
-
-.article-item-meta {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-}
-
-.research-editor-panel {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
-    overflow-y: auto;
-    display: none;
-}
-
-.research-editor-panel.active {
-    display: block;
-}
-
-.editor-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.editor-header h3 {
-    color: var(--text-color);
-    margin: 0;
-}
-
-.editor-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.research-actions {
-    display: flex;
-    gap: 0.5rem;
 }
 
 .primary-button {

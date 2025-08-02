@@ -8,8 +8,6 @@ import { startPerformanceMonitoring } from './performance-monitor';
 
 // 성능 최적화를 위한 상수들
 const DEBOUNCE_DELAY = 250;
-const THROTTLE_DELAY = 16;
-const MAX_RETRIES = 3;
 
 // 타입 정의
 interface HeroData {
@@ -997,7 +995,7 @@ function handleSwipeRight() {
 
 function handleSwipeLeft() {
     // 왼쪽 스와이프 동작 (필요시 구현)
-    console.log('Left swipe detected');
+    // Left swipe detected
 }
 
 // 모바일 제스처 초기화
