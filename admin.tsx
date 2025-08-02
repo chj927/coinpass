@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { supabase, DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
 // 타입 정의
@@ -175,18 +175,35 @@ async function initializeApp() {
 
 async function fetchDataFromSupabase() {
     showToast('데이터를 불러오는 중...');
-    const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('id');
-    const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
-    const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
-
-    if (cexError || faqsError || singlePagesError) {
-        console.error({ cexError, faqsError, singlePagesError });
-        showToast('데이터 로딩 중 오류 발생', 'error');
-    }
     
-    // 오류가 발생하더라도 빈 배열로 초기화
-    siteData.exchanges = cex || [];
-    siteData.faqs = faqsData || [];
+    try {
+        // 데이터베이스 연결 확인
+        const isConnected = await DatabaseUtils.checkConnection();
+        if (!isConnected) {
+            showToast('데이터베이스 연결 실패', 'error');
+            return;
+        }
+        
+        const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('id');
+        const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
+        const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
+
+        if (cexError) {
+            console.error('Exchange data error:', cexError);
+            showToast('거래소 데이터 로딩 실패', 'error');
+        }
+        if (faqsError) {
+            console.error('FAQ data error:', faqsError);
+            showToast('FAQ 데이터 로딩 실패', 'error');
+        }
+        if (singlePagesError) {
+            console.error('Page contents error:', singlePagesError);
+            showToast('페이지 콘텐츠 로딩 실패', 'error');
+        }
+        
+        // 오류가 발생하더라도 빈 배열로 초기화
+        siteData.exchanges = cex || [];
+        siteData.faqs = faqsData || [];
 
     singlePages?.forEach(page => {
         if (page.page_type === 'hero' && page.content) {
@@ -202,7 +219,11 @@ async function fetchDataFromSupabase() {
         }
     });
     
-    showToast('데이터 로딩 완료!');
+        showToast('데이터 로딩 완료!');
+    } catch (error) {
+        console.error('Database fetch error:', error);
+        showToast('데이터 로딩 중 예상치 못한 오류 발생', 'error');
+    }
 }
 
 async function saveItem(tableName: string, itemData: any, id?: number) {
@@ -261,9 +282,11 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
 
         if (response.error) {
             console.error(`Error saving to ${tableName}:`, response.error);
-            showToast(`오류: ${tableName} 저장 실패`, 'error');
+            console.error('Error details:', response.error.message);
+            showToast(`오류: ${tableName} 저장 실패 - ${response.error.message}`, 'error');
         } else {
             showToast(`${tableName} 항목이 저장되었습니다.`);
+            console.log('Save successful:', response.data);
             // 새로 생성된 항목인 경우에만 데이터를 다시 불러옵니다
             if (!id && response.data) {
                 await fetchDataFromSupabase();
@@ -386,6 +409,28 @@ function renderAll() {
     renderSupport();
     renderExchanges();
     renderFaqs();
+    updateDashboard();
+}
+
+function updateDashboard() {
+    // 대시보드 통계 업데이트
+    const exchangeCount = document.getElementById('exchange-count');
+    const faqCount = document.getElementById('faq-count');
+    const popupCount = document.getElementById('popup-count');
+    const lastUpdate = document.getElementById('last-update');
+    
+    if (exchangeCount) exchangeCount.textContent = siteData.exchanges.length.toString();
+    if (faqCount) faqCount.textContent = siteData.faqs.length.toString();
+    
+    let activePopups = 0;
+    if (siteData.popup?.enabled) activePopups++;
+    if (siteData.indexPopup?.enabled) activePopups++;
+    if (popupCount) popupCount.textContent = activePopups.toString();
+    
+    if (lastUpdate) {
+        const now = new Date();
+        lastUpdate.textContent = now.toLocaleTimeString('ko-KR');
+    }
 }
 
 function createBilingualFormGroup(container: HTMLElement, baseName: string, labels: { ko: string, en: string }, item: any, elType = 'input') {
@@ -688,10 +733,12 @@ function createNewItem(tableName: string) {
 function readDataFromCard(cardElement: HTMLElement): DatabaseRecord {
     const data: DatabaseRecord = {};
     cardElement.querySelectorAll('.item-input').forEach(input => {
-        const key = (input as HTMLElement).classList[1];
+        // classList에서 필드 이름 추출 (두 번째 클래스가 필드 이름)
+        const classList = Array.from((input as HTMLElement).classList);
+        const key = classList.find(cls => cls !== 'item-input') || '';
         const lang = (input as HTMLElement).dataset.lang;
         const dbKey = lang ? `${key}_${lang}` : key;
-        data[dbKey] = (input as HTMLInputElement).value;
+        data[dbKey] = (input as HTMLInputElement | HTMLTextAreaElement).value;
     });
     return data;
 }
