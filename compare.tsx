@@ -65,14 +65,14 @@ function setupSearchAndFilters() {
     }
 }
 
-function handleSearch(event: Event) {
-    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+function handleSearch(_event: Event) {
+    // const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
     // TODO: Implement search functionality when real data is available
     // Search functionality - TODO: implement filtering logic
 }
 
-function handleSort(event: Event) {
-    const sortBy = (event.target as HTMLSelectElement).value;
+function handleSort(_event: Event) {
+    // const sortBy = (event.target as HTMLSelectElement).value;
     // TODO: Implement sort functionality when real data is available
     // Sort functionality - TODO: implement sorting logic
 }
@@ -82,21 +82,21 @@ function initializePriceComparison() {
     // For now, we show the coming soon message
     
     // Placeholder data structure for future implementation
-    const mockData = [
-        {
-            symbol: 'BTC',
-            name: 'Bitcoin',
-            prices: {
-                binance: 0,
-                bybit: 0,
-                okx: 0,
-                upbit: 0,
-                bithumb: 0
-            },
-            premium: 0,
-            volume: 0
-        }
-    ];
+    // const mockData = [
+    //     {
+    //         symbol: 'BTC',
+    //         name: 'Bitcoin',
+    //         prices: {
+    //             binance: 0,
+    //             bybit: 0,
+    //             okx: 0,
+    //             upbit: 0,
+    //             bithumb: 0
+    //         },
+    //         premium: 0,
+    //         volume: 0
+    //     }
+    // ];
     
     // Price comparison initialized with placeholder data
 }

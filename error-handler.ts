@@ -50,7 +50,7 @@ export class ErrorHandler {
         this.handleError(new Error(message), context);
     }
 
-    public handleValidationError(field: string, value: any): void {
+    public handleValidationError(field: string, _value: any): void {
         const message = `입력 값이 올바르지 않습니다: ${field}`;
         this.handleError(new Error(message), 'Validation');
     }
@@ -202,9 +202,9 @@ export function setupGlobalErrorHandling(): void {
 
 // 유틸리티 함수들
 export const handleAsyncError = (asyncFn: () => Promise<any>) => {
-    return async (...args: any[]) => {
+    return async () => {
         try {
-            return await asyncFn.apply(this, args);
+            return await asyncFn();
         } catch (error) {
             ErrorHandler.getInstance().handleError(error as Error, 'Async Function');
             throw error;

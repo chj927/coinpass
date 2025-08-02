@@ -2,7 +2,7 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+    loadEnv(mode, '.', '');
     const isDev = mode === 'development';
     
     return {
@@ -82,7 +82,7 @@ export default defineConfig(({ mode }) => {
         {
           name: 'add-security-headers',
           configureServer(server) {
-            server.middlewares.use((req, res, next) => {
+            server.middlewares.use((_req, res, next) => {
               res.setHeader('X-Content-Type-Options', 'nosniff');
               res.setHeader('X-Frame-Options', 'DENY');
               res.setHeader('X-XSS-Protection', '1; mode=block');

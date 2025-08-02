@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 
-const uiStrings = {
+const uiStrings: Record<string, Record<string, string>> = {
     ko: {
         skipLink: '메인 콘텐츠로 건너뛰기',
         'nav.partners': '파트너 혜택',
@@ -13,8 +13,7 @@ const uiStrings = {
         'nav.guidesSubtitle': '사용안내 및 이벤트',
         'nav.faq': '자주 묻는 질문',
         'hero.cta': '파트너 혜택 보기',
-        'cex.title': '파트너 거래소 (CEX)',
-        'dex.title': '파트너 거래소 (DEX)',
+        'partners.title': '파트너 거래소',
         'howTo.title': '세 단계로 끝내는 수수료 혜택',
         'howTo.step1.title': '회원가입',
         'howTo.step1.desc': '본 사이트의 제휴 링크를 통해 원하는 거래소에 가입합니다.',
@@ -33,7 +32,31 @@ const uiStrings = {
     },
 };
 
-let siteData = {};
+interface SiteData {
+    hero?: {
+        title: string;
+        subtitle: string;
+    };
+    aboutUs?: {
+        title: string;
+        content: string;
+    };
+    exchanges?: any[];
+    faqs?: any[];
+    popup?: {
+        enabled: boolean;
+        type: 'text' | 'image';
+        content: string;
+        imageUrl: string;
+        startDate: string;
+        endDate: string;
+    };
+    support?: {
+        telegramUrl: string;
+    };
+}
+
+let siteData: SiteData = {};
 const currentLang = 'ko';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -44,25 +67,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadRemoteContent() {
-    const { data: cex, error: cexError } = await supabase.from('cex_exchanges').select('*').order('id');
-    const { data: dex, error: dexError } = await supabase.from('dex_exchanges').select('*').order('id');
-    const { data: faqsData, error: faqsError } = await supabase.from('faqs').select('*').order('id');
-    const { data: singlePages, error: singlePagesError } = await supabase.from('single_pages').select('*');
+    const { data: exchanges, error: exchangesError } = await supabase.from('exchange_exchanges').select('*').order('id');
+    const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
+    const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
 
-    if (cexError || dexError || faqsError || singlePagesError) {
-        console.error("Failed to load site data from Supabase", { cexError, dexError, faqsError, singlePagesError });
+    if (exchangesError || faqsError || singlePagesError) {
+        console.error("Failed to load site data from Supabase", { exchangesError, faqsError, singlePagesError });
         return;
     }
     
     siteData = {
-        exchanges: cex || [],
-        dexExchanges: dex || [],
+        exchanges: exchanges || [],
         faqs: faqsData || [],
     };
     
     singlePages?.forEach(page => {
-        if(page.page_name && page.content) {
-            siteData[page.page_name] = page.content;
+        if(page.page_type && page.content) {
+            (siteData as any)[page.page_type] = page.content;
         }
     });
 }
@@ -71,9 +92,9 @@ function renderContent() {
     if (!siteData) return;
     setupHero(siteData.hero);
     updateAboutUs(siteData.aboutUs);
-    populateExchangeGrid('exchange-grid', siteData.exchanges);
-    populateExchangeGrid('dex-grid', siteData.dexExchanges);
-    updateFaqs(siteData.faqs);
+    const allExchanges = siteData.exchanges || [];
+    populateExchangeGrid('exchange-grid', allExchanges);
+    updateFaqs(siteData.faqs || []);
     updateSupportSection(siteData.support);
     setupPopup();
     setupScrollAnimations();
@@ -100,8 +121,8 @@ function translateUI() {
 }
 
 class TypingAnimator {
-    private el: HTMLElement;
-    private phrases: string[];
+    private el!: HTMLElement;
+    private phrases!: string[];
     private loopNum: number = 0;
     private typingSpeed: number = 100;
     private erasingSpeed: number = 50;
@@ -151,21 +172,21 @@ class TypingAnimator {
     public resume() { if(this.isPaused) { this.isPaused = false; this.tick(); } }
 }
 
-let heroAnimator;
-function setupHero(heroData) {
+let heroAnimator: TypingAnimator | undefined;
+function setupHero(heroData: any) {
     const titleEl = document.getElementById('hero-title');
     const subtitleEl = document.getElementById('hero-subtitle');
     const heroSection = document.querySelector('.hero');
     if (!heroData) return;
 
-    if (titleEl && heroData.title && heroData.title[currentLang]) {
-        const sanitizedTitle = SecurityUtils.sanitizeHtml(heroData.title[currentLang]);
+    if (titleEl && heroData.title) {
+        const sanitizedTitle = SecurityUtils.sanitizeHtml(heroData.title);
         const phrases = sanitizedTitle.split('\n').filter(p => p.trim() !== '');
         if (!heroAnimator) {
              heroAnimator = new TypingAnimator(titleEl as HTMLElement, phrases);
              if(heroSection){
                 const observer = new IntersectionObserver(entries => {
-                    entries.forEach(entry => entry.isIntersecting ? heroAnimator.resume() : heroAnimator.pause());
+                    entries.forEach(entry => entry.isIntersecting ? heroAnimator?.resume() : heroAnimator?.pause());
                 });
                 observer.observe(heroSection);
             }
@@ -174,21 +195,21 @@ function setupHero(heroData) {
         }
     }
     
-    if (subtitleEl && heroData.subtitle) subtitleEl.textContent = heroData.subtitle[currentLang];
+    if (subtitleEl && heroData.subtitle) subtitleEl.textContent = heroData.subtitle;
 }
 
-function updateAboutUs(aboutUsData) {
+function updateAboutUs(aboutUsData: any) {
     const titleEl = document.getElementById('about-us-title');
     const contentEl = document.getElementById('about-us-content');
     if (!aboutUsData) return;
 
     if (titleEl && aboutUsData.title) {
-        titleEl.textContent = SecurityUtils.sanitizeHtml(aboutUsData.title[currentLang] || '');
+        titleEl.textContent = SecurityUtils.sanitizeHtml(aboutUsData.title || '');
     }
     if (contentEl && aboutUsData.content) {
         contentEl.innerHTML = '';
         const fragment = document.createDocumentFragment();
-        const sanitizedContent = SecurityUtils.sanitizeHtml(aboutUsData.content[currentLang] || '');
+        const sanitizedContent = SecurityUtils.sanitizeHtml(aboutUsData.content || '');
         const paragraphs = sanitizedContent.split(/\n\s*\n/).filter(p => p.trim() !== '');
         paragraphs.forEach(pText => {
             const p = document.createElement('p');
@@ -209,15 +230,15 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
         card.className = 'exchange-card anim-fade-in';
         
         // XSS 방지를 위한 데이터 sanitization
-        const name = SecurityUtils.sanitizeHtml(exchange[`name_${currentLang}`] || '');
-        const benefit1Tag = SecurityUtils.sanitizeHtml(exchange[`benefit1_tag_${currentLang}`] || '');
-        const benefit1Value = SecurityUtils.sanitizeHtml(exchange[`benefit1_value_${currentLang}`] || '');
-        const benefit2Tag = SecurityUtils.sanitizeHtml(exchange[`benefit2_tag_${currentLang}`] || '');
-        const benefit2Value = SecurityUtils.sanitizeHtml(exchange[`benefit2_value_${currentLang}`] || '');
-        const benefit3Tag = SecurityUtils.sanitizeHtml(exchange[`benefit3_tag_${currentLang}`] || '');
-        const benefit3Value = SecurityUtils.sanitizeHtml(exchange[`benefit3_value_${currentLang}`] || '');
-        const benefit4Tag = SecurityUtils.sanitizeHtml(exchange[`benefit4_tag_${currentLang}`] || '');
-        const benefit4Value = SecurityUtils.sanitizeHtml(exchange[`benefit4_value_${currentLang}`] || '');
+        const name = SecurityUtils.sanitizeHtml(exchange.name_ko || '');
+        const benefit1Tag = SecurityUtils.sanitizeHtml(exchange.benefit1_tag_ko || '');
+        const benefit1Value = SecurityUtils.sanitizeHtml(exchange.benefit1_value_ko || '');
+        const benefit2Tag = SecurityUtils.sanitizeHtml(exchange.benefit2_tag_ko || '');
+        const benefit2Value = SecurityUtils.sanitizeHtml(exchange.benefit2_value_ko || '');
+        const benefit3Tag = SecurityUtils.sanitizeHtml(exchange.benefit3_tag_ko || '');
+        const benefit3Value = SecurityUtils.sanitizeHtml(exchange.benefit3_value_ko || '');
+        const benefit4Tag = SecurityUtils.sanitizeHtml(exchange.benefit4_tag_ko || '');
+        const benefit4Value = SecurityUtils.sanitizeHtml(exchange.benefit4_value_ko || '');
 
         let logoHtml = '';
         if (exchange.logoImageUrl && SecurityUtils.isValidUrl(exchange.logoImageUrl)) {
@@ -269,11 +290,11 @@ function updateFaqs(faqsData: any[]) {
         const details = document.createElement('details');
         details.className = 'anim-fade-in';
         const summary = document.createElement('summary');
-        summary.textContent = SecurityUtils.sanitizeHtml(faq[`question_${currentLang}`] || '');
+        summary.textContent = SecurityUtils.sanitizeHtml(faq.question_ko || '');
         const contentDiv = document.createElement('div');
         contentDiv.className = 'faq-content';
         const p = document.createElement('p');
-        p.textContent = SecurityUtils.sanitizeHtml(faq[`answer_${currentLang}`] || '');
+        p.textContent = SecurityUtils.sanitizeHtml(faq.answer_ko || '');
         contentDiv.appendChild(p);
         details.appendChild(summary);
         details.appendChild(contentDiv);
@@ -283,7 +304,7 @@ function updateFaqs(faqsData: any[]) {
     faqContainerEl.appendChild(fragment);
 }
 
-function updateSupportSection(supportData) {
+function updateSupportSection(supportData: any) {
     const linkEl = document.getElementById('telegram-support-link');
     if (linkEl && supportData?.telegramUrl) {
         linkEl.setAttribute('href', supportData.telegramUrl);
@@ -322,7 +343,7 @@ function setupMobileMenu() {
 
 function setupNavigation() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', function (this: HTMLAnchorElement, e) {
             const href = this.getAttribute('href');
             if(href && href !== '#') {
                 e.preventDefault();
@@ -353,7 +374,7 @@ function setupPopup() {
     const overlay = container?.querySelector('.popup-overlay');
     if (!container || !imageEl || !textEl || !closeBtn || !close24hBtn) return;
     
-    const contentToDisplay = siteData.popup.content ? siteData.popup.content[currentLang] : '';
+    const contentToDisplay = siteData.popup.content || '';
 
     if (siteData.popup.type === 'image' && siteData.popup.imageUrl) {
         (imageEl as HTMLImageElement).src = siteData.popup.imageUrl;

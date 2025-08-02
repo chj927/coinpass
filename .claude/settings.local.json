@@ -20,7 +20,9 @@
       "Bash(find:*)",
       "Bash(cmd /c:*)",
       "Bash(powershell:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint)"
     ],
     "deny": []
   }

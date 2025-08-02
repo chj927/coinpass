@@ -13,11 +13,9 @@ const DEBOUNCE_DELAY = 250;
 interface HeroData {
     title: {
         ko: string;
-        en: string;
     };
     subtitle: {
         ko: string;
-        en: string;
     };
 }
 
@@ -26,7 +24,6 @@ interface PopupData {
     type: 'text' | 'image';
     content: {
         ko: string;
-        en: string;
     };
     imageUrl?: string;
     startDate?: string;
@@ -111,9 +108,9 @@ async function loadHeroData() {
 
     try {
         const { data, error } = await supabase
-            .from('single_pages')
+            .from('page_contents')
             .select('content')
-            .eq('page_name', 'hero')
+            .eq('page_type', 'hero')
             .single();
 
         const defaultData = {
@@ -147,9 +144,9 @@ async function loadPopupData() {
 
     try {
         const { data, error } = await supabase
-            .from('single_pages')
+            .from('page_contents')
             .select('content')
-            .eq('page_name', 'indexPopup')
+            .eq('page_type', 'indexPopup')
             .single();
 
         if (error) {
@@ -406,7 +403,7 @@ class ThreeJSManager {
 
         // 이미지 로드 및 재질 생성
         const textureLoader = new THREE.TextureLoader();
-        textureLoader.load('https://i.imgur.com/sF64B74.jpeg', (texture) => {
+        textureLoader.load('https://i.imgur.com/sF64B74.jpeg', (texture: any) => {
             const imageAspect = texture.image.width / texture.image.height;
             const planeHeight = 5;
             const planeWidth = planeHeight * imageAspect;
@@ -419,7 +416,7 @@ class ThreeJSManager {
             });
             const plane = new THREE.Mesh(geometry, material);
             this.scene.add(plane);
-        }, undefined, (error) => {
+        }, undefined, (error: any) => {
             console.error('An error happened during texture loading:', error);
         });
 
@@ -552,13 +549,13 @@ function setupPopup() {
 
 class CardSlider {
     private container: HTMLElement;
-    private grid: HTMLElement;
-    private prevBtn: HTMLElement;
-    private nextBtn: HTMLElement;
-    private dots: NodeListOf<HTMLElement>;
-    private cards: NodeListOf<HTMLElement>;
+    private grid!: HTMLElement;
+    private prevBtn!: HTMLElement;
+    private nextBtn!: HTMLElement;
+    private dots!: NodeListOf<HTMLElement>;
+    private cards!: NodeListOf<HTMLElement>;
     private currentSlide: number = 0;
-    private maxSlides: number;
+    private maxSlides!: number;
     private cardsPerSlide: number = 3;
 
     constructor(containerSelector: string) {
@@ -692,35 +689,6 @@ function setupSliders() {
 }
 
 // 유틸리티 함수들
-function showErrorToast(message: string) {
-    const toast = document.createElement('div');
-    toast.className = 'error-toast';
-    toast.textContent = message;
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #ff4757;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 14px;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: slideIn 0.3s ease-out;
-    `;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease-in forwards';
-        setTimeout(() => {
-            if (toast.parentNode) {
-                document.body.removeChild(toast);
-            }
-        }, 300);
-    }, 4000);
-}
 
 function showLoadingState(show: boolean) {
     const existingLoader = document.getElementById('page-loader');

@@ -8,55 +8,33 @@ interface DatabaseRecord {
     [key: string]: string | number | boolean | undefined;
 }
 
-interface BilingualContent {
-    ko: string;
-    en: string;
-}
 
 interface ExchangeData {
     id?: number;
     name_ko: string;
-    name_en: string;
     logoImageUrl: string;
     benefit1_tag_ko: string;
-    benefit1_tag_en: string;
     benefit1_value_ko: string;
-    benefit1_value_en: string;
     benefit2_tag_ko: string;
-    benefit2_tag_en: string;
     benefit2_value_ko: string;
-    benefit2_value_en: string;
     benefit3_tag_ko: string;
-    benefit3_tag_en: string;
     benefit3_value_ko: string;
-    benefit3_value_en: string;
     benefit4_tag_ko: string;
-    benefit4_tag_en: string;
     benefit4_value_ko: string;
-    benefit4_value_en: string;
     link: string;
 }
 
 interface FAQData {
     id?: number;
     question_ko: string;
-    question_en: string;
     answer_ko: string;
-    answer_en: string;
 }
 
-interface GuideData {
-    id?: number;
-    title_ko: string;
-    title_en: string;
-    content_ko: string;
-    content_en: string;
-}
 
 interface PopupContent {
     enabled: boolean;
     type: 'text' | 'image';
-    content: BilingualContent;
+    content: string;
     imageUrl: string;
     startDate: string;
     endDate: string;
@@ -64,17 +42,15 @@ interface PopupContent {
 
 interface SiteData {
     hero: {
-        title: BilingualContent;
-        subtitle: BilingualContent;
+        title: string;
+        subtitle: string;
     };
     aboutUs: {
-        title: BilingualContent;
-        content: BilingualContent;
+        title: string;
+        content: string;
     };
     exchanges: ExchangeData[];
-    dexExchanges: ExchangeData[];
     faqs: FAQData[];
-    guides: GuideData[];
     popup: PopupContent;
     indexPopup: PopupContent;
     support: {
@@ -84,14 +60,12 @@ interface SiteData {
 
 // 기본 데이터 구조는 유지합니다.
 const defaultSiteData: SiteData = {
-    hero: { title: { ko: '', en: '' }, subtitle: { ko: '', en: '' }},
-    aboutUs: { title: { ko: '', en: '' }, content: { ko: '', en: '' }},
+    hero: { title: '', subtitle: '' },
+    aboutUs: { title: '', content: '' },
     exchanges: [],
-    dexExchanges: [],
     faqs: [],
-    guides: [],
-    popup: { enabled: false, type: 'text', content: { ko: '', en: '' }, imageUrl: '', startDate: '', endDate: '' },
-    indexPopup: { enabled: false, type: 'text', content: { ko: '', en: '' }, imageUrl: '', startDate: '', endDate: '' },
+    popup: { enabled: false, type: 'text', content: '', imageUrl: '', startDate: '', endDate: '' },
+    indexPopup: { enabled: false, type: 'text', content: '', imageUrl: '', startDate: '', endDate: '' },
     support: { telegramUrl: '#' }
 };
 
@@ -201,29 +175,30 @@ async function initializeApp() {
 
 async function fetchDataFromSupabase() {
     showToast('데이터를 불러오는 중...');
-    const { data: cex, error: cexError } = await supabase.from('cex_exchanges').select('*').order('id');
-    const { data: dex, error: dexError } = await supabase.from('dex_exchanges').select('*').order('id');
-    const { data: faqsData, error: faqsError } = await supabase.from('faqs').select('*').order('id');
-    const { data: guidesData, error: guidesError } = await supabase.from('guides').select('*').order('id');
-    const { data: singlePages, error: singlePagesError } = await supabase.from('single_pages').select('*');
+    const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('id');
+    const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
+    const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
 
-    if (cexError || dexError || faqsError || guidesError || singlePagesError) {
-        console.error({ cexError, dexError, faqsError, guidesError, singlePagesError });
+    if (cexError || faqsError || singlePagesError) {
+        console.error({ cexError, faqsError, singlePagesError });
         showToast('데이터 로딩 중 오류 발생', 'error');
         return;
     }
     
     siteData.exchanges = cex || [];
-    siteData.dexExchanges = dex || [];
     siteData.faqs = faqsData || [];
-    siteData.guides = guidesData || [];
 
     singlePages?.forEach(page => {
-        if (siteData[page.page_name]) {
-            // content가 null이 아닐 경우에만 병합
-            if (page.content && typeof page.content === 'object') {
-                 siteData[page.page_name] = { ...siteData[page.page_name], ...page.content };
-            }
+        if (page.page_type === 'hero' && page.content) {
+            siteData.hero = page.content;
+        } else if (page.page_type === 'aboutUs' && page.content) {
+            siteData.aboutUs = page.content;
+        } else if (page.page_type === 'popup' && page.content) {
+            siteData.popup = page.content;
+        } else if (page.page_type === 'indexPopup' && page.content) {
+            siteData.indexPopup = page.content;
+        } else if (page.page_type === 'support' && page.content) {
+            siteData.support = page.content;
         }
     });
     
@@ -246,7 +221,7 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
     }
 
     // 테이블명 화이트리스트 검증
-    const allowedTables = ['cex_exchanges', 'dex_exchanges', 'faqs', 'guides'];
+    const allowedTables = ['exchange_exchanges', 'exchange_faqs'];
     if (!allowedTables.includes(tableName)) {
         showToast('허용되지 않는 테이블입니다.', 'error');
         return;
@@ -269,7 +244,7 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
                     sanitizedData[key] = SecurityUtils.validateInput(value, 2000);
                 }
             } else {
-                sanitizedData[key] = value;
+                sanitizedData[key] = value as string | number | boolean | undefined;
             }
         }
 
@@ -318,7 +293,7 @@ async function saveSinglePage(pageName: string, content: any) {
         // 콘텐츠 sanitization
         const sanitizedContent = sanitizeContent(content);
         
-        const { error } = await supabase.from('single_pages').update({ content: sanitizedContent }).eq('page_name', pageName);
+        const { error } = await supabase.from('page_contents').update({ content: sanitizedContent }).eq('page_type', pageName);
         if (error) {
             console.error(`Error saving ${pageName}:`, error);
             showToast(`오류: ${pageName} 저장 실패`, 'error');
@@ -339,7 +314,7 @@ function sanitizeContent(content: any): any {
     if (typeof content === 'string') {
         return SecurityUtils.validateInput(content, 5000);
     } else if (typeof content === 'object' && content !== null) {
-        const sanitized: DatabaseRecord = {};
+        const sanitized: any = {};
         for (const [key, value] of Object.entries(content)) {
             if (typeof value === 'string') {
                 if (key.includes('Url') || key.includes('url')) {
@@ -395,9 +370,7 @@ function renderAll() {
     renderPopup();
     renderSupport();
     renderExchanges();
-    renderDexExchanges();
     renderFaqs();
-    renderGuides();
 }
 
 function createBilingualFormGroup(container: HTMLElement, baseName: string, labels: { ko: string, en: string }, item: any, elType = 'input') {
@@ -488,17 +461,13 @@ function renderList(containerId: string, dataList: any[], listName: string, fiel
 }
 
 function renderHero() {
-    (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value = siteData.hero.title.ko;
-    (document.getElementById('hero-title-en-input') as HTMLTextAreaElement).value = siteData.hero.title.en;
-    (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value = siteData.hero.subtitle.ko;
-    (document.getElementById('hero-subtitle-en-input') as HTMLTextAreaElement).value = siteData.hero.subtitle.en;
+    (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value = siteData.hero.title || '';
+    (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value = siteData.hero.subtitle || '';
 }
 
 function renderAboutUs() {
-    (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value = siteData.aboutUs.title.ko;
-    (document.getElementById('about-us-title-en-input') as HTMLInputElement).value = siteData.aboutUs.title.en;
-    (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value = siteData.aboutUs.content.ko;
-    (document.getElementById('about-us-content-en-input') as HTMLTextAreaElement).value = siteData.aboutUs.content.en;
+    (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value = siteData.aboutUs.title || '';
+    (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value = siteData.aboutUs.content || '';
 }
 
 function renderPopup() {
@@ -509,8 +478,7 @@ function renderPopup() {
         document.querySelectorAll<HTMLInputElement>('input[name="exchange-popup-type"]').forEach(radio => {
             radio.checked = radio.value === popup.type;
         });
-        (document.getElementById('exchange-popup-content-ko-input') as HTMLTextAreaElement).value = popup.content.ko;
-        (document.getElementById('exchange-popup-content-en-input') as HTMLTextAreaElement).value = popup.content.en;
+        (document.getElementById('exchange-popup-content-ko-input') as HTMLTextAreaElement).value = popup.content || '';
         (document.getElementById('exchange-popup-image-url-input') as HTMLInputElement).value = popup.imageUrl;
         (document.getElementById('exchange-popup-start-date-input') as HTMLInputElement).value = popup.startDate;
         (document.getElementById('exchange-popup-end-date-input') as HTMLInputElement).value = popup.endDate;
@@ -523,8 +491,7 @@ function renderPopup() {
         document.querySelectorAll<HTMLInputElement>('input[name="index-popup-type"]').forEach(radio => {
             radio.checked = radio.value === indexPopup.type;
         });
-        (document.getElementById('index-popup-content-ko-input') as HTMLTextAreaElement).value = indexPopup.content.ko;
-        (document.getElementById('index-popup-content-en-input') as HTMLTextAreaElement).value = indexPopup.content.en;
+        (document.getElementById('index-popup-content-ko-input') as HTMLTextAreaElement).value = indexPopup.content || '';
         (document.getElementById('index-popup-image-url-input') as HTMLInputElement).value = indexPopup.imageUrl;
         (document.getElementById('index-popup-start-date-input') as HTMLInputElement).value = indexPopup.startDate;
         (document.getElementById('index-popup-end-date-input') as HTMLInputElement).value = indexPopup.endDate;
@@ -539,50 +506,29 @@ function renderSupport() {
 }
 
 function renderExchanges() {
-    renderList('exchanges-list', siteData.exchanges, 'cex_exchanges', [
-        { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
-        { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit2_value', labels: { ko: '혜택 2 값 (KO)', en: 'Benefit 2 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit3_tag', labels: { ko: '혜택 3 태그 (KO)', en: 'Benefit 3 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit3_value', labels: { ko: '혜택 3 값 (KO)', en: 'Benefit 3 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit4_tag', labels: { ko: '혜택 4 태그 (KO)', en: 'Benefit 4 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit4_value', labels: { ko: '혜택 4 값 (KO)', en: 'Benefit 4 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'link', labels: { ko: '가입 링크', en: 'Signup Link' }, bilingual: false, elType: 'input', inputType: 'url' },
+    renderList('exchanges-list', siteData.exchanges, 'exchange_exchanges', [
+        { name: 'name_ko', labels: { ko: '거래소 이름' }, bilingual: false, elType: 'input' },
+        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL' }, bilingual: false, elType: 'input', inputType: 'url' },
+        { name: 'benefit1_tag_ko', labels: { ko: '혜택 1 태그' }, bilingual: false, elType: 'input' },
+        { name: 'benefit1_value_ko', labels: { ko: '혜택 1 값' }, bilingual: false, elType: 'input' },
+        { name: 'benefit2_tag_ko', labels: { ko: '혜택 2 태그' }, bilingual: false, elType: 'input' },
+        { name: 'benefit2_value_ko', labels: { ko: '혜택 2 값' }, bilingual: false, elType: 'input' },
+        { name: 'benefit3_tag_ko', labels: { ko: '혜택 3 태그' }, bilingual: false, elType: 'input' },
+        { name: 'benefit3_value_ko', labels: { ko: '혜택 3 값' }, bilingual: false, elType: 'input' },
+        { name: 'benefit4_tag_ko', labels: { ko: '혜택 4 태그' }, bilingual: false, elType: 'input' },
+        { name: 'benefit4_value_ko', labels: { ko: '혜택 4 값' }, bilingual: false, elType: 'input' },
+        { name: 'link', labels: { ko: '가입 링크' }, bilingual: false, elType: 'input', inputType: 'url' },
     ]);
 }
 
-function renderDexExchanges() {
-     renderList('dex-exchanges-list', siteData.dexExchanges, 'dex_exchanges', [
-        { name: 'name', labels: { ko: '이름 (KO)', en: 'Name (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'logoImageUrl', labels: { ko: '로고 이미지 URL', en: 'Logo Image URL' }, bilingual: false, elType: 'input', inputType: 'url' },
-        { name: 'benefit1_tag', labels: { ko: '혜택 1 태그 (KO)', en: 'Benefit 1 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit1_value', labels: { ko: '혜택 1 값 (KO)', en: 'Benefit 1 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit2_tag', labels: { ko: '혜택 2 태그 (KO)', en: 'Benefit 2 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit2_value', labels: { ko: '혜택 2 값 (KO)', en: 'Benefit 2 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit3_tag', labels: { ko: '혜택 3 태그 (KO)', en: 'Benefit 3 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit3_value', labels: { ko: '혜택 3 값 (KO)', en: 'Benefit 3 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit4_tag', labels: { ko: '혜택 4 태그 (KO)', en: 'Benefit 4 Tag (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'benefit4_value', labels: { ko: '혜택 4 값 (KO)', en: 'Benefit 4 Value (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'link', labels: { ko: '가입 링크', en: 'Signup Link' }, bilingual: false, elType: 'input', inputType: 'url' },
-    ]);
-}
 
 function renderFaqs() {
-    renderList('faq-list', siteData.faqs, 'faqs', [
-        { name: 'question', labels: { ko: '질문 (KO)', en: 'Question (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'answer', labels: { ko: '답변 (KO)', en: 'Answer (EN)' }, bilingual: true, elType: 'textarea' },
+    renderList('faq-list', siteData.faqs, 'exchange_faqs', [
+        { name: 'question_ko', labels: { ko: '질문' }, bilingual: false, elType: 'input' },
+        { name: 'answer_ko', labels: { ko: '답변' }, bilingual: false, elType: 'textarea' },
     ]);
 }
 
-function renderGuides() {
-    renderList('guides-list', siteData.guides, 'guides', [
-        { name: 'title', labels: { ko: '제목 (KO)', en: 'Title (EN)' }, bilingual: true, elType: 'input' },
-        { name: 'content', labels: { ko: '내용 (KO)', en: 'Content (EN)' }, bilingual: true, elType: 'textarea' },
-    ]);
-}
 
 
 function setupEventListeners() {
@@ -611,10 +557,9 @@ function setupEventListeners() {
         });
     });
 
-    document.getElementById('add-exchange-button')?.addEventListener('click', () => createNewItem('cex_exchanges'));
-    document.getElementById('add-dex-exchange-button')?.addEventListener('click', () => createNewItem('dex_exchanges'));
-    document.getElementById('add-faq-button')?.addEventListener('click', () => createNewItem('faqs'));
-    document.getElementById('add-guide-button')?.addEventListener('click', () => createNewItem('guides'));
+
+    document.getElementById('add-exchange-button')?.addEventListener('click', () => createNewItem('exchange_exchanges'));
+    document.getElementById('add-faq-button')?.addEventListener('click', () => createNewItem('exchange_faqs'));
 
     document.getElementById('main-content')?.addEventListener('click', e => {
         const target = e.target as HTMLButtonElement;
@@ -644,10 +589,7 @@ function readDataFromSection(section: string): any {
                 data: {
                     enabled: (document.getElementById('exchange-popup-enabled-input') as HTMLInputElement).checked,
                     type: (document.querySelector('input[name="exchange-popup-type"]:checked') as HTMLInputElement)?.value || 'text',
-                    content: {
-                        ko: (document.getElementById('exchange-popup-content-ko-input') as HTMLTextAreaElement).value,
-                        en: (document.getElementById('exchange-popup-content-en-input') as HTMLTextAreaElement).value
-                    },
+                    content: (document.getElementById('exchange-popup-content-ko-input') as HTMLTextAreaElement).value,
                     imageUrl: (document.getElementById('exchange-popup-image-url-input') as HTMLInputElement).value,
                     startDate: (document.getElementById('exchange-popup-start-date-input') as HTMLInputElement).value,
                     endDate: (document.getElementById('exchange-popup-end-date-input') as HTMLInputElement).value
@@ -659,10 +601,7 @@ function readDataFromSection(section: string): any {
                 data: {
                     enabled: (document.getElementById('index-popup-enabled-input') as HTMLInputElement).checked,
                     type: (document.querySelector('input[name="index-popup-type"]:checked') as HTMLInputElement)?.value || 'text',
-                    content: {
-                        ko: (document.getElementById('index-popup-content-ko-input') as HTMLTextAreaElement).value,
-                        en: (document.getElementById('index-popup-content-en-input') as HTMLTextAreaElement).value
-                    },
+                    content: (document.getElementById('index-popup-content-ko-input') as HTMLTextAreaElement).value,
                     imageUrl: (document.getElementById('index-popup-image-url-input') as HTMLInputElement).value,
                     startDate: (document.getElementById('index-popup-start-date-input') as HTMLInputElement).value,
                     endDate: (document.getElementById('index-popup-end-date-input') as HTMLInputElement).value
@@ -671,25 +610,13 @@ function readDataFromSection(section: string): any {
         }
     } else if (section === 'hero') {
         return {
-            title: {
-                ko: (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value,
-                en: (document.getElementById('hero-title-en-input') as HTMLTextAreaElement).value
-            },
-            subtitle: {
-                ko: (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value,
-                en: (document.getElementById('hero-subtitle-en-input') as HTMLTextAreaElement).value
-            }
+            title: (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value,
+            subtitle: (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value
         };
     } else if (section === 'aboutUs') {
         return {
-            title: {
-                ko: (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value,
-                en: (document.getElementById('about-us-title-en-input') as HTMLInputElement).value
-            },
-            content: {
-                ko: (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value,
-                en: (document.getElementById('about-us-content-en-input') as HTMLTextAreaElement).value
-            }
+            title: (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value,
+            content: (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value
         };
     } else if (section === 'support') {
          return {
@@ -701,12 +628,10 @@ function readDataFromSection(section: string): any {
 
 async function createNewItem(tableName: string) {
     let newItemData = {};
-    if (tableName === 'cex_exchanges' || tableName === 'dex_exchanges') {
-        newItemData = { name_ko: '새 항목', name_en: 'New Item' };
-    } else if (tableName === 'faqs') {
-        newItemData = { question_ko: '새 질문', question_en: 'New Question', answer_ko: '', answer_en: '' };
-    } else if (tableName === 'guides') {
-        newItemData = { title_ko: '새 제목', title_en: 'New Title', content_ko: '', content_en: '' };
+    if (tableName === 'exchange_exchanges') {
+        newItemData = { name_ko: '새 거래소' };
+    } else if (tableName === 'exchange_faqs') {
+        newItemData = { question_ko: '새 질문', answer_ko: '' };
     }
     await saveItem(tableName, newItemData);
 }
@@ -869,5 +794,6 @@ function switchPopupTab(page: string) {
     document.getElementById('exchange-popup-content')!.style.display = page === 'exchange' ? 'block' : 'none';
     document.getElementById('index-popup-content')!.style.display = page === 'index' ? 'block' : 'none';
 }
+
 
 export {};
