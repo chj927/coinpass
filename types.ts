@@ -9,7 +9,7 @@ export interface DatabaseRecord {
 export interface ExchangeData extends DatabaseRecord {
     name_ko: string;
     link: string;
-    logoImageUrl?: string;
+    logoimageurl?: string;
     benefit1_tag_ko: string;
     benefit1_value_ko: string;
     benefit2_tag_ko: string;

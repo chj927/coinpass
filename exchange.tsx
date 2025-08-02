@@ -241,8 +241,8 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
         const benefit4Value = SecurityUtils.sanitizeHtml(exchange.benefit4_value_ko || '');
 
         let logoHtml = '';
-        if (exchange.logoImageUrl && SecurityUtils.isValidUrl(exchange.logoImageUrl)) {
-            const sanitizedUrl = SecurityUtils.sanitizeHtml(exchange.logoImageUrl);
+        if (exchange.logoimageurl && SecurityUtils.isValidUrl(exchange.logoimageurl)) {
+            const sanitizedUrl = SecurityUtils.sanitizeHtml(exchange.logoimageurl);
             logoHtml = `<div class="exchange-logo"><img src="${sanitizedUrl}" alt="${name} logo" loading="lazy" onerror="this.style.display='none'"></div>`;
         } else {
             logoHtml = `<div class="exchange-logo exchange-logo-text">${name?.substring(0, 3).toUpperCase() || 'N/A'}</div>`;
