@@ -182,9 +182,9 @@ async function fetchDataFromSupabase() {
     if (cexError || faqsError || singlePagesError) {
         console.error({ cexError, faqsError, singlePagesError });
         showToast('데이터 로딩 중 오류 발생', 'error');
-        return;
     }
     
+    // 오류가 발생하더라도 빈 배열로 초기화
     siteData.exchanges = cex || [];
     siteData.faqs = faqsData || [];
 
@@ -410,8 +410,13 @@ function createSingleFormGroup(container: HTMLElement, baseName: string, label: 
     group.className = 'form-group';
     const labelEl = document.createElement('label');
     labelEl.textContent = label;
-    const input = document.createElement(elType) as HTMLInputElement;
-    input.type = inputType;
+    const input = document.createElement(elType) as HTMLInputElement | HTMLTextAreaElement;
+    
+    // textarea에는 type 속성이 없으므로 input일 때만 설정
+    if (elType === 'input' && input instanceof HTMLInputElement) {
+        input.type = inputType;
+    }
+    
     input.value = item[baseName] || '';
     input.className = `item-input ${baseName}`;
     group.append(labelEl, input);
@@ -429,7 +434,7 @@ function renderList(containerId: string, dataList: any[], listName: string, fiel
         card.className = 'item-card';
         card.dataset.index = index.toString();
         card.dataset.listName = listName;
-        card.dataset.itemId = item.id;
+        card.dataset.itemId = item.id?.toString() || '';
 
         fields.forEach(field => {
             if (field.bilingual) {
