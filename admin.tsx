@@ -88,10 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     emailInput.placeholder = '관리자 이메일';
     emailInput.className = 'login-input';
     passwordInput.parentElement?.insertBefore(emailInput, passwordInput);
-    
-    // 초기 세션 확인
-    checkExistingSession();
-    }
 
     // 로그인 버튼 이벤트 핸들러 - 서버사이드 인증 사용
     loginButton.addEventListener('click', async () => {
@@ -179,6 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
         location.reload();
     };
     adminPanel.querySelector('.admin-header')?.appendChild(logoutButton);
+    
+    // 초기 세션 확인 호출
+    checkExistingSession();
 });
 
 async function initializeApp() {
@@ -338,7 +337,7 @@ async function saveSinglePage(pageName: string, content: any) {
         const sanitizedContent = sanitizeContent(content);
         
         // 먼저 해당 page_type의 레코드가 존재하는지 확인
-        const { data: existing, error: checkError } = await supabase
+        const { data: existing } = await supabase
             .from('page_contents')
             .select('id')
             .eq('page_type', pageName)
@@ -661,14 +660,14 @@ function renderExchanges() {
             // 태그 입력
             const tagInput = document.createElement('input');
             tagInput.placeholder = '태그 (예: 수수료 할인)';
-            tagInput.value = item[`benefit${i}_tag_ko`] || '';
+            tagInput.value = (item as any)[`benefit${i}_tag_ko`] || '';
             tagInput.className = `item-input benefit${i}_tag_ko`;
             tagInput.style.marginBottom = '4px';
             
             // 값 입력
             const valueInput = document.createElement('input');
             valueInput.placeholder = '값 (예: 20%)';
-            valueInput.value = item[`benefit${i}_value_ko`] || '';
+            valueInput.value = (item as any)[`benefit${i}_value_ko`] || '';
             valueInput.className = `item-input benefit${i}_value_ko`;
             
             benefitContainer.appendChild(tagInput);

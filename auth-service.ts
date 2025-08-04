@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient';
-import { SecurityUtils } from './security-utils';
 
 /**
  * 서버사이드 인증 서비스
@@ -7,7 +6,7 @@ import { SecurityUtils } from './security-utils';
  */
 export class AuthService {
     private static instance: AuthService;
-    private sessionTimeout: number = 30 * 60 * 1000; // 30분
+    // 세션 타임아웃 설정 (30분)
     private refreshInterval: NodeJS.Timeout | null = null;
 
     private constructor() {
@@ -155,7 +154,7 @@ export class AuthService {
             }
 
             // Supabase Auth로 사용자 생성
-            const { data, error } = await supabase.auth.signUp({
+            const { error } = await supabase.auth.signUp({
                 email: email,
                 password: password,
                 options: {
@@ -213,7 +212,7 @@ export class AuthService {
     /**
      * 로그인 시도 제한 관리
      */
-    private loginRateLimiter = {
+    loginRateLimiter = {
         attempts: new Map<string, { count: number; firstAttempt: number }>(),
         maxAttempts: 5,
         windowMs: 15 * 60 * 1000, // 15분
@@ -286,7 +285,7 @@ export class AuthService {
     /**
      * 세션 저장
      */
-    private saveSession(session: any): void {
+    private saveSession(_session: any): void {
         // 세션 정보는 Supabase가 자동으로 관리하지만,
         // 추가적인 메타데이터가 필요한 경우 여기서 처리
         sessionStorage.setItem('admin_session_started', new Date().toISOString());

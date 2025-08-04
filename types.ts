@@ -75,15 +75,7 @@ export interface APIResponse<T> {
     loading: boolean;
 }
 
-// Vite 환경변수 타입
-export interface ImportMetaEnv {
-    readonly VITE_SUPABASE_URL: string;
-    readonly VITE_SUPABASE_ANON_KEY: string;
-}
-
-export interface ImportMeta {
-    readonly env: ImportMetaEnv;
-}
+// Vite 환경변수 타입은 vite-env.d.ts에서 글로벌로 정의됨
 
 // 이벤트 관련 타입
 export interface CustomEventDetail {

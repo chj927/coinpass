@@ -97,8 +97,16 @@
                             <a href="compare" class="cta-button">시세 비교하기</a>
                         </div>
                     </div>
-                    <div class="hero-3d-container">
-                        <canvas id="webgl-canvas"></canvas>
+                    <div class="hero-image-container">
+                        <picture>
+                            <!-- WebP 형식 (더 나은 압축) -->
+                            <source srcset="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=700&fit=crop&crop=entropy&fm=webp" type="image/webp">
+                            <!-- 대체 옵션들 -->
+                            <source srcset="https://images.unsplash.com/photo-1605792657660-596af9009e82?w=1200&h=700&fit=crop&crop=entropy" media="(prefers-color-scheme: light)">
+                            <source srcset="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=700&fit=crop&crop=entropy" media="(prefers-color-scheme: dark)">
+                            <!-- 기본 이미지 -->
+                            <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=700&fit=crop&crop=entropy" alt="CoinPass Hero Background - Cryptocurrency Trading" class="hero-bg-image" loading="eager">
+                        </picture>
                     </div>
                 </div>
             </section>
@@ -219,7 +227,7 @@
         </div>
     </div>
 
-    <script async src="https://unpkg.com/three@0.158.0/build/three.min.js" onload="window.THREE_LOADED = true"></script>
+    <!-- Three.js removed - replaced with static image -->
 
     <script type="module" src="index.tsx"></script>
 </body>

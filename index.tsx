@@ -1,11 +1,9 @@
-// Three.js 타입을 사용하기 위해 선언 (TypeScript 환경)
-declare const THREE: any;
+// Three.js 제거 - 이미지로 대체
 
 import { supabase, DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 import { ErrorHandler, setupGlobalErrorHandling, handleAsyncError } from './error-handler';
 import { startPerformanceMonitoring } from './performance-monitor';
-import { SecurityMiddleware } from './security-middleware';
 
 // 성능 최적화를 위한 상수들
 const DEBOUNCE_DELAY = 250;
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
         setupEventListeners();
         setupScrollAnimations();
         startTypingAnimation();
-        setupThreeJSScene();
+        // Three.js 제거 - 이미지로 대체됨
         setupPopup();
         setupSliders();
         // Theme setup is handled by theme-toggle.js
@@ -321,191 +319,9 @@ function setupMobileMenu() {
     });
 }
 
-/**
- * Three.js 씬을 설정하고 애니메이션을 시작하는 함수
- */
-function setupThreeJSScene() {
-    if (typeof THREE === 'undefined') {
-        // Use window.THREE_LOADED flag for better performance
-        const checkThreeJS = () => {
-            if (typeof THREE !== 'undefined' || (window as any).THREE_LOADED) {
-                initThreeJSScene();
-            } else {
-                // Use requestAnimationFrame for better performance than setTimeout
-                requestAnimationFrame(checkThreeJS);
-            }
-        };
-        
-        // Start checking immediately
-        checkThreeJS();
-        
-        // Fallback timeout
-        setTimeout(() => {
-            if (typeof THREE === 'undefined') {
-                console.warn('Three.js failed to load within timeout');
-            }
-        }, 10000);
-        return;
-    }
-    initThreeJSScene();
-}
+// Three.js 관련 코드 제거 - 이미지로 대체됨
 
-// Three.js 씬 관리 클래스
-class ThreeJSManager {
-    private scene: any = null;
-    private renderer: any = null;
-    private camera: any = null;
-    private spotlight: any = null;
-    private animationId: number | null = null;
-    private resizeHandler: (() => void) | null = null;
-    private mouseMoveHandler: ((event: MouseEvent) => void) | null = null;
-    private isDestroyed = false;
-
-    init() {
-        const canvas = document.getElementById('webgl-canvas');
-        if (!canvas) return;
-
-        const container = document.querySelector('.hero-3d-container') as HTMLElement;
-        if (!container) return;
-
-        if (this.scene) {
-            this.dispose();
-        }
-
-        this.scene = new THREE.Scene();
-
-        const sizes = {
-            width: container.clientWidth,
-            height: container.clientHeight
-        };
-
-        this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
-        this.camera.position.z = 5;
-
-        const isMobile = window.innerWidth <= 768;
-        this.renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
-            alpha: true,
-            antialias: !isMobile,
-            powerPreference: 'high-performance'
-        });
-        this.renderer.setSize(sizes.width, sizes.height);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // 조명 설정
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-        this.scene.add(ambientLight);
-
-        this.spotlight = new THREE.SpotLight(0xffffff, 1.5, 20, Math.PI / 4, 0.5, 2);
-        this.spotlight.position.set(0, 0, 5);
-        this.spotlight.target.position.set(0, 0, 0);
-        this.scene.add(this.spotlight);
-        this.scene.add(this.spotlight.target);
-
-        // 이미지 로드 및 재질 생성
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load('https://i.imgur.com/sF64B74.jpeg', (texture: any) => {
-            const imageAspect = texture.image.width / texture.image.height;
-            const planeHeight = 5;
-            const planeWidth = planeHeight * imageAspect;
-
-            const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
-            const material = new THREE.MeshStandardMaterial({
-                map: texture,
-                metalness: 0.2,
-                roughness: 0.7
-            });
-            const plane = new THREE.Mesh(geometry, material);
-            this.scene.add(plane);
-        }, undefined, (error: any) => {
-            console.error('An error happened during texture loading:', error);
-        });
-
-        const tick = () => {
-            if (this.isDestroyed) return;
-            this.renderer.render(this.scene, this.camera);
-            this.animationId = window.requestAnimationFrame(tick);
-        };
-        tick();
-
-        this.resizeHandler = this.debounce(() => {
-            if (this.isDestroyed) return;
-            sizes.width = container.clientWidth;
-            sizes.height = container.clientHeight;
-            this.camera.aspect = sizes.width / sizes.height;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(sizes.width, sizes.height);
-            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        }, 100);
-        window.addEventListener('resize', this.resizeHandler);
-
-        this.mouseMoveHandler = (event) => {
-            if (this.isDestroyed) return;
-            const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-            const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-            const vector = new THREE.Vector3(mouseX, mouseY, 0.5);
-            vector.unproject(this.camera);
-            const dir = vector.sub(this.camera.position).normalize();
-            const distance = -this.camera.position.z / dir.z;
-            const pos = this.camera.position.clone().add(dir.multiplyScalar(distance));
-            this.spotlight.target.position.copy(pos);
-        };
-        window.addEventListener('mousemove', this.mouseMoveHandler);
-
-        window.addEventListener('beforeunload', () => this.dispose());
-    }
-
-    dispose() {
-        this.isDestroyed = true;
-        if (this.animationId) cancelAnimationFrame(this.animationId);
-        if (this.resizeHandler) window.removeEventListener('resize', this.resizeHandler);
-        if (this.mouseMoveHandler) window.removeEventListener('mousemove', this.mouseMoveHandler);
-
-        if (this.scene) {
-            this.scene.traverse((object: any) => {
-                if (object.geometry) object.geometry.dispose();
-                if (object.material) {
-                    if (Array.isArray(object.material)) {
-                        object.material.forEach((material: any) => material.dispose());
-                    } else {
-                        object.material.dispose();
-                    }
-                }
-            });
-            this.scene.clear();
-        }
-        if (this.renderer) {
-            this.renderer.dispose();
-            this.renderer.forceContextLoss();
-        }
-        this.scene = null;
-        this.renderer = null;
-        this.camera = null;
-        this.spotlight = null;
-    }
-
-    private debounce(func: Function, wait: number) {
-        let timeout: number;
-        return function executedFunction(...args: any[]) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = window.setTimeout(later, wait);
-        };
-    }
-}
-
-// 전역 Three.js 매니저 인스턴스
-let threeJSManager: ThreeJSManager | null = null;
-
-function initThreeJSScene() {
-    if (!threeJSManager) {
-        threeJSManager = new ThreeJSManager();
-    }
-    threeJSManager.init();
-}
+// Three.js 관련 코드 모두 제거 - 정적 이미지로 대체됨
 
 function setupPopup() {
     if (!popupData || !popupData.enabled) return;
