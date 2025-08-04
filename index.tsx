@@ -5,6 +5,7 @@ import { supabase, DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 import { ErrorHandler, setupGlobalErrorHandling, handleAsyncError } from './error-handler';
 import { startPerformanceMonitoring } from './performance-monitor';
+import { SecurityMiddleware } from './security-middleware';
 
 // 성능 최적화를 위한 상수들
 const DEBOUNCE_DELAY = 250;

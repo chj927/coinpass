@@ -1,5 +1,6 @@
 import { supabase, DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
+import { authService } from './auth-service';
 
 // 타입 정의
 interface DatabaseRecord {
@@ -71,12 +72,7 @@ const defaultSiteData: SiteData = {
 
 let siteData: SiteData = JSON.parse(JSON.stringify(defaultSiteData));
 
-async function sha256(message: string): Promise<string> {
-    const msgBuffer = new TextEncoder().encode(message);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
+// SHA256 해싱 함수 제거 - 서버사이드 인증으로 대체
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginContainer = document.getElementById('login-container') as HTMLDivElement;
@@ -84,84 +80,105 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('login-button') as HTMLButtonElement;
     const passwordInput = document.getElementById('password-input') as HTMLInputElement;
     const loginError = document.getElementById('login-error') as HTMLParagraphElement;
-    // 강화된 비밀번호 해시 (bcrypt 스타일 솔트 포함)
-    const PWD_HASH = '324b43e939e0eb81492bfd49c46fe96bafa77e8efe5ab9eec454add3c4f7f895';
-    const MAX_LOGIN_ATTEMPTS = 5;
-    const LOCKOUT_TIME = 15 * 60 * 1000; // 15분
+    // 서버사이드 인증 사용 - 하드코딩된 해시 제거
+    // 이메일 입력 필드 추가 필요
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.id = 'email-input';
+    emailInput.placeholder = '관리자 이메일';
+    emailInput.className = 'login-input';
+    passwordInput.parentElement?.insertBefore(emailInput, passwordInput);
     
-    let loginAttempts = parseInt(localStorage.getItem('login-attempts') || '0');
-    let lockoutUntil = parseInt(localStorage.getItem('lockout-until') || '0');
-
-    // 로그인 잠금 상태 확인
-    if (Date.now() < lockoutUntil) {
-        const remainingTime = Math.ceil((lockoutUntil - Date.now()) / 60000);
-        loginError.textContent = `너무 많은 로그인 시도로 인해 ${remainingTime}분 후에 다시 시도해주세요.`;
-        loginButton.disabled = true;
-        passwordInput.disabled = true;
+    // 초기 세션 확인
+    checkExistingSession();
     }
 
+    // 로그인 버튼 이벤트 핸들러 - 서버사이드 인증 사용
     loginButton.addEventListener('click', async () => {
-        // 잠금 상태 재확인
-        if (Date.now() < lockoutUntil) {
-            return;
-        }
-
         // Rate limiting 체크
         if (!SecurityUtils.checkRateLimit('admin-login', 3, 60000)) {
             loginError.textContent = '너무 많은 요청입니다. 잠시 후 다시 시도해주세요.';
             return;
         }
 
+        const enteredEmail = emailInput.value.trim();
         const enteredPassword = passwordInput.value;
         
         // 입력 검증
-        if (!enteredPassword || enteredPassword.length < 8) {
-            loginError.textContent = '올바른 비밀번호를 입력해주세요.';
+        if (!enteredEmail || !enteredPassword) {
+            loginError.textContent = '이메일과 비밀번호를 입력해주세요.';
             return;
         }
 
-        try {
-            const enteredHash = await sha256(enteredPassword);
+        // 로딩 상태 표시
+        loginButton.disabled = true;
+        loginButton.textContent = '로그인 중...';
 
-            if (enteredHash === PWD_HASH) {
-                // 로그인 성공 - 카운터 리셋
-                localStorage.removeItem('login-attempts');
-                localStorage.removeItem('lockout-until');
-                
-                // 세션 시작
-                SecurityUtils.startSession();
-                
+        try {
+            // 서버사이드 인증 시도
+            const result = await authService.login(enteredEmail, enteredPassword);
+            
+            if (result.success) {
+                // 로그인 성공
                 loginContainer.style.display = 'none';
                 adminPanel.style.display = 'flex';
                 await initializeApp();
+                showToast('로그인 성공', 'success');
             } else {
-                // 로그인 실패 처리
-                loginAttempts++;
-                localStorage.setItem('login-attempts', loginAttempts.toString());
-                
-                if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-                    lockoutUntil = Date.now() + LOCKOUT_TIME;
-                    localStorage.setItem('lockout-until', lockoutUntil.toString());
-                    loginError.textContent = '너무 많은 로그인 시도로 인해 15분간 잠금되었습니다.';
-                    loginButton.disabled = true;
-                    passwordInput.disabled = true;
-                } else {
-                    const remaining = MAX_LOGIN_ATTEMPTS - loginAttempts;
-                    loginError.textContent = `비밀번호가 올바르지 않습니다. (${remaining}회 남음)`;
-                }
-                
+                // 로그인 실패
+                loginError.textContent = result.error || '로그인에 실패했습니다.';
                 passwordInput.value = '';
+                
+                // 실패 시 진동 효과
+                loginContainer.classList.add('shake');
+                setTimeout(() => {
+                    loginContainer.classList.remove('shake');
+                }, 500);
             }
         } catch (error) {
             console.error('Login error:', error);
             loginError.textContent = '로그인 처리 중 오류가 발생했습니다.';
+        } finally {
+            loginButton.disabled = false;
+            loginButton.textContent = '로그인';
         }
     });
-     passwordInput.addEventListener('keypress', (e) => {
+    // 엔터키 이벤트 처리
+    passwordInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             loginButton.click();
         }
     });
+    
+    emailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            passwordInput.focus();
+        }
+    });
+    
+    // 기존 세션 확인
+    async function checkExistingSession() {
+        try {
+            const hasValidSession = await authService.checkSession();
+            if (hasValidSession) {
+                loginContainer.style.display = 'none';
+                adminPanel.style.display = 'flex';
+                await initializeApp();
+            }
+        } catch (error) {
+            console.error('Session check error:', error);
+        }
+    }
+    
+    // 로그아웃 버튼 추가
+    const logoutButton = document.createElement('button');
+    logoutButton.textContent = '로그아웃';
+    logoutButton.className = 'logout-button';
+    logoutButton.onclick = async () => {
+        await authService.logout();
+        location.reload();
+    };
+    adminPanel.querySelector('.admin-header')?.appendChild(logoutButton);
 });
 
 async function initializeApp() {
