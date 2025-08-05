@@ -482,11 +482,10 @@ function setupSliders() {
         const width = window.innerWidth;
         if (width > 768) {
             // Desktop and tablet get sliders
-            new CardSlider('.features-section .slider-container');
             new CardSlider('.why-coinpass .slider-container');
         } else {
             // Mobile: reset transforms
-            const grids = document.querySelectorAll('.features-grid, .benefits-grid');
+            const grids = document.querySelectorAll('.benefits-grid');
             grids.forEach(grid => {
                 (grid as HTMLElement).style.transform = 'translateX(0)';
             });

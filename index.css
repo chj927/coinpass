@@ -543,32 +543,6 @@ main {
     box-shadow: 0 0 20px 10px rgba(0, 212, 170, 0);
 }
 
-
-/* Features Section */
-.features-section {
-    padding: 4rem 2rem;
-    background-color: var(--card-bg);
-    background-image: 
-        radial-gradient(circle at 25% 25%, rgba(0, 212, 170, 0.03) 0%, transparent 30%),
-        radial-gradient(circle at 75% 75%, rgba(0, 212, 170, 0.02) 0%, transparent 35%);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    margin: 2rem;
-    position: relative;
-}
-
-.features-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.01) 0%, rgba(255,255,255,0) 50%);
-    pointer-events: none;
-    border-radius: inherit;
-}
-
 /* Popup Styles */
 .popup-container {
     position: fixed;
@@ -758,94 +732,6 @@ main {
     border-radius: 12px;
 }
 
-.features-grid {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-    gap: 2rem;
-}
-
-.features-grid .feature-card {
-    flex: 0 0 calc(33.333% - 1.33rem);
-    min-width: 300px;
-}
-
-.feature-card {
-    background: 
-        /* Subtle paper texture */
-        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.012) 0%, transparent 40%),
-        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.008) 0%, transparent 40%),
-        /* Fine grain texture */
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 1px,
-            rgba(255, 255, 255, 0.004) 1px,
-            rgba(255, 255, 255, 0.004) 2px
-        ),
-        var(--card-bg);
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-    position: relative;
-    backdrop-filter: blur(1px);
-}
-
-.feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        /* Subtle texture overlay */
-        repeating-conic-gradient(
-            from 0deg at 50% 50%,
-            transparent 0deg,
-            rgba(255, 255, 255, 0.003) 1deg,
-            transparent 2deg
-        );
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-.feature-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--accent-color);
-    box-shadow: 0 10px 30px rgba(0, 212, 170, 0.2);
-}
-
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.feature-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--accent-color);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    font-weight: 600;
-}
-
-.feature-card p {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.feature-link {
-    color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-
-.feature-link:hover {
-    color: #00b894;
-}
 
 /* Why CoinPass Section */
 .why-coinpass {
@@ -1231,7 +1117,6 @@ footer::before {
         padding: 1rem;
     }
 
-    .features-section,
     .why-coinpass,
     footer {
         margin: 1rem;
@@ -1381,14 +1266,12 @@ footer::before {
         margin: 1rem 0;
     }
 
-    .features-section,
     .why-coinpass {
         padding: 3rem 0;
         margin: 0;
     }
 
     /* 카드 간격 개선 */
-    .feature-card,
     .benefit-item {
         margin-bottom: 1.5rem;
         padding: 1.5rem;
