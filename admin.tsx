@@ -79,15 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminPanel = document.getElementById('admin-panel') as HTMLDivElement;
     const loginButton = document.getElementById('login-button') as HTMLButtonElement;
     const passwordInput = document.getElementById('password-input') as HTMLInputElement;
+    const emailInput = document.getElementById('email-input') as HTMLInputElement;
     const loginError = document.getElementById('login-error') as HTMLParagraphElement;
-    // 서버사이드 인증 사용 - 하드코딩된 해시 제거
-    // 이메일 입력 필드 추가 필요
-    const emailInput = document.createElement('input');
-    emailInput.type = 'email';
-    emailInput.id = 'email-input';
-    emailInput.placeholder = '관리자 이메일';
-    emailInput.className = 'login-input';
-    passwordInput.parentElement?.insertBefore(emailInput, passwordInput);
 
     // 로그인 버튼 이벤트 핸들러 - 서버사이드 인증 사용
     loginButton.addEventListener('click', async () => {
@@ -146,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    emailInput.addEventListener('keypress', (e) => {
+    emailInput?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             passwordInput.focus();
         }

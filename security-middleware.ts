@@ -25,10 +25,10 @@ export class SecurityMiddleware {
         cspMeta.content = import.meta.env.VITE_CSP_HEADER || 
             "default-src 'self'; " +
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; " +
-            "style-src 'self' 'unsafe-inline'; " +
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
             "img-src 'self' data: https: blob:; " +
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.coingecko.com https://api.upbit.com; " +
-            "font-src 'self' data:; " +
+            "font-src 'self' data: https://cdn.jsdelivr.net; " +
             "object-src 'none'; " +
             "media-src 'self'; " +
             "frame-src 'none';";

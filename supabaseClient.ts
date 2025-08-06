@@ -1,17 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
 // 환경변수에서 Supabase 설정 로드 (보안 강화)
-// Vite 환경변수 타입 선언
-interface ImportMetaEnv {
-    readonly VITE_SUPABASE_URL: string;
-    readonly VITE_SUPABASE_ANON_KEY: string;
-}
-
-declare global {
-    interface ImportMeta {
-        readonly env: ImportMetaEnv;
-    }
-}
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -23,7 +12,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-        persistSession: false, // 보안 강화를 위해 세션 지속성 비활성화
+        persistSession: true, // 관리자 세션 유지를 위해 활성화
+        storageKey: 'coinpass-admin-auth', // 세션 키 지정
+        storage: window.sessionStorage, // sessionStorage 사용 (브라우저 닫으면 삭제)
     },
     db: {
         schema: 'public'

@@ -44,7 +44,21 @@ function applyTheme(theme) {
         themeToggle.setAttribute('aria-label', newLabel);
         themeToggle.setAttribute('title', newLabel);
     }
+
+    // body 태그에도 클래스 추가 (호환성을 위해)
+    document.body.classList.remove('theme-dark', 'theme-light');
+    document.body.classList.add(`theme-${theme}`);
+    
+    // 테마 변경 이벤트 발생 (다른 컴포넌트가 반응할 수 있도록)
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
 }
+
+// 초기 테마 적용을 더 빠르게 (FOUC 방지)
+(function() {
+    const savedTheme = localStorage.getItem('coinpass-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.body?.classList.add(`theme-${savedTheme}`);
+})();
 
 // Initialize theme on page load
 document.addEventListener('DOMContentLoaded', setupThemeToggle);
