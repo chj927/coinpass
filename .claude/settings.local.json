@@ -23,7 +23,11 @@
       "Bash(dir:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
-      "Bash(psql:*)"
+      "Bash(psql:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm run dev:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
