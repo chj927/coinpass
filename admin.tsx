@@ -109,6 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (result.success) {
                 // 로그인 성공
+                // SecurityUtils 세션도 시작 (두 시스템 동기화)
+                SecurityUtils.startSession();
                 loginContainer.style.display = 'none';
                 adminPanel.style.display = 'flex';
                 await initializeApp();
@@ -150,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const hasValidSession = await authService.checkSession();
             if (hasValidSession) {
+                // Supabase 세션이 유효하면 SecurityUtils 세션도 동기화
+                SecurityUtils.startSession();
                 loginContainer.style.display = 'none';
                 adminPanel.style.display = 'flex';
                 await initializeApp();
@@ -165,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutButton.className = 'logout-button';
     logoutButton.onclick = async () => {
         await authService.logout();
+        SecurityUtils.clearSession(); // SecurityUtils 세션도 정리
         location.reload();
     };
     adminPanel.querySelector('.admin-header')?.appendChild(logoutButton);
@@ -236,11 +241,19 @@ async function fetchDataFromSupabase() {
 }
 
 async function saveItem(tableName: string, itemData: any, id?: number) {
-    // 세션 유효성 검사
-    if (!SecurityUtils.isSessionValid()) {
-        showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
-        location.reload();
-        return;
+    // 세션 유효성 검사 (두 시스템 모두 확인)
+    const supabaseSessionValid = await authService.checkSession();
+    const securityUtilsSessionValid = SecurityUtils.isSessionValid();
+    
+    if (!supabaseSessionValid || !securityUtilsSessionValid) {
+        // 세션 불일치 시 재동기화 시도
+        if (supabaseSessionValid && !securityUtilsSessionValid) {
+            SecurityUtils.startSession();
+        } else {
+            showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
+            location.reload();
+            return;
+        }
     }
 
     // CSRF 토큰 검증
@@ -311,11 +324,19 @@ async function saveItem(tableName: string, itemData: any, id?: number) {
 }
 
 async function saveSinglePage(pageName: string, content: any) {
-    // 세션 유효성 검사
-    if (!SecurityUtils.isSessionValid()) {
-        showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
-        location.reload();
-        return;
+    // 세션 유효성 검사 (두 시스템 모두 확인)
+    const supabaseSessionValid = await authService.checkSession();
+    const securityUtilsSessionValid = SecurityUtils.isSessionValid();
+    
+    if (!supabaseSessionValid || !securityUtilsSessionValid) {
+        // 세션 불일치 시 재동기화 시도
+        if (supabaseSessionValid && !securityUtilsSessionValid) {
+            SecurityUtils.startSession();
+        } else {
+            showToast('세션이 만료되었습니다. 다시 로그인해주세요.', 'error');
+            location.reload();
+            return;
+        }
     }
 
     // 페이지명 화이트리스트 검증
