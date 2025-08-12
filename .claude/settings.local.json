@@ -28,7 +28,8 @@
       "Bash(mkdir:*)",
       "Bash(npm run dev:*)",
       "Bash(ls:*)",
-      "Bash(start http://localhost:3001/test-theme-functionality.html)"
+      "Bash(start http://localhost:3001/test-theme-functionality.html)",
+      "Bash(start http://localhost:3000)"
     ],
     "deny": []
   }

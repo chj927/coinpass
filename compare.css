@@ -45,6 +45,288 @@
     --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    background: 
+        /* Subtle noise texture */
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(0, 212, 170, 0.008) 0%, transparent 50%),
+        /* Matte texture overlay */
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.003) 2px,
+            rgba(255, 255, 255, 0.003) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.002) 2px,
+            rgba(255, 255, 255, 0.002) 4px
+        ),
+        /* Base gradient */
+        linear-gradient(135deg, #1a1a1a 0%, #1e1e1e 25%, #242424 50%, #1f1f1f 75%, #1a1a1a 100%);
+    color: var(--text-color);
+    line-height: 1.6;
+    font-size: 16px;
+    position: relative;
+}
+
+/* Light theme body background */
+[data-theme="light"] body {
+    background: 
+        /* Subtle light texture */
+        radial-gradient(circle at 20% 50%, rgba(0, 0, 0, 0.008) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 0, 0, 0.005) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(0, 212, 170, 0.015) 0%, transparent 50%),
+        /* Light matte texture overlay */
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.002) 2px,
+            rgba(0, 0, 0, 0.002) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.001) 2px,
+            rgba(0, 0, 0, 0.001) 4px
+        ),
+        /* Base light gradient */
+        linear-gradient(135deg, #ffffff 0%, #fafafa 25%, #f5f5f5 50%, #f8f8f8 75%, #ffffff 100%);
+}
+
+#app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Header */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-link {
+    text-decoration: none;
+    z-index: 101;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-img {
+    height: 32px;
+    width: auto;
+}
+
+.logo-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent-color);
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.hamburger-button {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.hamburger-box {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+}
+
+.hamburger-inner {
+    display: block;
+    top: 50%;
+    margin-top: -2px;
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-color);
+    border-radius: 4px;
+    position: absolute;
+    transition-property: transform;
+    transition-duration: 0.15s;
+    transition-timing-function: ease;
+}
+
+.hamburger-inner::before,
+.hamburger-inner::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: var(--text-color);
+    border-radius: 4px;
+    position: absolute;
+    transition-property: transform;
+    transition-duration: 0.15s;
+    transition-timing-function: ease;
+}
+
+.hamburger-inner::before {
+    top: -8px;
+}
+
+.hamburger-inner::after {
+    bottom: -8px;
+}
+
+#main-nav ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 0.5rem;
+}
+
+#main-nav li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+#main-nav li a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#main-nav li a .nav-title {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+#main-nav li a .nav-subtitle {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.8rem;
+    transition: color 0.3s ease;
+}
+
+#main-nav li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--accent-color);
+    transition: all 0.4s ease;
+    transform: translateX(-50%);
+}
+
+#main-nav li a:hover::after {
+    width: calc(100% - 2rem);
+}
+
+#main-nav li a:hover .nav-title {
+    color: var(--accent-color);
+}
+
+/* Theme Switcher */
+.theme-switcher {
+    display: flex;
+    align-items: center;
+}
+
+#theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+#theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle:hover .theme-icon {
+    transform: rotate(20deg);
+}
+
+.sun-icon {
+    display: none;
+}
+
+.moon-icon {
+    display: block;
+}
+
+[data-theme="light"] .sun-icon {
+    display: block;
+}
+
+[data-theme="light"] .moon-icon {
+    display: none;
+}
+
 /* Banner Section */
 .banner-section {
     background: var(--secondary-color);
