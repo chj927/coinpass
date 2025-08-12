@@ -29,7 +29,7 @@ export const supabase = (supabaseUrl && supabaseAnonKey) ? createClient(supabase
             eventsPerSecond: 2 // 실시간 업데이트 제한
         }
     }
-}) : null as any
+}) : null as any;
 
 // 데이터베이스 쿼리 최적화 유틸리티
 export class DatabaseUtils {

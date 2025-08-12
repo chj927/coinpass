@@ -158,7 +158,12 @@ async function loadHeroData() {
             console.error('Failed to load hero data:', error);
             heroData = defaultData;
         } else {
-            heroData = data?.content || defaultData;
+            const rawContent = data?.content || {};
+            // Transform flat structure to expected nested structure
+            heroData = {
+                title: { ko: rawContent.title || defaultData.title.ko },
+                subtitle: { ko: rawContent.subtitle || defaultData.subtitle.ko }
+            };
             setCachedData(cacheKey, heroData);
         }
     } catch (error) {
@@ -185,7 +190,7 @@ async function loadPopupData() {
         const { data, error } = await supabase
             .from('page_contents')
             .select('content')
-            .eq('page_type', 'indexPopup')
+            .eq('page_type', 'popup')
             .single();
 
         if (error) {
