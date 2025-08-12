@@ -333,9 +333,12 @@ header {
     font-weight: 700;
     margin-bottom: 0.75rem;
     line-height: 1.2;
-    min-height: 1.2em;
+    min-height: 1.4em;
     color: var(--text-color);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero-banner h1::after {

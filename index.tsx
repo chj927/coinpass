@@ -83,6 +83,9 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
     try {
         showLoadingState(true);
         
+        // 즉시 기본 타이핑 애니메이션 시작 (데이터 로딩 전)
+        startTypingAnimationWithDefaults();
+        
         // 데이터베이스 연결 상태 확인
         const isConnected = await DatabaseUtils.checkConnection();
         if (!isConnected) {
@@ -105,7 +108,10 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
         
         setupEventListeners();
         setupScrollAnimations();
-        startTypingAnimation();
+        // 데이터 로드 완료 후 실제 데이터로 타이핑 업데이트
+        if (heroData) {
+            startTypingAnimation();
+        }
         // Three.js 제거 - 이미지로 대체됨
         setupPopup();
         setupSliders();
@@ -343,6 +349,26 @@ class TypingAnimator {
 }
 
 let typingAnimator: TypingAnimator | null = null;
+
+// 즉시 기본값으로 타이핑 시작
+function startTypingAnimationWithDefaults() {
+    const heroTitle = document.getElementById('hero-title');
+    if (!heroTitle) return;
+    
+    // 기존 애니메이션이 있다면 정지
+    if (typingAnimator) {
+        typingAnimator.stop();
+    }
+    
+    const defaultSentences = [
+        '최대 50%까지 수수료 할인!',
+        '최고의 혜택을 누구나 무료로!',
+        '한번 등록하고 평생 혜택받기!'
+    ];
+    
+    typingAnimator = new TypingAnimator(heroTitle as HTMLElement, defaultSentences);
+    typingAnimator.startTyping();
+}
 
 function startTypingAnimation() {
     const heroTitle = document.getElementById('hero-title');
