@@ -82,7 +82,7 @@ export default defineConfig(({ mode }) => {
         }),
         chunkSizeWarningLimit: 500,
         assetsInlineLimit: 4096,
-        cssMinify: 'lightningcss',
+        cssMinify: true, // Changed from 'lightningcss' to default minifier
         reportCompressedSize: false
       },
       optimizeDeps: {
