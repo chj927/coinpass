@@ -1,4 +1,4 @@
-import { signIn, signOut, getSession, getUser, refreshSession } from './supabaseClient.lite';
+import { supabase } from './supabaseClient';
 
 /**
  * 서버사이드 인증 서비스
@@ -34,7 +34,7 @@ export class AuthService {
             }
 
             // Supabase Auth로 로그인
-            const { data, error } = await signIn(email, password);
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 console.error('Login error:', error);
@@ -77,7 +77,7 @@ export class AuthService {
      */
     async logout(): Promise<void> {
         try {
-            await signOut();
+            await supabase.auth.signOut();
             this.clearSession();
             if (this.refreshInterval) {
                 clearInterval(this.refreshInterval);
@@ -96,7 +96,7 @@ export class AuthService {
      */
     async checkSession(): Promise<boolean> {
         try {
-            const { data: { session }, error } = await getSession();
+            const { data: { session }, error } = await supabase.auth.getSession();
             
             if (error || !session) {
                 return false;
@@ -110,7 +110,7 @@ export class AuthService {
             }
 
             // 관리자 권한 재확인
-            const { data: { user } } = await getUser();
+            const { data: { user } } = await supabase.auth.getUser();
             if (!user || user.user_metadata?.is_admin !== true) {
                 await this.logout();
                 return false;
@@ -128,7 +128,7 @@ export class AuthService {
      */
     async refreshSession(): Promise<boolean> {
         try {
-            const { data, error } = await refreshSession();
+            const { data, error } = await supabase.auth.refreshSession();
             
             if (error || !data.session) {
                 console.error('Session refresh failed:', error);
@@ -161,11 +161,6 @@ export class AuthService {
             }
 
             // Supabase Auth로 사용자 생성
-            const { createClient } = await import('@supabase/supabase-js');
-            const supabase = createClient(
-                import.meta.env.VITE_SUPABASE_URL,
-                import.meta.env.VITE_SUPABASE_ANON_KEY
-            );
             const { error } = await supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -206,11 +201,6 @@ export class AuthService {
             }
 
             // 비밀번호 업데이트
-            const { createClient } = await import('@supabase/supabase-js');
-            const supabase = createClient(
-                import.meta.env.VITE_SUPABASE_URL,
-                import.meta.env.VITE_SUPABASE_ANON_KEY
-            );
             const { error } = await supabase.auth.updateUser({
                 password: newPassword
             });
@@ -335,11 +325,12 @@ export class AuthService {
         // 허용된 IP 목록을 Supabase 테이블에서 관리할 수 있음
         // 이는 추가적인 보안 계층으로 사용 가능
         try {
-            const { DatabaseUtils } = await import('./supabaseClient.lite');
-            const { data, error } = await DatabaseUtils.selectSingle(
+            const { DatabaseUtils } = await import('./supabaseClient');
+            const { data, error } = await DatabaseUtils.getPaginatedData(
                 'admin_allowed_ips',
-                'ip_address',
-                { ip_address: clientIP }
+                1,
+                1,
+                'ip_address'
             );
 
             return !error && data !== null;
