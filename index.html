@@ -93,77 +93,406 @@
         <main id="main-content">
             <section class="hero" aria-labelledby="hero-title">
                 <div class="hero-banner anim-fade-in">
-                    <div class="hero-content">
+                    <div class="hero-content-centered">
+                        <div class="hero-badge">
+                            <span>🚀</span>
+                            <span>2025년 최고의 선택</span>
+                            <span>🚀</span>
+                        </div>
                         <h1 id="hero-title"></h1>
                         <p id="hero-subtitle">거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서</p>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">50%</span>
+                                <span class="stat-label">수수료 할인</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-value">15+</span>
+                                <span class="stat-label">거래소 제휴</span>
+                            </div>
+                            <div class="stat-divider"></div>
+                            <div class="stat-item">
+                                <span class="stat-value">100K+</span>
+                                <span class="stat-label">활성 사용자</span>
+                            </div>
+                        </div>
                         <div class="main-cta-buttons">
-                            <a href="exchange" class="cta-button">수수료 혜택 받기</a>
-                            <a href="compare" class="cta-button">시세 비교하기</a>
+                            <a href="exchange" class="cta-button primary">수수료 혜택 받기</a>
+                            <a href="compare" class="cta-button secondary">시세 비교하기</a>
                         </div>
                     </div>
-                    <div class="hero-image-container">
-                        <picture>
-                            <!-- WebP 형식 (더 나은 압축) -->
-                            <source srcset="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=700&fit=crop&crop=entropy&fm=webp" type="image/webp">
-                            <!-- 대체 옵션들 -->
-                            <source srcset="https://images.unsplash.com/photo-1605792657660-596af9009e82?w=1200&h=700&fit=crop&crop=entropy" media="(prefers-color-scheme: light)">
-                            <source srcset="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=700&fit=crop&crop=entropy" media="(prefers-color-scheme: dark)">
-                            <!-- 기본 이미지 -->
-                            <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=700&fit=crop&crop=entropy" alt="CoinPass Hero Background - Cryptocurrency Trading" class="hero-bg-image" loading="eager">
-                        </picture>
+                </div>
+            </section>
+
+            <!-- Exchange Comparison Table Section -->
+            <section class="exchange-comparison-preview">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="section-badge">REAL-TIME COMPARISON</span>
+                        <h2 class="section-title">
+                            거래소별 <span class="gradient-text">수수료 할인율</span> 한눈에 비교
+                        </h2>
+                        <p class="section-description">
+                            국내 최고 수준의 할인율을 제공하는 TOP 5 거래소
+                        </p>
+                    </div>
+                    
+                    <div class="comparison-table-wrapper">
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>거래소</th>
+                                    <th>기본 수수료</th>
+                                    <th>할인 수수료</th>
+                                    <th>절약률</th>
+                                    <th>월 예상 절약</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-row featured">
+                                    <td class="exchange-name">
+                                        <span class="exchange-badge">🥇</span>
+                                        <strong>바이낸스</strong>
+                                    </td>
+                                    <td class="fee-original">0.10%</td>
+                                    <td class="fee-discounted">0.05%</td>
+                                    <td class="savings-rate">
+                                        <span class="rate-badge">50%</span>
+                                    </td>
+                                    <td class="monthly-savings">₩250,000</td>
+                                    <td>
+                                        <a href="exchange" class="table-cta">가입하기</a>
+                                    </td>
+                                </tr>
+                                <tr class="table-row">
+                                    <td class="exchange-name">
+                                        <span class="exchange-badge">🥈</span>
+                                        <strong>바이비트</strong>
+                                    </td>
+                                    <td class="fee-original">0.10%</td>
+                                    <td class="fee-discounted">0.055%</td>
+                                    <td class="savings-rate">
+                                        <span class="rate-badge">45%</span>
+                                    </td>
+                                    <td class="monthly-savings">₩225,000</td>
+                                    <td>
+                                        <a href="exchange" class="table-cta">가입하기</a>
+                                    </td>
+                                </tr>
+                                <tr class="table-row">
+                                    <td class="exchange-name">
+                                        <span class="exchange-badge">🥉</span>
+                                        <strong>OKX</strong>
+                                    </td>
+                                    <td class="fee-original">0.08%</td>
+                                    <td class="fee-discounted">0.05%</td>
+                                    <td class="savings-rate">
+                                        <span class="rate-badge">38%</span>
+                                    </td>
+                                    <td class="monthly-savings">₩150,000</td>
+                                    <td>
+                                        <a href="exchange" class="table-cta">가입하기</a>
+                                    </td>
+                                </tr>
+                                <tr class="table-row">
+                                    <td class="exchange-name">
+                                        <strong>MEXC</strong>
+                                    </td>
+                                    <td class="fee-original">0.10%</td>
+                                    <td class="fee-discounted">0.06%</td>
+                                    <td class="savings-rate">
+                                        <span class="rate-badge">40%</span>
+                                    </td>
+                                    <td class="monthly-savings">₩200,000</td>
+                                    <td>
+                                        <a href="exchange" class="table-cta">가입하기</a>
+                                    </td>
+                                </tr>
+                                <tr class="table-row">
+                                    <td class="exchange-name">
+                                        <strong>Gate.io</strong>
+                                    </td>
+                                    <td class="fee-original">0.075%</td>
+                                    <td class="fee-discounted">0.05%</td>
+                                    <td class="savings-rate">
+                                        <span class="rate-badge">33%</span>
+                                    </td>
+                                    <td class="monthly-savings">₩125,000</td>
+                                    <td>
+                                        <a href="exchange" class="table-cta">가입하기</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="table-footer">
+                            <p class="table-note">* 월 5천만원 거래 기준 예상 절약 금액</p>
+                            <a href="exchange" class="view-all-btn">
+                                모든 거래소 보기
+                                <span class="arrow">→</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section class="why-coinpass">
                 <div class="container">
-                    <h2 class="section-title anim-fade-in">왜 코인패스를 선택해야 할까요?</h2>
-                    <div class="slider-container">
-                        <div class="slider-wrapper">
-                            <div class="benefits-grid">
-                                <div class="benefit-item anim-fade-in">
-                                    <div class="benefit-icon">🎯</div>
-                                    <h3>원스톱 서비스</h3>
-                                    <p>여러 사이트를 돌아다닐 필요 없이 코인패스 하나로 모든 투자 정보를 확인할 수 있습니다.</p>
+                    <div class="section-header">
+                        <span class="section-badge">WHY COINPASS</span>
+                        <h2 class="section-title anim-fade-in">
+                            왜 <span class="gradient-text">코인패스</span>를 선택해야 할까요?
+                        </h2>
+                        <p class="section-description anim-fade-in">
+                            수익을 극대화하고 리스크를 최소화하는 스마트한 선택
+                        </p>
+                    </div>
+                    
+                    <div class="benefits-grid">
+                        <!-- Benefit Card 1 -->
+                        <div class="benefit-card anim-fade-in">
+                            <div class="benefit-header">
+                                <div class="benefit-icon-wrapper">
+                                    <div class="benefit-icon-bg"></div>
+                                    <span class="benefit-icon">🎯</span>
                                 </div>
-                                
-                                <div class="benefit-item anim-fade-in">
-                                    <div class="benefit-icon">💎</div>
-                                    <h3>검증된 파트너십</h3>
-                                    <p>글로벌 1위 거래소들과의 공식 제휴를 통해 안전하고 확실한 혜택을 보장합니다.</p>
-                                </div>
-                                
-                                <div class="benefit-item anim-fade-in">
-                                    <div class="benefit-icon">⚡</div>
-                                    <h3>실시간 업데이트</h3>
-                                    <p>시세, 뉴스, 온체인 데이터가 실시간으로 업데이트되어 항상 최신 정보를 제공합니다.</p>
-                                </div>
-                                
-                                <div class="benefit-item anim-fade-in">
-                                    <div class="benefit-icon">🛡️</div>
-                                    <h3>안전한 서비스</h3>
-                                    <p>개인정보 보호와 보안을 최우선으로 하여 안전한 투자 환경을 제공합니다.</p>
-                                </div>
+                                <h3 class="benefit-title">원스톱 서비스</h3>
+                            </div>
+                            <p class="benefit-description">
+                                여러 사이트를 돌아다닐 필요 없이 코인패스 하나로 모든 투자 정보를 확인할 수 있습니다.
+                            </p>
+                            <div class="benefit-features">
+                                <span class="feature-tag">통합 대시보드</span>
+                                <span class="feature-tag">실시간 업데이트</span>
                             </div>
                         </div>
-                        <button class="slider-nav prev" aria-label="이전 항목">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <button class="slider-nav next" aria-label="다음 항목">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <div class="slider-dots">
-                            <button class="dot active" data-slide="0"></button>
-                            <button class="dot" data-slide="1"></button>
+                        
+                        <!-- Benefit Card 2 -->
+                        <div class="benefit-card anim-fade-in delay-1">
+                            <div class="benefit-header">
+                                <div class="benefit-icon-wrapper">
+                                    <div class="benefit-icon-bg"></div>
+                                    <span class="benefit-icon">⚡</span>
+                                </div>
+                                <h3 class="benefit-title">검증된 파트너십</h3>
+                            </div>
+                            <p class="benefit-description">
+                                글로벌 1위 거래소들과의 공식 제휴를 통해 안전하고 확실한 혜택을 보장합니다.
+                            </p>
+                            <div class="benefit-features">
+                                <span class="feature-tag">공식 인증</span>
+                                <span class="feature-tag">최고 할인율</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Benefit Card 3 -->
+                        <div class="benefit-card anim-fade-in delay-2">
+                            <div class="benefit-header">
+                                <div class="benefit-icon-wrapper">
+                                    <div class="benefit-icon-bg"></div>
+                                    <span class="benefit-icon">🛡️</span>
+                                </div>
+                                <h3 class="benefit-title">안전한 서비스</h3>
+                            </div>
+                            <p class="benefit-description">
+                                개인정보 보호와 보안을 최우선으로 하여 안전한 투자 환경을 제공합니다.
+                            </p>
+                            <div class="benefit-features">
+                                <span class="feature-tag">SSL 암호화</span>
+                                <span class="feature-tag">2FA 지원</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- User Testimonials Section -->
+            <section class="testimonials-section">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="section-badge">USER REVIEWS</span>
+                        <h2 class="section-title">
+                            실제 사용자들의 <span class="gradient-text">생생한 후기</span>
+                        </h2>
+                        <p class="section-description">
+                            코인패스와 함께 수수료를 절약한 투자자들의 이야기
+                        </p>
+                    </div>
+                    
+                    <div class="testimonials-carousel">
+                        <div class="testimonial-card active">
+                            <div class="testimonial-header">
+                                <div class="user-info">
+                                    <div class="user-avatar">김**</div>
+                                    <div class="user-details">
+                                        <h4 class="user-name">김민수</h4>
+                                        <p class="user-badge">인증된 사용자</p>
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                </div>
+                            </div>
+                            <blockquote class="testimonial-content">
+                                "코인패스를 통해 바이낸스에 가입한 후 매달 30만원 이상 수수료를 절약하고 있습니다. 
+                                특히 선물거래 수수료 할인이 정말 큽니다!"
+                            </blockquote>
+                            <div class="testimonial-footer">
+                                <span class="savings-amount">월 평균 절약: ₩350,000</span>
+                                <span class="date">2025.01</span>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-card">
+                            <div class="testimonial-header">
+                                <div class="user-info">
+                                    <div class="user-avatar">이**</div>
+                                    <div class="user-details">
+                                        <h4 class="user-name">이지은</h4>
+                                        <p class="user-badge">인증된 사용자</p>
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                </div>
+                            </div>
+                            <blockquote class="testimonial-content">
+                                "여러 거래소를 비교해서 수수료가 가장 저렴한 곳을 찾을 수 있어서 좋아요. 
+                                지금까지 총 200만원 넘게 절약했습니다."
+                            </blockquote>
+                            <div class="testimonial-footer">
+                                <span class="savings-amount">총 절약: ₩2,100,000</span>
+                                <span class="date">2024.12</span>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-card">
+                            <div class="testimonial-header">
+                                <div class="user-info">
+                                    <div class="user-avatar">박**</div>
+                                    <div class="user-details">
+                                        <h4 class="user-name">박준호</h4>
+                                        <p class="user-badge">인증된 사용자</p>
+                                    </div>
+                                </div>
+                                <div class="rating">
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                    <span class="star">⭐</span>
+                                </div>
+                            </div>
+                            <blockquote class="testimonial-content">
+                                "처음엔 반신반의했는데 정말 수수료가 50% 할인되더라구요. 
+                                덕분에 더 많은 수익을 낼 수 있게 되었습니다."
+                            </blockquote>
+                            <div class="testimonial-footer">
+                                <span class="savings-amount">월 평균 절약: ₩450,000</span>
+                                <span class="date">2025.01</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-nav">
+                        <button class="nav-btn prev" aria-label="이전 후기">‹</button>
+                        <div class="nav-dots">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                        <button class="nav-btn next" aria-label="다음 후기">›</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Savings Calculator Section -->
+            <section class="savings-calculator-section">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="section-badge">CALCULATOR</span>
+                        <h2 class="section-title">
+                            나의 <span class="gradient-text">수수료 절약액</span> 계산하기
+                        </h2>
+                        <p class="section-description">
+                            월 거래량을 입력하고 얼마나 절약할 수 있는지 확인해보세요
+                        </p>
+                    </div>
+                    
+                    <div class="calculator-wrapper">
+                        <div class="calculator-inputs">
+                            <div class="input-group">
+                                <label for="trading-volume">월 평균 거래량</label>
+                                <div class="input-wrapper">
+                                    <span class="currency-symbol">₩</span>
+                                    <input 
+                                        type="text" 
+                                        id="trading-volume" 
+                                        placeholder="50,000,000"
+                                        value="50,000,000"
+                                    >
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="exchange-select">거래소 선택</label>
+                                <select id="exchange-select">
+                                    <option value="binance">바이낸스 (50% 할인)</option>
+                                    <option value="bybit">바이비트 (45% 할인)</option>
+                                    <option value="okx">OKX (38% 할인)</option>
+                                    <option value="mexc">MEXC (40% 할인)</option>
+                                    <option value="gate">Gate.io (33% 할인)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="calculator-results">
+                            <div class="result-card">
+                                <h3>예상 절약 금액</h3>
+                                <div class="result-values">
+                                    <div class="result-item">
+                                        <span class="result-label">월간 절약</span>
+                                        <span class="result-value monthly" id="monthly-savings">₩250,000</span>
+                                    </div>
+                                    <div class="result-item highlight">
+                                        <span class="result-label">연간 절약</span>
+                                        <span class="result-value yearly" id="yearly-savings">₩3,000,000</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="comparison-chart">
+                                    <div class="chart-bar">
+                                        <div class="bar-label">일반 수수료</div>
+                                        <div class="bar-fill original" style="width: 100%">
+                                            <span class="bar-value" id="original-fee">₩500,000</span>
+                                        </div>
+                                    </div>
+                                    <div class="chart-bar">
+                                        <div class="bar-label">할인 수수료</div>
+                                        <div class="bar-fill discounted" style="width: 50%">
+                                            <span class="bar-value" id="discounted-fee">₩250,000</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <a href="exchange" class="calculator-cta">
+                                    지금 바로 절약 시작하기
+                                    <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
         </main>
 
@@ -194,6 +523,7 @@
 
     <script type="module" src="theme-toggle.js"></script>
     <script src="mobile-navigation.js"></script>
+    <script src="index-interactions.js"></script>
     <script type="module" src="index.tsx"></script>
 </body>
 </html>
