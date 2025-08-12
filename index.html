@@ -24,11 +24,24 @@
     <meta name="twitter:description" content="거래소 수수료 할인부터 실시간 시세분석까지, 모든 투자 정보를 한 곳에서.">
     <meta name="twitter:image" content="https://znixozrpthqcrvgdkgry.supabase.co/storage/v1/object/public/public-assets/coinpass-og-image.png">
     <link rel="stylesheet" href="index.css">
+    <!-- <link rel="stylesheet" href="mobile-optimizations.css"> -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="dns-prefetch" href="https://znixozrpthqcrvgdkgry.supabase.co">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin></noscript>
+    <style>
+        /* Critical font-display optimization */
+        @font-face {
+            font-family: 'Pretendard';
+            font-display: swap;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        }
+    </style>
     
     <script type="application/ld+json">
     {
@@ -46,7 +59,7 @@
             <div class="header-container">
                 <a href="/" class="logo-link">
                     <div class="logo">
-                        <img src="assets/logo.png" alt="CoinPass Logo" class="logo-img">
+                        <img src="assets/logo.png" alt="CoinPass Logo" class="logo-img" width="40" height="40" loading="eager" decoding="async">
                         <span class="logo-text">CoinPass</span>
                     </div>
                 </a>
@@ -147,7 +160,6 @@
                                     <th>할인 수수료</th>
                                     <th>절약률</th>
                                     <th>월 예상 절약</th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -162,9 +174,6 @@
                                         <span class="rate-badge">50%</span>
                                     </td>
                                     <td class="monthly-savings">₩250,000</td>
-                                    <td>
-                                        <a href="exchange" class="table-cta">가입하기</a>
-                                    </td>
                                 </tr>
                                 <tr class="table-row">
                                     <td class="exchange-name">
@@ -177,9 +186,6 @@
                                         <span class="rate-badge">45%</span>
                                     </td>
                                     <td class="monthly-savings">₩225,000</td>
-                                    <td>
-                                        <a href="exchange" class="table-cta">가입하기</a>
-                                    </td>
                                 </tr>
                                 <tr class="table-row">
                                     <td class="exchange-name">
@@ -192,37 +198,6 @@
                                         <span class="rate-badge">38%</span>
                                     </td>
                                     <td class="monthly-savings">₩150,000</td>
-                                    <td>
-                                        <a href="exchange" class="table-cta">가입하기</a>
-                                    </td>
-                                </tr>
-                                <tr class="table-row">
-                                    <td class="exchange-name">
-                                        <strong>MEXC</strong>
-                                    </td>
-                                    <td class="fee-original">0.10%</td>
-                                    <td class="fee-discounted">0.06%</td>
-                                    <td class="savings-rate">
-                                        <span class="rate-badge">40%</span>
-                                    </td>
-                                    <td class="monthly-savings">₩200,000</td>
-                                    <td>
-                                        <a href="exchange" class="table-cta">가입하기</a>
-                                    </td>
-                                </tr>
-                                <tr class="table-row">
-                                    <td class="exchange-name">
-                                        <strong>Gate.io</strong>
-                                    </td>
-                                    <td class="fee-original">0.075%</td>
-                                    <td class="fee-discounted">0.05%</td>
-                                    <td class="savings-rate">
-                                        <span class="rate-badge">33%</span>
-                                    </td>
-                                    <td class="monthly-savings">₩125,000</td>
-                                    <td>
-                                        <a href="exchange" class="table-cta">가입하기</a>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -509,7 +484,7 @@
         <div class="popup-overlay"></div>
         <div class="popup-box">
             <div class="popup-content">
-                <img id="popup-image" src="" alt="Popup Image" style="display: none;" loading="lazy">
+                <img id="popup-image" src="" alt="Popup Image" style="display: none;" loading="lazy" decoding="async">
                 <p id="popup-text" style="display: none;"></p>
             </div>
             <div class="popup-actions">
@@ -523,6 +498,7 @@
 
     <script type="module" src="theme-toggle.js"></script>
     <script src="mobile-navigation.js"></script>
+    <!-- <script src="performance-optimizations.js"></script> -->
     <script src="index-interactions.js"></script>
     <script type="module" src="index.tsx"></script>
 </body>

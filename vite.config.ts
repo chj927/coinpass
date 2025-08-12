@@ -37,8 +37,23 @@ export default defineConfig(({ mode }) => {
       },
       build: {
         target: 'es2020',
-        minify: 'esbuild',
+        minify: 'terser',
+        terserOptions: {
+          compress: {
+            drop_console: !isDev,
+            drop_debugger: !isDev,
+            pure_funcs: ['console.log', 'console.debug'],
+            passes: 2
+          },
+          mangle: {
+            safari10: true
+          },
+          format: {
+            comments: false
+          }
+        },
         sourcemap: !isDev,
+        cssCodeSplit: true,
         rollupOptions: {
           input: {
             main: path.resolve(__dirname, 'index.html'),
@@ -65,8 +80,10 @@ export default defineConfig(({ mode }) => {
           drop: ['console', 'debugger'],
           pure: ['console.log', 'console.debug']
         }),
-        chunkSizeWarningLimit: 1000,
-        assetsInlineLimit: 4096
+        chunkSizeWarningLimit: 500,
+        assetsInlineLimit: 4096,
+        cssMinify: 'lightningcss',
+        reportCompressedSize: false
       },
       optimizeDeps: {
         include: ['@supabase/supabase-js']

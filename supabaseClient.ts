@@ -5,12 +5,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// 입력 검증 추가
+// 입력 검증 추가 - 에러 대신 경고만 표시
 if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase configuration is missing');
+    console.warn('Supabase configuration is missing - some features may be limited');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = (supabaseUrl && supabaseAnonKey) ? createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         persistSession: true, // 관리자 세션 유지를 위해 활성화
         storageKey: 'coinpass-admin-auth', // 세션 키 지정
@@ -29,7 +29,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
             eventsPerSecond: 2 // 실시간 업데이트 제한
         }
     }
-})
+}) : null as any
 
 // 데이터베이스 쿼리 최적화 유틸리티
 export class DatabaseUtils {
@@ -102,6 +102,9 @@ export class DatabaseUtils {
     // 연결 상태 확인
     static async checkConnection(): Promise<boolean> {
         try {
+            if (!supabase) {
+                return false;
+            }
             // page_contents 테이블로 변경 (single_pages 테이블이 없을 수 있음)
             const { error } = await supabase.from('page_contents').select('id').limit(1);
             return !error;

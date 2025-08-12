@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>코인패스 (CoinPass) - 암호화폐 거래소 수수료 할인의 모든 것</title>
+    <meta name="description" content="바이낸스, 바이비트, OKX 등 글로벌 거래소의 최대 50% 수수료 할인. 실시간 시세 비교와 함께 스마트한 암호화폐 투자를 시작하세요.">
+    <meta name="keywords" content="암호화폐, 거래소, 수수료 할인, 페이백, 셀퍼럴, 비트코인, 이더리움, 바이낸스, 바이비트, CEX, DEX">
+    <link rel="canonical" href="https://coinpass.kr">
+    
+    <!-- Favicon & PWA -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://znixozrpthqcrvgdkgry.supabase.co/storage/v1/object/public/public-assets/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="https://znixozrpthqcrvgdkgry.supabase.co/storage/v1/object/public/public-assets/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#00d4aa">
+    
+    <!-- Open Graph & Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://coinpass.kr">
+    <meta property="og:title" content="코인패스 - 최대 50% 거래소 수수료 할인">
+    <meta property="og:description" content="글로벌 암호화폐 거래소의 최고 수수료 할인 혜택을 한 곳에서">
+    <meta property="og:image" content="https://znixozrpthqcrvgdkgry.supabase.co/storage/v1/object/public/public-assets/coinpass-og-image.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="코인패스 - 암호화폐 거래소 수수료 할인">
+    <meta name="twitter:description" content="스마트한 암호화폐 투자의 시작">
+    <meta name="twitter:image" content="https://znixozrpthqcrvgdkgry.supabase.co/storage/v1/object/public/public-assets/coinpass-og-image.png">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" as="style">
+    <link rel="preload" href="index-improved.css" as="style">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin>
+    <link rel="stylesheet" href="index-improved.css">
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialService",
+      "name": "코인패스 (CoinPass)",
+      "url": "https://coinpass.kr",
+      "description": "암호화폐 거래소 수수료 할인 비교 서비스",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "1250"
+      },
+      "offers": {
+        "@type": "Offer",
+        "description": "최대 50% 거래 수수료 할인",
+        "price": "0",
+        "priceCurrency": "KRW"
+      }
+    }
+    </script>
+</head>
+<body>
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#main-content" class="skip-link">메인 콘텐츠로 건너뛰기</a>
+    
+    <div id="app-container">
+        <!-- Modern Header with Glass Morphism -->
+        <header class="header-modern">
+            <div class="header-container">
+                <a href="/" class="logo-link">
+                    <div class="logo-modern">
+                        <img src="assets/logo.png" alt="CoinPass Logo" class="logo-img">
+                        <span class="logo-text gradient-text">CoinPass</span>
+                    </div>
+                </a>
+                
+                <nav id="main-nav" aria-label="주요 메뉴">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link active">
+                                <span class="nav-icon">🏠</span>
+                                <span class="nav-title">홈</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="compare" class="nav-link">
+                                <span class="nav-icon">📊</span>
+                                <span class="nav-title">시세비교</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="exchange" class="nav-link">
+                                <span class="nav-icon">💎</span>
+                                <span class="nav-title">거래소 혜택</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="header-actions">
+                    <button id="theme-toggle" class="theme-toggle-modern" aria-label="테마 변경">
+                        <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                    
+                    <button class="mobile-menu-toggle" aria-label="메뉴 열기">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Page Progress Indicator -->
+            <div class="page-progress"></div>
+        </header>
+
+        <main id="main-content" role="main">
+            <!-- Enhanced Hero Section -->
+            <section class="hero-section" aria-labelledby="hero-title">
+                <!-- Dynamic Background Effects -->
+                <div class="hero-background">
+                    <div class="gradient-orb gradient-orb-1"></div>
+                    <div class="gradient-orb gradient-orb-2"></div>
+                    <div class="gradient-orb gradient-orb-3"></div>
+                    <div class="crypto-pattern"></div>
+                </div>
+                
+                <div class="hero-container-centered">
+                    <!-- Animated Particles Background -->
+                    <div class="particles-container">
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                    </div>
+                    
+                    <div class="hero-content-centered">
+                        <!-- Trust Badge -->
+                        <div class="hero-badge-premium reveal">
+                            <span class="badge-icon">⭐</span>
+                            <span class="badge-text">2025년 최고의 선택</span>
+                            <span class="badge-icon">⭐</span>
+                        </div>
+                        
+                        <!-- Dynamic Hero Title -->
+                        <h1 id="hero-title" class="hero-title-large reveal delay-1">
+                            <span class="title-line-1">암호화폐 거래 수수료</span>
+                            <br />
+                            <span class="title-line-2">
+                                <span class="gradient-text-animated">최대 50% 할인</span>
+                            </span>
+                            <br />
+                            <span class="title-line-3 typewriter" data-words='["지금 시작하세요", "평생 혜택 제공", "간편한 가입"]'></span>
+                        </h1>
+                        
+                        <!-- Hero Description -->
+                        <p class="hero-description-centered reveal delay-2">
+                            바이낸스, 바이비트, OKX 등 글로벌 TOP 거래소와의<br />
+                            독점 파트너십으로 제공하는 국내 최고 수수료 할인 서비스
+                        </p>
+                        
+                        <!-- Animated Stats Bar -->
+                        <div class="hero-stats-bar reveal delay-3">
+                            <div class="stats-bar-container">
+                                <div class="stat-card-animated">
+                                    <div class="stat-icon-wrapper">
+                                        <span class="stat-icon">💰</span>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value" data-counter="50">0</span>
+                                        <span class="stat-suffix">%</span>
+                                        <span class="stat-label">수수료 할인</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-divider"></div>
+                                
+                                <div class="stat-card-animated">
+                                    <div class="stat-icon-wrapper">
+                                        <span class="stat-icon">🏆</span>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value" data-counter="15">0</span>
+                                        <span class="stat-suffix">+</span>
+                                        <span class="stat-label">거래소 제휴</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-divider"></div>
+                                
+                                <div class="stat-card-animated">
+                                    <div class="stat-icon-wrapper">
+                                        <span class="stat-icon">👥</span>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value" data-counter="100">0</span>
+                                        <span class="stat-suffix">K+</span>
+                                        <span class="stat-label">활성 사용자</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-divider"></div>
+                                
+                                <div class="stat-card-animated">
+                                    <div class="stat-icon-wrapper">
+                                        <span class="stat-icon">⚡</span>
+                                    </div>
+                                    <div class="stat-content">
+                                        <span class="stat-value">24/7</span>
+                                        <span class="stat-label">실시간 지원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Buttons -->
+                        <div class="hero-cta-group-centered reveal delay-4">
+                            <a href="exchange" class="btn btn-primary-large btn-pulse">
+                                <span class="btn-shine"></span>
+                                <span class="btn-content">
+                                    <span class="btn-icon">🚀</span>
+                                    <span>지금 시작하기</span>
+                                </span>
+                            </a>
+                            <a href="compare" class="btn btn-glass">
+                                <span class="btn-icon">📊</span>
+                                <span>시세 비교하기</span>
+                            </a>
+                        </div>
+                        
+                        <!-- Floating Exchange Logos -->
+                        <div class="exchange-logos-floating reveal delay-5">
+                            <div class="logo-orbit">
+                                <div class="exchange-logo binance" title="Binance">
+                                    <img src="https://bin.bnbstatic.com/static/images/common/favicon.ico" alt="Binance" />
+                                </div>
+                                <div class="exchange-logo bybit" title="Bybit">
+                                    <img src="https://cdn.bybit.com/assets/images/favicon.ico" alt="Bybit" />
+                                </div>
+                                <div class="exchange-logo okx" title="OKX">
+                                    <img src="https://static.okx.com/cdn/assets/imgs/favicon.ico" alt="OKX" />
+                                </div>
+                                <div class="exchange-logo mexc" title="MEXC">
+                                    <span class="logo-text">MEXC</span>
+                                </div>
+                                <div class="exchange-logo gate" title="Gate.io">
+                                    <span class="logo-text">Gate</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Trust & Security Badges -->
+                        <div class="security-badges reveal delay-6">
+                            <div class="security-badge">
+                                <svg class="security-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>SSL 보안</span>
+                            </div>
+                            <div class="security-divider">•</div>
+                            <div class="security-badge">
+                                <svg class="security-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="1.5"/>
+                                    <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>공식 인증</span>
+                            </div>
+                            <div class="security-divider">•</div>
+                            <div class="security-badge">
+                                <svg class="security-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                                <span>검증 완료</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scroll Indicator -->
+                <div class="scroll-indicator">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Enhanced Benefits Section -->
+            <section class="benefits-section" aria-labelledby="benefits-title">
+                <div class="container">
+                    <div class="section-header">
+                        <span class="section-badge">WHY COINPASS</span>
+                        <h2 id="benefits-title" class="section-title reveal">
+                            왜 <span class="gradient-text">코인패스</span>를 선택해야 할까요?
+                        </h2>
+                        <p class="section-description reveal">
+                            수익을 극대화하고 리스크를 최소화하는 스마트한 선택
+                        </p>
+                    </div>
+                    
+                    <div class="benefits-grid">
+                        <!-- Benefit Card 1 -->
+                        <div class="benefit-card reveal">
+                            <div class="benefit-header">
+                                <div class="benefit-icon-wrapper">
+                                    <div class="benefit-icon-bg"></div>
+                                    <span class="benefit-icon">🎯</span>
+                                </div>
+                                <h3 class="benefit-title">원스톱 서비스</h3>
+                            </div>
+                            <p class="benefit-description">
+                                여러 사이트를 돌아다닐 필요 없이 코인패스 하나로 모든 투자 정보를 확인할 수 있습니다.
+                            </p>
+                            <div class="benefit-features">
+                                <span class="feature-tag">통합 대시보드</span>
+                                <span class="feature-tag">실시간 업데이트</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Benefit Card 2 -->
+                        <div class="benefit-card reveal delay-1">
+                            <div class="benefit-header">
+                                <div class="benefit-icon-wrapper">
+                                    <div class="benefit-icon-bg"></div>
+                                    <span class="benefit-icon">⚡</span>
+                                </div>
+                                <h3 class="benefit-title">검증된 파트너십</h3>
+                            </div>
+                            <p class="benefit-description">
+                                글로벌 1위 거래소들과의 공식 제휴를 통해 안전하고 확실한 혜택을 보장합니다.
+                            </p>
+                            <div class="benefit-features">
+                                <span class="feature-tag">공식 인증</span>
+                                <span class="feature-tag">최고 할인율</span>
+                            </div>
+                        </div>
+                        
+                        
+                        <!-- Benefit Card 3 -->
+                        <div class="benefit-card reveal delay-2">
+                            <div class="benefit-header">
+                                <div class="benefit-icon-wrapper">
+                                    <div class="benefit-icon-bg"></div>
+                                    <span class="benefit-icon">🛡️</span>
+                                </div>
+                                <h3 class="benefit-title">안전한 서비스</h3>
+                            </div>
+                            <p class="benefit-description">
+                                개인정보 보호와 보안을 최우선으로 하여 안전한 투자 환경을 제공합니다.
+                            </p>
+                            <div class="benefit-features">
+                                <span class="feature-tag">SSL 암호화</span>
+                                <span class="feature-tag">2FA 지원</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Social Proof Section -->
+            <section class="social-proof-section">
+                <div class="container">
+                    <div class="social-proof-grid">
+                        <div class="proof-item">
+                            <span class="proof-value">₩100억+</span>
+                            <span class="proof-label">누적 거래량</span>
+                        </div>
+                        <div class="proof-item">
+                            <span class="proof-value">10,000+</span>
+                            <span class="proof-label">활성 사용자</span>
+                        </div>
+                        <div class="proof-item">
+                            <span class="proof-value">₩50만</span>
+                            <span class="proof-label">평균 연간 절약</span>
+                        </div>
+                        <div class="proof-item">
+                            <span class="proof-value">4.8/5</span>
+                            <span class="proof-label">사용자 평점</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <div class="container">
+                    <div class="cta-content">
+                        <h2 class="cta-title">
+                            지금 시작하고 <span class="gradient-text">수수료를 절약</span>하세요
+                        </h2>
+                        <p class="cta-description">
+                            5분만 투자하면 평생 수수료 할인 혜택을 받을 수 있습니다
+                        </p>
+                        <a href="exchange" class="btn btn-primary btn-large btn-glow">
+                            <span>무료로 시작하기</span>
+                            <span class="btn-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modern Footer -->
+        <footer class="footer-modern">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <img src="assets/logo.png" alt="CoinPass" class="footer-logo">
+                        <p class="footer-tagline">스마트한 암호화폐 투자의 시작</p>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <div class="footer-column">
+                            <h4>서비스</h4>
+                            <a href="exchange">거래소 혜택</a>
+                            <a href="compare">시세 비교</a>
+                        </div>
+                        <div class="footer-column">
+                            <h4>지원</h4>
+                            <a href="#faq">자주 묻는 질문</a>
+                            <a href="#support">고객센터</a>
+                        </div>
+                        <div class="footer-column">
+                            <h4>소셜</h4>
+                            <a href="#" aria-label="텔레그램">텔레그램</a>
+                            <a href="#" aria-label="트위터">트위터</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p>&copy; 2025 CoinPass. All rights reserved.</p>
+                    <p class="footer-disclaimer">
+                        본 서비스는 정보 제공 목적이며, 투자 권유가 아닙니다.
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="mobile-nav" aria-label="모바일 네비게이션">
+            <a href="/" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-label">홈</span>
+            </a>
+            <a href="compare" class="mobile-nav-item">
+                <span class="mobile-nav-icon">📊</span>
+                <span class="mobile-nav-label">시세</span>
+            </a>
+            <a href="exchange" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💎</span>
+                <span class="mobile-nav-label">혜택</span>
+            </a>
+            <button class="mobile-nav-item" id="mobile-menu-btn">
+                <span class="mobile-nav-icon">☰</span>
+                <span class="mobile-nav-label">메뉴</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Enhanced Popup -->
+    <div id="popup-container" class="popup-modern" style="display: none;">
+        <div class="popup-overlay"></div>
+        <div class="popup-content-wrapper">
+            <button class="popup-close-btn" aria-label="닫기">×</button>
+            <div class="popup-content">
+                <img id="popup-image" src="" alt="팝업 이미지" loading="lazy">
+                <div id="popup-text"></div>
+            </div>
+            <div class="popup-actions">
+                <button id="popup-close-24h" class="btn btn-ghost">24시간 보지않기</button>
+                <button id="popup-close" class="btn btn-primary">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="theme-toggle.js"></script>
+    <script type="module" src="index-improved.js"></script>
+</body>
+</html>

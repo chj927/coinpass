@@ -1,0 +1,324 @@
+/* Mobile Experience Optimizations */
+
+/* 1. Touch Target Optimization - 모든 터치 요소 최소 48px */
+@media (max-width: 768px) {
+    /* 버튼 터치 영역 확대 */
+    .cta-button,
+    .table-cta,
+    .nav-btn,
+    .calculator-cta,
+    button,
+    a[href] {
+        min-height: 48px;
+        min-width: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    /* 터치 영역 확대를 위한 가상 요소 */
+    .nav-btn::before,
+    .dot::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        bottom: -8px;
+        left: -8px;
+    }
+
+    /* 입력 필드 최적화 */
+    input, select, textarea {
+        min-height: 48px;
+        font-size: 16px; /* iOS 줌 방지 */
+        padding: 12px;
+    }
+
+    /* 네비게이션 링크 터치 영역 */
+    #main-nav a {
+        padding: 12px 16px;
+        min-height: 48px;
+    }
+}
+
+/* 2. Mobile Fixed Bottom CTA */
+.mobile-bottom-cta {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-bottom-cta {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: linear-gradient(to top, 
+            var(--primary-color) 0%, 
+            var(--primary-color) 80%, 
+            transparent 100%);
+        padding: 20px 16px 16px;
+        gap: 12px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .mobile-bottom-cta .cta-button {
+        flex: 1;
+        margin: 0;
+        font-size: 14px;
+        padding: 14px 16px;
+    }
+
+    /* 메인 콘텐츠 하단 여백 추가 */
+    main {
+        padding-bottom: 100px;
+    }
+}
+
+/* 3. Table Mobile Optimization */
+@media (max-width: 768px) {
+    .comparison-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        scrollbar-width: thin;
+    }
+
+    .comparison-table {
+        font-size: 14px;
+        min-width: 500px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+
+    .exchange-name {
+        position: sticky;
+        left: 0;
+        background: var(--card-bg);
+        z-index: 1;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 스크롤 힌트 추가 */
+    .comparison-table-wrapper::after {
+        content: '→ 스크롤';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--accent-color);
+        color: #000;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        pointer-events: none;
+        animation: scroll-hint 2s ease-in-out infinite;
+    }
+
+    @keyframes scroll-hint {
+        0%, 100% { opacity: 0.7; transform: translateY(-50%) translateX(0); }
+        50% { opacity: 1; transform: translateY(-50%) translateX(-5px); }
+    }
+}
+
+/* 4. Swipe Gestures for Carousel */
+@media (max-width: 768px) {
+    .testimonials-carousel {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .testimonials-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .testimonial-card {
+        scroll-snap-align: center;
+        flex: 0 0 85%;
+        margin-right: 16px;
+    }
+
+    .testimonial-nav {
+        margin-top: 20px;
+    }
+}
+
+/* 5. Mobile Typography Optimization */
+@media (max-width: 768px) {
+    .hero-banner h1 {
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
+        line-height: 1.2;
+    }
+
+    .hero-banner p {
+        font-size: clamp(0.95rem, 3vw, 1.1rem);
+    }
+
+    .section-title {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+
+    .benefit-title {
+        font-size: 1.1rem;
+    }
+
+    .benefit-description {
+        font-size: 0.9rem;
+    }
+}
+
+/* 6. Mobile Grid Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+
+    .benefits-grid {
+        gap: 16px;
+    }
+
+    .calculator-wrapper {
+        flex-direction: column;
+    }
+
+    .calculator-inputs,
+    .calculator-results {
+        width: 100%;
+    }
+
+    .hero-stats {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 0;
+    }
+
+    .stat-item {
+        flex: 0 0 auto;
+        min-width: 100px;
+    }
+}
+
+/* 7. Performance Optimizations */
+
+/* GPU 가속 활성화 */
+.benefit-card,
+.testimonial-card,
+.cta-button,
+.table-row {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* 애니메이션 성능 최적화 */
+@media (max-width: 768px) {
+    /* 모바일에서 복잡한 애니메이션 제거 */
+    .anim-fade-in,
+    .benefit-card:hover {
+        animation: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+}
+
+/* Reduced Motion 지원 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* 8. Skeleton Loading UI */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--card-bg);
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.05) 20%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 80%,
+        transparent 100%
+    );
+    animation: skeleton-shimmer 2s infinite;
+    transform: translateX(-100%);
+}
+
+@keyframes skeleton-shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.skeleton-text {
+    height: 16px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.skeleton-title {
+    height: 24px;
+    width: 60%;
+    margin-bottom: 16px;
+    border-radius: 4px;
+}
+
+.skeleton-card {
+    height: 200px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+/* 9. iOS Specific Fixes */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari fixes */
+    input, textarea, select {
+        -webkit-appearance: none;
+        border-radius: 0;
+    }
+
+    /* Safe area insets for notch devices */
+    .mobile-bottom-cta {
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    header {
+        padding-top: env(safe-area-inset-top);
+    }
+}
+
+/* 10. Android Specific Optimizations */
+@media (max-width: 768px) and (hover: none) {
+    /* Remove hover effects on touch devices */
+    .benefit-card:hover,
+    .cta-button:hover,
+    .table-row:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}

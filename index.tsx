@@ -32,8 +32,42 @@ interface PopupData {
 let heroData: HeroData | null = null;
 let popupData: PopupData | null = null;
 
-// 캐싱을 위한 Map
-const dataCache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+// Enhanced caching with LRU implementation
+class LRUCache {
+    private cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+    private maxSize = 50;
+    
+    get(key: string): any | null {
+        const item = this.cache.get(key);
+        if (!item) return null;
+        
+        if (Date.now() - item.timestamp > item.ttl) {
+            this.cache.delete(key);
+            return null;
+        }
+        
+        // Move to end (most recently used)
+        this.cache.delete(key);
+        this.cache.set(key, item);
+        return item.data;
+    }
+    
+    set(key: string, data: any, ttl: number = 5 * 60 * 1000): void {
+        // Remove oldest if at capacity
+        if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+            const firstKey = this.cache.keys().next().value;
+            this.cache.delete(firstKey);
+        }
+        
+        this.cache.set(key, { data, timestamp: Date.now(), ttl });
+    }
+    
+    clear(): void {
+        this.cache.clear();
+    }
+}
+
+const dataCache = new LRUCache();
 const CACHE_TTL = 5 * 60 * 1000; // 5분
 
 // 전역 에러 핸들러 설정
@@ -106,6 +140,9 @@ async function loadHeroData() {
     }
 
     try {
+        if (!supabase) {
+            throw new Error('Supabase not configured');
+        }
         const { data, error } = await supabase
             .from('page_contents')
             .select('content')
@@ -142,6 +179,9 @@ async function loadPopupData() {
     }
 
     try {
+        if (!supabase) {
+            throw new Error('Supabase not configured');
+        }
         const { data, error } = await supabase
             .from('page_contents')
             .select('content')
@@ -175,10 +215,38 @@ class TypingAnimator {
     private delayBetweenSentences: number = 2000;
     private delayBetweenCycles: number = 3000;
     private isAnimating: boolean = false;
+    private rafId: number | null = null;
+    private isVisible: boolean = true;
 
     constructor(element: HTMLElement, sentences: string[]) {
         this.element = element;
         this.sentences = sentences.filter(s => s.trim().length > 0);
+        this.setupVisibilityHandling();
+    }
+
+    private setupVisibilityHandling() {
+        // Pause animation when page is not visible
+        document.addEventListener('visibilitychange', () => {
+            this.isVisible = !document.hidden;
+            if (!this.isVisible && this.isAnimating) {
+                this.pause();
+            } else if (this.isVisible && this.isAnimating) {
+                this.resume();
+            }
+        });
+
+        // Intersection Observer to pause when not in viewport
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting && this.isAnimating) {
+                    this.pause();
+                } else if (entry.isIntersecting && this.isAnimating) {
+                    this.resume();
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        observer.observe(this.element);
     }
 
     public startTyping() {
@@ -191,18 +259,35 @@ class TypingAnimator {
 
     public stop() {
         this.isAnimating = false;
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
+    }
+
+    private pause() {
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
+    }
+
+    private resume() {
+        if (this.isAnimating && !this.rafId) {
+            this.animateLoop();
+        }
     }
 
     private async animateLoop() {
-        while (this.isAnimating) {
+        while (this.isAnimating && this.isVisible) {
             const sentence = this.sentences[this.currentIndex];
             await this.typeText(sentence);
             
-            if (!this.isAnimating) break;
+            if (!this.isAnimating || !this.isVisible) break;
             
             await this.eraseText();
             
-            if (!this.isAnimating) break;
+            if (!this.isAnimating || !this.isVisible) break;
             
             this.currentIndex = (this.currentIndex + 1) % this.sentences.length;
             
@@ -218,8 +303,16 @@ class TypingAnimator {
         this.element.textContent = '';
         
         for (let i = 0; i <= text.length; i++) {
-            if (!this.isAnimating) break;
-            this.element.textContent = text.substring(0, i);
+            if (!this.isAnimating || !this.isVisible) break;
+            
+            // Use requestAnimationFrame for smoother text updates
+            await new Promise<void>(resolve => {
+                this.rafId = requestAnimationFrame(() => {
+                    this.element.textContent = text.substring(0, i);
+                    resolve();
+                });
+            });
+            
             await this.sleep(this.typingSpeed);
         }
         
@@ -230,8 +323,16 @@ class TypingAnimator {
         const text = this.element.textContent || '';
         
         for (let i = text.length; i >= 0; i--) {
-            if (!this.isAnimating) break;
-            this.element.textContent = text.substring(0, i);
+            if (!this.isAnimating || !this.isVisible) break;
+            
+            // Use requestAnimationFrame for smoother text updates
+            await new Promise<void>(resolve => {
+                this.rafId = requestAnimationFrame(() => {
+                    this.element.textContent = text.substring(0, i);
+                    resolve();
+                });
+            });
+            
             await this.sleep(this.typingSpeed * 0.5);
         }
     }
@@ -285,16 +386,44 @@ function startTypingAnimation() {
 
 
 function setupScrollAnimations() {
+    // Batch animation observations for better performance
+    const animationQueue: Element[] = [];
+    let rafId: number | null = null;
+    
+    const processAnimationQueue = () => {
+        if (animationQueue.length === 0) {
+            rafId = null;
+            return;
+        }
+        
+        // Process up to 5 elements per frame
+        const batch = animationQueue.splice(0, 5);
+        batch.forEach(element => {
+            element.classList.add('is-visible');
+        });
+        
+        rafId = requestAnimationFrame(processAnimationQueue);
+    };
+    
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
+                animationQueue.push(entry.target);
                 observer.unobserve(entry.target);
+                
+                if (!rafId) {
+                    rafId = requestAnimationFrame(processAnimationQueue);
+                }
             }
         });
-    }, { threshold: 0.1 });
+    }, { 
+        threshold: 0.1,
+        rootMargin: '50px' // Start loading slightly before element is visible
+    });
     
-    document.querySelectorAll('.anim-fade-in').forEach(el => observer.observe(el));
+    // Use querySelectorAll more efficiently
+    const elements = document.querySelectorAll('.anim-fade-in');
+    elements.forEach(el => observer.observe(el));
 }
 
 function setupMobileMenu() {
