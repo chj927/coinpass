@@ -1435,6 +1435,50 @@ input:checked + .slider:before {
     width: 100%;
 }
 
+/* 메인 헤더 스타일 */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.main-header h2 {
+    margin: 0;
+    font-size: 28px;
+    color: var(--text-color);
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.header-actions .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.header-actions .btn-secondary {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.header-actions .btn-secondary:hover {
+    background: var(--sidebar-hover-bg);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
 /* 에디터 섹션 패딩 제거 */
 .editor-section {
     padding: 0;

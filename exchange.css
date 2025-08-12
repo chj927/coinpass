@@ -14,14 +14,14 @@
 
 /* Light Theme */
 [data-theme="light"] {
-    --bg-color: #ffffff;
+    --bg-color: #f5f5f5;
     --card-bg-color: #ffffff;
     --primary-text-color: #1a1a1a;
     --secondary-text-color: #666666;
     --border-color: #e0e0e0;
-    --accent-color: #00f2c3;
-    --accent-color-dark: #00c9a3;
-    --shadow-color: rgba(0, 242, 195, 0.15);
+    --accent-color: #2d2d2d;
+    --accent-color-dark: #1a1a1a;
+    --shadow-color: rgba(0, 0, 0, 0.1);
     --premium-positive-color: #e5425a;
     --premium-negative-color: #3e86e1;
 }
@@ -58,6 +58,10 @@ body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+[data-theme="light"] body {
+    background-image: radial-gradient(ellipse at top, rgba(45, 45, 45, 0.02) 0%, var(--bg-color) 60%);
 }
 
 #app-container {
@@ -216,6 +220,10 @@ header {
 #theme-toggle:hover {
     border-color: var(--accent-color);
     background-color: rgba(0, 242, 195, 0.1);
+}
+
+[data-theme="light"] #theme-toggle:hover {
+    background-color: rgba(45, 45, 45, 0.1);
 }
 
 .theme-icon {
@@ -412,18 +420,39 @@ main {
 
 .cta-button {
     background-color: var(--accent-color);
-    color: #121212;
+    color: var(--bg-color);
     padding: 0.8rem 2rem;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 700;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+[data-theme="dark"] .cta-button {
+    background-color: #00f2c3;
+    color: #121212;
     box-shadow: 0 0 0 0 rgba(0, 242, 195, 0.7);
+}
+
+[data-theme="light"] .cta-button {
+    background-color: #2d2d2d;
+    color: #ffffff;
 }
 
 .cta-button:hover {
     background-color: var(--accent-color-dark);
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .cta-button:hover {
+    background-color: #00c9a3;
     box-shadow: 0 0 20px 10px rgba(0, 242, 195, 0);
+}
+
+[data-theme="light"] .cta-button:hover {
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Section Title */
@@ -481,6 +510,12 @@ main {
     flex-shrink: 0;
 }
 
+[data-theme="light"] .exchange-logo-text {
+    background-color: #f5f5f5;
+    color: #2d2d2d;
+    border: 1px solid var(--border-color);
+}
+
 .card-header h4 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -515,6 +550,14 @@ main {
     color: var(--accent-color);
 }
 
+[data-theme="dark"] .benefits-list li strong {
+    color: #00f2c3;
+}
+
+[data-theme="light"] .benefits-list li strong {
+    color: #2d2d2d;
+}
+
 .card-cta {
     display: block;
     width: 100%;
@@ -525,11 +568,30 @@ main {
     border-radius: 8px;
     text-decoration: none;
     font-weight: 700;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .card-cta {
+    background: #00f2c3;
+    color: #121212;
+}
+
+[data-theme="light"] .card-cta {
+    background: #2d2d2d;
+    color: #ffffff;
 }
 
 .card-cta:hover {
     background-color: var(--accent-color-dark);
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .card-cta:hover {
+    background-color: #00c9a3;
+}
+
+[data-theme="light"] .card-cta:hover {
+    background-color: #1a1a1a;
 }
 
 /* About Us Section */
@@ -586,6 +648,16 @@ main {
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0 auto 1.5rem auto;
+}
+
+[data-theme="dark"] .step-icon {
+    background-color: #00f2c3;
+    color: #121212;
+}
+
+[data-theme="light"] .step-icon {
+    background-color: #2d2d2d;
+    color: #ffffff;
 }
 
 .step h4 {
