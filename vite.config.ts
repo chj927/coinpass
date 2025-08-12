@@ -37,21 +37,7 @@ export default defineConfig(({ mode }) => {
       },
       build: {
         target: 'es2020',
-        minify: 'terser',
-        terserOptions: {
-          compress: {
-            drop_console: !isDev,
-            drop_debugger: !isDev,
-            pure_funcs: ['console.log', 'console.debug'],
-            passes: 2
-          },
-          mangle: {
-            safari10: true
-          },
-          format: {
-            comments: false
-          }
-        },
+        minify: 'esbuild', // Changed from 'terser' to 'esbuild' (Vite default)
         sourcemap: !isDev,
         cssCodeSplit: true,
         rollupOptions: {
@@ -75,11 +61,11 @@ export default defineConfig(({ mode }) => {
             assetFileNames: 'assets/[name]-[hash].[ext]'
           }
         },
-        // esbuild minification options
-        ...(isDev ? {} : {
-          drop: ['console', 'debugger'],
-          pure: ['console.log', 'console.debug']
-        }),
+        esbuildOptions: {
+          // esbuild minification options
+          drop: !isDev ? ['console', 'debugger'] : [],
+          pure: !isDev ? ['console.log', 'console.debug'] : []
+        },
         chunkSizeWarningLimit: 500,
         assetsInlineLimit: 4096,
         cssMinify: true, // Changed from 'lightningcss' to default minifier
