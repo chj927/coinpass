@@ -119,16 +119,11 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
 
 // 캐시 유틸리티 함수
 function getCachedData(key: string): any | null {
-    const cached = dataCache.get(key);
-    if (cached && Date.now() - cached.timestamp < cached.ttl) {
-        return cached.data;
-    }
-    dataCache.delete(key);
-    return null;
+    return dataCache.get(key);
 }
 
 function setCachedData(key: string, data: any, ttl: number = CACHE_TTL): void {
-    dataCache.set(key, { data, timestamp: Date.now(), ttl });
+    dataCache.set(key, data, ttl);
 }
 
 async function loadHeroData() {

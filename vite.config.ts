@@ -85,11 +85,24 @@ export default defineConfig(({ mode }) => {
         {
           name: 'add-security-headers',
           configureServer(server) {
-            server.middlewares.use((_req, res, next) => {
+            server.middlewares.use((req, res, next) => {
+              // Set proper MIME types for JS files
+              if (req.url?.endsWith('.js')) {
+                res.setHeader('Content-Type', 'application/javascript');
+              }
               res.setHeader('X-Content-Type-Options', 'nosniff');
               res.setHeader('X-Frame-Options', 'DENY');
               res.setHeader('X-XSS-Protection', '1; mode=block');
               res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+              next();
+            });
+          },
+          configurePreviewServer(server) {
+            server.middlewares.use((req, res, next) => {
+              // Set proper MIME types for JS files in preview mode
+              if (req.url?.endsWith('.js')) {
+                res.setHeader('Content-Type', 'application/javascript');
+              }
               next();
             });
           }
