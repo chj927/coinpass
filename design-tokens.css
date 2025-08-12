@@ -1,0 +1,274 @@
+/* =============================================
+   CoinPass Design Token System
+   Central design system for consistent UI/UX
+   ============================================= */
+
+:root {
+  /* ============= COLOR TOKENS ============= */
+  /* Primary Brand Colors */
+  --color-primary: #00d4aa;
+  --color-primary-hover: #00b892;
+  --color-primary-active: #009a7a;
+  --color-primary-light: rgba(0, 212, 170, 0.1);
+  
+  /* Surface Colors - Dark Theme */
+  --color-surface-1: #1a1a1a;
+  --color-surface-2: #242424;
+  --color-surface-3: #2d2d2d;
+  --color-surface-4: #333333;
+  
+  /* Text Colors - Dark Theme */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0b0;
+  --color-text-muted: #808080;
+  --color-text-disabled: #4a4a4a;
+  
+  /* Semantic Colors */
+  --color-success: #00d4aa;
+  --color-warning: #ffa726;
+  --color-error: #ef5350;
+  --color-info: #29b6f6;
+  
+  /* Border Colors */
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-border-focus: var(--color-primary);
+  
+  /* ============= SPACING TOKENS ============= */
+  /* 8px Grid System */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  --spacing-4xl: 6rem;     /* 96px */
+  
+  /* ============= TYPOGRAPHY TOKENS ============= */
+  /* Font Families */
+  --font-primary: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 
+                   "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", 
+                   "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  
+  /* Fluid Typography - Responsive Font Sizes */
+  --font-size-xs: clamp(0.75rem, 1.5vw, 0.875rem);    /* 12px - 14px */
+  --font-size-sm: clamp(0.875rem, 2vw, 1rem);         /* 14px - 16px */
+  --font-size-base: clamp(1rem, 2.5vw, 1.125rem);     /* 16px - 18px */
+  --font-size-lg: clamp(1.125rem, 3vw, 1.25rem);      /* 18px - 20px */
+  --font-size-xl: clamp(1.25rem, 3.5vw, 1.5rem);      /* 20px - 24px */
+  --font-size-2xl: clamp(1.5rem, 4vw, 2rem);          /* 24px - 32px */
+  --font-size-3xl: clamp(2rem, 5vw, 2.5rem);          /* 32px - 40px */
+  --font-size-4xl: clamp(2.5rem, 6vw, 3rem);          /* 40px - 48px */
+  
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-base: 1.6;
+  --line-height-relaxed: 1.8;
+  
+  /* ============= LAYOUT TOKENS ============= */
+  /* Container Widths */
+  --container-xs: 480px;
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1440px;
+  
+  /* Breakpoints */
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* ============= EFFECTS TOKENS ============= */
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.20);
+  --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  
+  /* Border Radius */
+  --radius-xs: 0.125rem;   /* 2px */
+  --radius-sm: 0.25rem;    /* 4px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.5rem;    /* 24px */
+  --radius-full: 9999px;
+  
+  /* ============= ANIMATION TOKENS ============= */
+  /* Durations */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+  
+  /* Easings */
+  --easing-linear: linear;
+  --easing-ease: ease;
+  --easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ============= Z-INDEX TOKENS ============= */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-maximum: 999;
+  
+  /* ============= COMPONENT TOKENS ============= */
+  /* Header */
+  --header-height: 72px;
+  --header-height-mobile: 64px;
+  --header-bg: rgba(26, 26, 26, 0.85);
+  --header-blur: 12px;
+  
+  /* Navigation */
+  --nav-item-height: 48px;
+  --nav-item-padding: var(--spacing-md) var(--spacing-lg);
+  
+  /* Cards */
+  --card-padding: var(--spacing-lg);
+  --card-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-md);
+  
+  /* Buttons */
+  --button-height-sm: 32px;
+  --button-height-md: 40px;
+  --button-height-lg: 48px;
+  --button-padding-sm: var(--spacing-sm) var(--spacing-md);
+  --button-padding-md: var(--spacing-sm) var(--spacing-lg);
+  --button-padding-lg: var(--spacing-md) var(--spacing-xl);
+  --button-radius: var(--radius-md);
+  
+  /* Forms */
+  --input-height: 48px;
+  --input-padding: var(--spacing-md);
+  --input-radius: var(--radius-md);
+  --input-border-width: 1px;
+  
+  /* Mobile Touch Targets */
+  --touch-target-min: 48px;
+  --touch-spacing: var(--spacing-sm);
+}
+
+/* ============= LIGHT THEME OVERRIDES ============= */
+[data-theme="light"] {
+  /* Surface Colors */
+  --color-surface-1: #ffffff;
+  --color-surface-2: #f8f8f8;
+  --color-surface-3: #f0f0f0;
+  --color-surface-4: #e8e8e8;
+  
+  /* Text Colors */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-muted: #999999;
+  --color-text-disabled: #cccccc;
+  
+  /* Primary Colors */
+  --color-primary: #2d2d2d;
+  --color-primary-hover: #1a1a1a;
+  --color-primary-active: #000000;
+  --color-primary-light: rgba(45, 45, 45, 0.1);
+  
+  /* Border Colors */
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+  
+  /* Header */
+  --header-bg: rgba(255, 255, 255, 0.92);
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.16);
+}
+
+/* ============= ACCESSIBILITY PREFERENCES ============= */
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-default: rgba(255, 255, 255, 0.3);
+    --color-text-secondary: #e0e0e0;
+  }
+  
+  [data-theme="light"] {
+    --color-border-default: rgba(0, 0, 0, 0.3);
+    --color-text-secondary: #333333;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 0ms;
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+    --duration-slower: 0ms;
+  }
+}
+
+/* Dark Mode Preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    /* Use dark theme by default */
+  }
+}
+
+/* ============= UTILITY CLASSES ============= */
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus Visible Only */
+.focus-visible-only :focus:not(:focus-visible) {
+  outline: none;
+}
+
+.focus-visible-only :focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Safe Area Padding for iOS */
+.safe-area {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
