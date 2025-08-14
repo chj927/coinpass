@@ -31,6 +31,23 @@ interface FAQData {
     answer_ko: string;
 }
 
+interface PinnedArticle {
+    id?: number;
+    position: number;
+    badge_text: string;
+    badge_type: string;
+    image_url: string;
+    category: string;
+    category_icon: string;
+    title: string;
+    description: string;
+    footer_type: string;
+    footer_text: string;
+    cta_text: string;
+    link_url: string;
+    is_active: boolean;
+}
+
 
 interface PopupContent {
     enabled: boolean;
@@ -57,6 +74,7 @@ interface SiteData {
     support: {
         telegramUrl: string;
     };
+    pinnedArticles: PinnedArticle[];
 }
 
 // 기본 데이터 구조는 유지합니다.
@@ -67,7 +85,8 @@ const defaultSiteData: SiteData = {
     faqs: [],
     popup: { enabled: false, type: 'text', content: '', imageUrl: '', startDate: '', endDate: '' },
     indexPopup: { enabled: false, type: 'text', content: '', imageUrl: '', startDate: '', endDate: '' },
-    support: { telegramUrl: '#' }
+    support: { telegramUrl: '#' },
+    pinnedArticles: []
 };
 
 let siteData: SiteData = JSON.parse(JSON.stringify(defaultSiteData));
@@ -201,6 +220,7 @@ async function fetchDataFromSupabase() {
         const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('id');
         const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
         const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
+        const { data: pinnedData, error: pinnedError } = await supabase.from('pinned_articles').select('*').order('position');
 
         if (cexError) {
             console.error('Exchange data error:', cexError);
@@ -214,10 +234,15 @@ async function fetchDataFromSupabase() {
             console.error('Page contents error:', singlePagesError);
             showToast('페이지 콘텐츠 로딩 실패', 'error');
         }
+        if (pinnedError) {
+            console.error('Pinned articles error:', pinnedError);
+            // Pinned articles table might not exist yet
+        }
         
         // 오류가 발생하더라도 빈 배열로 초기화
         siteData.exchanges = cex || [];
         siteData.faqs = faqsData || [];
+        siteData.pinnedArticles = pinnedData || [];
 
     singlePages?.forEach(page => {
         if (page.page_type === 'hero' && page.content) {
@@ -465,6 +490,7 @@ function renderAll() {
     renderSupport();
     renderExchanges();
     renderFaqs();
+    renderPinnedArticles();
     updateDashboard();
 }
 
@@ -723,6 +749,91 @@ function renderFaqs() {
     ]);
 }
 
+function renderPinnedArticles() {
+    // Load pinned articles data into the form
+    for (let position = 1; position <= 6; position++) {
+        const article = siteData.pinnedArticles.find(a => a.position === position);
+        const card = document.querySelector(`.pinned-article-card[data-position="${position}"]`);
+        
+        if (card && article) {
+            (card.querySelector('.pinned-active') as HTMLInputElement).checked = article.is_active;
+            (card.querySelector('.pinned-badge-text') as HTMLInputElement).value = article.badge_text;
+            (card.querySelector('.pinned-badge-type') as HTMLSelectElement).value = article.badge_type;
+            (card.querySelector('.pinned-image') as HTMLInputElement).value = article.image_url;
+            (card.querySelector('.pinned-category') as HTMLSelectElement).value = article.category;
+            (card.querySelector('.pinned-category-icon') as HTMLInputElement).value = article.category_icon;
+            (card.querySelector('.pinned-title') as HTMLInputElement).value = article.title;
+            (card.querySelector('.pinned-description') as HTMLTextAreaElement).value = article.description;
+            (card.querySelector('.pinned-footer-type') as HTMLSelectElement).value = article.footer_type;
+            (card.querySelector('.pinned-footer-text') as HTMLInputElement).value = article.footer_text;
+            (card.querySelector('.pinned-cta') as HTMLInputElement).value = article.cta_text;
+            (card.querySelector('.pinned-link') as HTMLInputElement).value = article.link_url;
+        }
+    }
+}
+
+async function savePinnedArticle(position: number) {
+    const card = document.querySelector(`.pinned-article-card[data-position="${position}"]`);
+    if (!card) return;
+    
+    const articleData: PinnedArticle = {
+        position: position,
+        is_active: (card.querySelector('.pinned-active') as HTMLInputElement).checked,
+        badge_text: (card.querySelector('.pinned-badge-text') as HTMLInputElement).value,
+        badge_type: (card.querySelector('.pinned-badge-type') as HTMLSelectElement).value,
+        image_url: (card.querySelector('.pinned-image') as HTMLInputElement).value,
+        category: (card.querySelector('.pinned-category') as HTMLSelectElement).value,
+        category_icon: (card.querySelector('.pinned-category-icon') as HTMLInputElement).value,
+        title: (card.querySelector('.pinned-title') as HTMLInputElement).value,
+        description: (card.querySelector('.pinned-description') as HTMLTextAreaElement).value,
+        footer_type: (card.querySelector('.pinned-footer-type') as HTMLSelectElement).value,
+        footer_text: (card.querySelector('.pinned-footer-text') as HTMLInputElement).value,
+        cta_text: (card.querySelector('.pinned-cta') as HTMLInputElement).value,
+        link_url: (card.querySelector('.pinned-link') as HTMLInputElement).value
+    };
+    
+    try {
+        // Check if article exists for this position
+        const { data: existing } = await supabase
+            .from('pinned_articles')
+            .select('id')
+            .eq('position', position)
+            .single();
+        
+        let result;
+        if (existing) {
+            // Update existing article
+            result = await supabase
+                .from('pinned_articles')
+                .update(articleData)
+                .eq('position', position);
+        } else {
+            // Insert new article
+            result = await supabase
+                .from('pinned_articles')
+                .insert(articleData);
+        }
+        
+        if (result.error) {
+            console.error('Error saving pinned article:', result.error);
+            showToast(`오류: 고정 게시물 저장 실패 - ${result.error.message}`, 'error');
+        } else {
+            showToast(`위치 ${position} 고정 게시물이 저장되었습니다.`);
+        }
+    } catch (error) {
+        console.error('Save pinned article error:', error);
+        showToast('고정 게시물 저장 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+async function saveAllPinnedArticles() {
+    for (let position = 1; position <= 6; position++) {
+        await savePinnedArticle(position);
+    }
+    await fetchDataFromSupabase();
+    renderPinnedArticles();
+}
+
 
 
 function setupEventListeners() {
@@ -738,6 +849,20 @@ function setupEventListeners() {
                 }
             }
         });
+    });
+    
+    // Pinned articles event listeners
+    document.querySelectorAll('.save-pinned-article').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const position = parseInt((e.target as HTMLElement).dataset.position || '0');
+            if (position > 0) {
+                await savePinnedArticle(position);
+            }
+        });
+    });
+    
+    document.getElementById('save-all-pinned')?.addEventListener('click', async () => {
+        await saveAllPinnedArticles();
     });
 
     // 팝업 탭 전환 이벤트 리스너

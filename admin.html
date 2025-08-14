@@ -72,6 +72,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                     <span>고객센터</span>
                 </a></li>
+                <li><a href="#" class="nav-link" data-target="pinned-articles-editor">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path></svg>
+                    <span>고정 게시물</span>
+                </a></li>
                 <li><a href="#" class="nav-link" data-target="banners-editor">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                     <span>배너 관리</span>
@@ -284,6 +288,487 @@
                     </div>
                 </section>
 
+
+                <section class="editor-section" id="pinned-articles-editor">
+                    <div class="section-header">
+                        <h2>고정 게시물 관리</h2>
+                        <p>이벤트 & 가이드 페이지 상단 캐러셀에 표시될 고정 게시물을 관리합니다. (최대 6개)</p>
+                    </div>
+                    
+                    <div class="pinned-articles-grid" id="pinned-articles-list">
+                        <!-- Position 1 -->
+                        <div class="pinned-article-card" data-position="1">
+                            <div class="position-badge">위치 1</div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" class="pinned-active" data-position="1" checked>
+                                    활성화
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>배지 텍스트</label>
+                                    <input type="text" class="pinned-badge-text" placeholder="🔥 HOT" value="🔥 HOT">
+                                </div>
+                                <div class="form-group">
+                                    <label>배지 타입</label>
+                                    <select class="pinned-badge-type">
+                                        <option value="hot">HOT</option>
+                                        <option value="notice">공지</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="event">이벤트</option>
+                                        <option value="tip">팁</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>썸네일 이미지 URL</label>
+                                <input type="url" class="pinned-image" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>카테고리</label>
+                                    <select class="pinned-category">
+                                        <option value="event">이벤트</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="notice">공지사항</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>카테고리 아이콘</label>
+                                    <input type="text" class="pinned-category-icon" placeholder="🎁" value="🎁">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" class="pinned-title" placeholder="게시물 제목">
+                            </div>
+                            <div class="form-group">
+                                <label>설명</label>
+                                <textarea class="pinned-description" rows="2" placeholder="게시물 설명"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>하단 표시 타입</label>
+                                    <select class="pinned-footer-type">
+                                        <option value="date">날짜</option>
+                                        <option value="event_period">이벤트 기간</option>
+                                        <option value="views">조회수</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>하단 텍스트</label>
+                                    <input type="text" class="pinned-footer-text" placeholder="01.14 또는 ~01.31">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>버튼 텍스트</label>
+                                    <input type="text" class="pinned-cta" placeholder="참여하기 →" value="자세히 →">
+                                </div>
+                                <div class="form-group">
+                                    <label>링크 URL</label>
+                                    <input type="url" class="pinned-link" placeholder="/article/123 또는 https://...">
+                                </div>
+                            </div>
+                            <button class="save-pinned-article" data-position="1">위치 1 저장</button>
+                        </div>
+
+                        <!-- Positions 2-6 will be generated similarly -->
+                        <div class="pinned-article-card" data-position="2">
+                            <div class="position-badge">위치 2</div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" class="pinned-active" data-position="2">
+                                    활성화
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>배지 텍스트</label>
+                                    <input type="text" class="pinned-badge-text" placeholder="📢 공지">
+                                </div>
+                                <div class="form-group">
+                                    <label>배지 타입</label>
+                                    <select class="pinned-badge-type">
+                                        <option value="hot">HOT</option>
+                                        <option value="notice">공지</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="event">이벤트</option>
+                                        <option value="tip">팁</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>썸네일 이미지 URL</label>
+                                <input type="url" class="pinned-image" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>카테고리</label>
+                                    <select class="pinned-category">
+                                        <option value="event">이벤트</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="notice">공지사항</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>카테고리 아이콘</label>
+                                    <input type="text" class="pinned-category-icon" placeholder="📢">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" class="pinned-title" placeholder="게시물 제목">
+                            </div>
+                            <div class="form-group">
+                                <label>설명</label>
+                                <textarea class="pinned-description" rows="2" placeholder="게시물 설명"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>하단 표시 타입</label>
+                                    <select class="pinned-footer-type">
+                                        <option value="date">날짜</option>
+                                        <option value="event_period">이벤트 기간</option>
+                                        <option value="views">조회수</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>하단 텍스트</label>
+                                    <input type="text" class="pinned-footer-text" placeholder="01.14 또는 ~01.31">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>버튼 텍스트</label>
+                                    <input type="text" class="pinned-cta" placeholder="참여하기 →" value="자세히 →">
+                                </div>
+                                <div class="form-group">
+                                    <label>링크 URL</label>
+                                    <input type="url" class="pinned-link" placeholder="/article/123 또는 https://...">
+                                </div>
+                            </div>
+                            <button class="save-pinned-article" data-position="2">위치 2 저장</button>
+                        </div>
+
+                        <!-- Position 3 -->
+                        <div class="pinned-article-card" data-position="3">
+                            <div class="position-badge">위치 3</div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" class="pinned-active" data-position="3">
+                                    활성화
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>배지 텍스트</label>
+                                    <input type="text" class="pinned-badge-text" placeholder="📘 가이드">
+                                </div>
+                                <div class="form-group">
+                                    <label>배지 타입</label>
+                                    <select class="pinned-badge-type">
+                                        <option value="hot">HOT</option>
+                                        <option value="notice">공지</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="event">이벤트</option>
+                                        <option value="tip">팁</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>썸네일 이미지 URL</label>
+                                <input type="url" class="pinned-image" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>카테고리</label>
+                                    <select class="pinned-category">
+                                        <option value="event">이벤트</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="notice">공지사항</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>카테고리 아이콘</label>
+                                    <input type="text" class="pinned-category-icon" placeholder="📘">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" class="pinned-title" placeholder="게시물 제목">
+                            </div>
+                            <div class="form-group">
+                                <label>설명</label>
+                                <textarea class="pinned-description" rows="2" placeholder="게시물 설명"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>하단 표시 타입</label>
+                                    <select class="pinned-footer-type">
+                                        <option value="date">날짜</option>
+                                        <option value="event_period">이벤트 기간</option>
+                                        <option value="views">조회수</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>하단 텍스트</label>
+                                    <input type="text" class="pinned-footer-text" placeholder="01.14 또는 ~01.31">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>버튼 텍스트</label>
+                                    <input type="text" class="pinned-cta" placeholder="참여하기 →" value="자세히 →">
+                                </div>
+                                <div class="form-group">
+                                    <label>링크 URL</label>
+                                    <input type="url" class="pinned-link" placeholder="/article/123 또는 https://...">
+                                </div>
+                            </div>
+                            <button class="save-pinned-article" data-position="3">위치 3 저장</button>
+                        </div>
+
+                        <!-- Position 4 -->
+                        <div class="pinned-article-card" data-position="4">
+                            <div class="position-badge">위치 4</div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" class="pinned-active" data-position="4">
+                                    활성화
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>배지 텍스트</label>
+                                    <input type="text" class="pinned-badge-text" placeholder="🎁 이벤트">
+                                </div>
+                                <div class="form-group">
+                                    <label>배지 타입</label>
+                                    <select class="pinned-badge-type">
+                                        <option value="hot">HOT</option>
+                                        <option value="notice">공지</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="event">이벤트</option>
+                                        <option value="tip">팁</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>썸네일 이미지 URL</label>
+                                <input type="url" class="pinned-image" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>카테고리</label>
+                                    <select class="pinned-category">
+                                        <option value="event">이벤트</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="notice">공지사항</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>카테고리 아이콘</label>
+                                    <input type="text" class="pinned-category-icon" placeholder="🎁">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" class="pinned-title" placeholder="게시물 제목">
+                            </div>
+                            <div class="form-group">
+                                <label>설명</label>
+                                <textarea class="pinned-description" rows="2" placeholder="게시물 설명"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>하단 표시 타입</label>
+                                    <select class="pinned-footer-type">
+                                        <option value="date">날짜</option>
+                                        <option value="event_period">이벤트 기간</option>
+                                        <option value="views">조회수</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>하단 텍스트</label>
+                                    <input type="text" class="pinned-footer-text" placeholder="01.14 또는 ~01.31">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>버튼 텍스트</label>
+                                    <input type="text" class="pinned-cta" placeholder="참여하기 →" value="자세히 →">
+                                </div>
+                                <div class="form-group">
+                                    <label>링크 URL</label>
+                                    <input type="url" class="pinned-link" placeholder="/article/123 또는 https://...">
+                                </div>
+                            </div>
+                            <button class="save-pinned-article" data-position="4">위치 4 저장</button>
+                        </div>
+
+                        <!-- Position 5 -->
+                        <div class="pinned-article-card" data-position="5">
+                            <div class="position-badge">위치 5</div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" class="pinned-active" data-position="5">
+                                    활성화
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>배지 텍스트</label>
+                                    <input type="text" class="pinned-badge-text" placeholder="💡 팁">
+                                </div>
+                                <div class="form-group">
+                                    <label>배지 타입</label>
+                                    <select class="pinned-badge-type">
+                                        <option value="hot">HOT</option>
+                                        <option value="notice">공지</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="event">이벤트</option>
+                                        <option value="tip">팁</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>썸네일 이미지 URL</label>
+                                <input type="url" class="pinned-image" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>카테고리</label>
+                                    <select class="pinned-category">
+                                        <option value="event">이벤트</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="notice">공지사항</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>카테고리 아이콘</label>
+                                    <input type="text" class="pinned-category-icon" placeholder="💡">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" class="pinned-title" placeholder="게시물 제목">
+                            </div>
+                            <div class="form-group">
+                                <label>설명</label>
+                                <textarea class="pinned-description" rows="2" placeholder="게시물 설명"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>하단 표시 타입</label>
+                                    <select class="pinned-footer-type">
+                                        <option value="date">날짜</option>
+                                        <option value="event_period">이벤트 기간</option>
+                                        <option value="views">조회수</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>하단 텍스트</label>
+                                    <input type="text" class="pinned-footer-text" placeholder="01.14 또는 ~01.31">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>버튼 텍스트</label>
+                                    <input type="text" class="pinned-cta" placeholder="참여하기 →" value="자세히 →">
+                                </div>
+                                <div class="form-group">
+                                    <label>링크 URL</label>
+                                    <input type="url" class="pinned-link" placeholder="/article/123 또는 https://...">
+                                </div>
+                            </div>
+                            <button class="save-pinned-article" data-position="5">위치 5 저장</button>
+                        </div>
+
+                        <!-- Position 6 -->
+                        <div class="pinned-article-card" data-position="6">
+                            <div class="position-badge">위치 6</div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" class="pinned-active" data-position="6">
+                                    활성화
+                                </label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>배지 텍스트</label>
+                                    <input type="text" class="pinned-badge-text" placeholder="🎁 이벤트">
+                                </div>
+                                <div class="form-group">
+                                    <label>배지 타입</label>
+                                    <select class="pinned-badge-type">
+                                        <option value="hot">HOT</option>
+                                        <option value="notice">공지</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="event">이벤트</option>
+                                        <option value="tip">팁</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>썸네일 이미지 URL</label>
+                                <input type="url" class="pinned-image" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>카테고리</label>
+                                    <select class="pinned-category">
+                                        <option value="event">이벤트</option>
+                                        <option value="guide">가이드</option>
+                                        <option value="notice">공지사항</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>카테고리 아이콘</label>
+                                    <input type="text" class="pinned-category-icon" placeholder="🎁">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>제목</label>
+                                <input type="text" class="pinned-title" placeholder="게시물 제목">
+                            </div>
+                            <div class="form-group">
+                                <label>설명</label>
+                                <textarea class="pinned-description" rows="2" placeholder="게시물 설명"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>하단 표시 타입</label>
+                                    <select class="pinned-footer-type">
+                                        <option value="date">날짜</option>
+                                        <option value="event_period">이벤트 기간</option>
+                                        <option value="views">조회수</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>하단 텍스트</label>
+                                    <input type="text" class="pinned-footer-text" placeholder="01.14 또는 ~01.31">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>버튼 텍스트</label>
+                                    <input type="text" class="pinned-cta" placeholder="참여하기 →" value="자세히 →">
+                                </div>
+                                <div class="form-group">
+                                    <label>링크 URL</label>
+                                    <input type="url" class="pinned-link" placeholder="/article/123 또는 https://...">
+                                </div>
+                            </div>
+                            <button class="save-pinned-article" data-position="6">위치 6 저장</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pinned-articles-actions">
+                        <button class="save-all-pinned" id="save-all-pinned">모든 고정 게시물 저장</button>
+                    </div>
+                </section>
 
                 <section class="editor-section" id="banners-editor">
                     <div class="section-header">

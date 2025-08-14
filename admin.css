@@ -1513,12 +1513,117 @@ input:checked + .slider:before {
     margin: 0;
 }
 
+/* Pinned Articles Management */
+.pinned-articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.pinned-article-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+}
+
+.position-badge {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pinned-article-card .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.pinned-article-card .form-group {
+    margin-bottom: 16px;
+}
+
+.pinned-article-card .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.pinned-article-card input[type="text"],
+.pinned-article-card input[type="url"],
+.pinned-article-card select,
+.pinned-article-card textarea {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.pinned-article-card input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.save-pinned-article {
+    width: 100%;
+    padding: 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-pinned-article:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.pinned-articles-actions {
+    text-align: center;
+    padding: 20px;
+}
+
+.save-all-pinned {
+    padding: 12px 32px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-all-pinned:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
 /* 미디어 쿼리 */
 @media (max-width: 1600px) {
     #exchanges-list {
         grid-template-columns: repeat(2, 1fr);
     }
     #faq-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .pinned-articles-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }

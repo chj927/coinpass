@@ -45,7 +45,7 @@ export default defineConfig(({ mode }) => {
             main: path.resolve(__dirname, 'index.html'),
             admin: path.resolve(__dirname, 'admin.html'),
             exchange: path.resolve(__dirname, 'exchange.html'),
-            compare: path.resolve(__dirname, 'compare.html'),
+            articles: path.resolve(__dirname, 'articles.html'),
           },
           output: {
             manualChunks: {
