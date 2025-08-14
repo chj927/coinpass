@@ -926,26 +926,40 @@ function renderArticles() {
     setupArticleEventListeners();
 }
 
+// 이벤트 위임을 사용하여 메모리 누수 방지
 function setupArticleEventListeners() {
-    // 편집 버튼
-    document.querySelectorAll('.edit-article-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = (e.target as HTMLElement).dataset.id;
+    const articlesList = document.getElementById('articles-list');
+    if (!articlesList) return;
+    
+    // 기존 이벤트 리스너 제거 (이벤트 위임 사용)
+    const newArticlesList = articlesList.cloneNode(false) as HTMLElement;
+    newArticlesList.innerHTML = articlesList.innerHTML;
+    newArticlesList.id = articlesList.id;
+    articlesList.parentNode?.replaceChild(newArticlesList, articlesList);
+    
+    // 이벤트 위임 사용
+    newArticlesList.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        
+        // 편집 버튼 클릭
+        const editBtn = target.closest('.edit-article-btn') as HTMLElement;
+        if (editBtn) {
+            const id = editBtn.dataset.id;
             const article = siteData.articles.find(a => a.id === id);
             if (article) {
                 openArticleEditor(article);
             }
-        });
-    });
-    
-    // 삭제 버튼
-    document.querySelectorAll('.delete-article-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const id = (e.target as HTMLElement).dataset.id;
+            return;
+        }
+        
+        // 삭제 버튼 클릭
+        const deleteBtn = target.closest('.delete-article-btn') as HTMLElement;
+        if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
             if (id && confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
-                await deleteArticle(id);
+                deleteArticle(id);
             }
-        });
+        }
     });
 }
 
@@ -970,14 +984,16 @@ function openArticleEditor(article?: Article) {
     const editorContainer = document.getElementById('article-editor-container');
     const externalUrlGroup = document.getElementById('external-url-group');
     
-    if (contentType === 'internal') {
-        editorContainer!.style.display = 'block';
-        externalUrlGroup!.style.display = 'none';
+    if (editorContainer && externalUrlGroup) {
+        if (contentType === 'internal') {
+            editorContainer.style.display = 'block';
+            externalUrlGroup.style.display = 'none';
         
         // Quill 에디터 초기화
-        if (!quillEditor) {
-            quillEditor = new (window as any).Quill('#article-content-editor', {
-                theme: 'snow',
+        if (!quillEditor && (window as any).Quill) {
+            try {
+                quillEditor = new (window as any).Quill('#article-content-editor', {
+                    theme: 'snow',
                 modules: {
                     toolbar: [
                         [{ 'header': [1, 2, 3, false] }],
@@ -990,6 +1006,10 @@ function openArticleEditor(article?: Article) {
                     ]
                 }
             });
+            } catch (error) {
+                console.error('Failed to initialize Quill editor:', error);
+                showToast('에디터 초기화 실패', 'error');
+            }
         }
         
         // 콘텐츠 설정
@@ -999,8 +1019,8 @@ function openArticleEditor(article?: Article) {
             quillEditor.setText('');
         }
     } else {
-        editorContainer!.style.display = 'none';
-        externalUrlGroup!.style.display = 'block';
+        if (editorContainer) editorContainer.style.display = 'none';
+        if (externalUrlGroup) externalUrlGroup.style.display = 'block';
     }
     
     modal.style.display = 'flex';
@@ -1015,16 +1035,52 @@ function closeArticleEditor() {
 }
 
 async function saveArticle() {
+    const title = (document.getElementById('article-title') as HTMLInputElement)?.value || '';
+    const category = (document.getElementById('article-category') as HTMLSelectElement)?.value as Article['category'];
+    const contentType = (document.getElementById('article-content-type') as HTMLSelectElement)?.value as Article['content_type'];
+    const excerpt = (document.getElementById('article-excerpt') as HTMLTextAreaElement)?.value || '';
+    const externalUrl = (document.getElementById('article-external-url') as HTMLInputElement)?.value || null;
+    const imageUrl = (document.getElementById('article-image-url') as HTMLInputElement)?.value || null;
+    const author = (document.getElementById('article-author') as HTMLInputElement)?.value || 'CoinPass';
+    const isPinned = (document.getElementById('article-is-pinned') as HTMLInputElement)?.checked || false;
+    const isPublished = (document.getElementById('article-is-published') as HTMLInputElement)?.checked || false;
+    
+    // 유효성 검사
+    if (!title || title.trim().length === 0) {
+        showToast('제목을 입력해주세요.', 'error');
+        return;
+    }
+    
+    if (title.length > 200) {
+        showToast('제목은 200자 이내로 입력해주세요.', 'error');
+        return;
+    }
+    
+    if (!category) {
+        showToast('카테고리를 선택해주세요.', 'error');
+        return;
+    }
+    
+    if (contentType === 'external' && (!externalUrl || !externalUrl.startsWith('http'))) {
+        showToast('올바른 외부 링크 URL을 입력해주세요.', 'error');
+        return;
+    }
+    
+    if (imageUrl && !imageUrl.startsWith('http')) {
+        showToast('올바른 이미지 URL을 입력해주세요.', 'error');
+        return;
+    }
+    
     const articleData: Article = {
-        title: (document.getElementById('article-title') as HTMLInputElement).value,
-        category: (document.getElementById('article-category') as HTMLSelectElement).value as Article['category'],
-        content_type: (document.getElementById('article-content-type') as HTMLSelectElement).value as Article['content_type'],
-        excerpt: (document.getElementById('article-excerpt') as HTMLTextAreaElement).value,
-        external_url: (document.getElementById('article-external-url') as HTMLInputElement).value || null,
-        image_url: (document.getElementById('article-image-url') as HTMLInputElement).value || null,
-        author: (document.getElementById('article-author') as HTMLInputElement).value || 'CoinPass',
-        is_pinned: (document.getElementById('article-is-pinned') as HTMLInputElement).checked,
-        is_published: (document.getElementById('article-is-published') as HTMLInputElement).checked,
+        title: title,
+        category: category,
+        content_type: contentType,
+        excerpt: excerpt,
+        external_url: externalUrl,
+        image_url: imageUrl,
+        author: author,
+        is_pinned: isPinned,
+        is_published: isPublished,
         view_count: currentEditingArticle?.view_count || 0,
         content: null
     };
