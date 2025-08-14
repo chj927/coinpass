@@ -31,8 +31,11 @@
       "Bash(start http://localhost:3001/test-theme-functionality.html)",
       "Bash(start http://localhost:3000)",
       "Bash(curl:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(start http://localhost:3000/articles-new.html)",
+      "Bash(sed:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

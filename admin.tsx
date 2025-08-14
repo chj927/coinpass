@@ -1504,5 +1504,4 @@ function switchPopupTab(page: string) {
     document.getElementById('index-popup-content')!.style.display = page === 'index' ? 'block' : 'none';
 }
 
-
 export {};
