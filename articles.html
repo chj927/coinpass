@@ -50,162 +50,179 @@
             </div>
         </header>
 
-        <main id="main-content">
-            <!-- Minimal Hero -->
-            <section class="hero-minimal">
-                <div class="container">
-                    <h1 class="page-title">이벤트 & 가이드</h1>
-                    <p class="page-subtitle">특별한 혜택과 투자 가이드를 한곳에서</p>
+        <main>
+            <!-- Simple Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">이벤트 & 가이드</h1>
+                    <p class="hero-description">
+                        거래소 이벤트부터 투자 가이드까지, 암호화폐 투자 정보를 한 곳에서
+                    </p>
                 </div>
             </section>
 
-            <!-- Tab Navigation -->
-            <section class="tab-navigation">
+            <!-- Category Filter Section -->
+            <section class="filter-section">
                 <div class="container">
-                    <div class="tabs-wrapper">
-                        <button class="tab-btn active" data-tab="all">
-                            전체
-                            <span class="count">23</span>
-                        </button>
-                        <button class="tab-btn" data-tab="event">
-                            이벤트
-                            <span class="count">5</span>
-                        </button>
-                        <button class="tab-btn" data-tab="guide">
-                            가이드
-                            <span class="count">12</span>
-                        </button>
-                        <button class="tab-btn" data-tab="notice">
-                            공지사항
-                            <span class="count">6</span>
-                        </button>
+                    <div class="filter-wrapper">
+                        <div class="filter-tabs">
+                            <button class="filter-btn active" data-category="all">
+                                <span class="tab-icon">🌐</span>
+                                <span class="tab-text">전체</span>
+                            </button>
+                            <button class="filter-btn" data-category="notice">
+                                <span class="tab-icon">📢</span>
+                                <span class="tab-text">공지사항</span>
+                            </button>
+                            <button class="filter-btn" data-category="guide">
+                                <span class="tab-icon">📚</span>
+                                <span class="tab-text">가이드</span>
+                            </button>
+                            <button class="filter-btn" data-category="event">
+                                <span class="tab-icon">🎁</span>
+                                <span class="tab-text">이벤트</span>
+                            </button>
+                            <button class="filter-btn" data-category="airdrop">
+                                <span class="tab-icon">🪂</span>
+                                <span class="tab-text">에어드랍</span>
+                            </button>
+                        </div>
+                        <div class="filter-options">
+                            <input type="text" class="search-input" placeholder="검색어를 입력하세요...">
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Pinned Carousel Section -->
-            <section class="pinned-carousel-section">
+            <!-- Pinned Articles Section -->
+            <section class="featured-section">
                 <div class="container">
-                    <div class="carousel-header">
-                        <h2 class="carousel-title">📌 고정 게시물</h2>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" aria-label="이전">
+                    <div class="section-header">
+                        <div class="section-title-group">
+                            <h2 class="section-title">
+                                <span class="title-icon">⭐</span>
+                                주목할 만한 콘텐츠
+                            </h2>
+                            <p class="section-desc">놓치면 후회할 이벤트와 필수 가이드</p>
+                        </div>
+                        <div class="carousel-nav">
+                            <button class="nav-btn prev" aria-label="이전">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                 </svg>
                             </button>
-                            <div class="carousel-indicators">
-                                <span class="indicator active"></span>
-                                <span class="indicator"></span>
+                            <div class="carousel-dots">
+                                <span class="dot active"></span>
+                                <span class="dot"></span>
                             </div>
-                            <button class="carousel-btn next" aria-label="다음">
+                            <button class="nav-btn next" aria-label="다음">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                 </svg>
                             </button>
                         </div>
                     </div>
-                    
-                    <div class="carousel-container">
+
+                    <div class="carousel-wrapper">
                         <div class="carousel-track">
-                            <!-- Pinned Item 1 -->
-                            <article class="pinned-item" data-pinned-id="1">
-                                <div class="pinned-badge">🔥 HOT</div>
-                                <div class="pinned-image">
-                                    <img src="https://via.placeholder.com/400x200/667EEA/ffffff?text=Grand+Opening" alt="오픈 이벤트">
+                            <!-- Featured Card 1 -->
+                            <article class="featured-card">
+                                <div class="card-ribbon">HOT</div>
+                                <div class="card-image-wrapper">
+                                    <img src="https://via.placeholder.com/400x240/FF6B6B/ffffff?text=Grand+Event" alt="그랜드 오픈 이벤트">
+                                    <div class="card-overlay">
+                                        <span class="overlay-badge">D-7</span>
+                                    </div>
                                 </div>
-                                <div class="pinned-content">
-                                    <div class="pinned-category">🎁 이벤트</div>
-                                    <h3>코인패스 그랜드 오픈 이벤트</h3>
-                                    <p>지금 가입하시는 모든 분께 거래소 수수료 추가 10% 할인!</p>
-                                    <div class="pinned-footer">
-                                        <span class="event-period">~01.31</span>
-                                        <button class="pinned-cta">참여하기 →</button>
+                                <div class="card-content">
+                                    <div class="card-meta">
+                                        <span class="meta-tag event">이벤트</span>
+                                        <span class="meta-date">~2025.01.31</span>
+                                    </div>
+                                    <h3 class="card-title">코인패스 그랜드 오픈 특별 이벤트</h3>
+                                    <p class="card-description">
+                                        지금 가입하시는 모든 분들께 거래소 수수료 추가 10% 할인 혜택을 드립니다
+                                    </p>
+                                    <div class="card-footer">
+                                        <div class="participant-info">
+                                            <div class="participant-avatars">
+                                                <span class="avatar"></span>
+                                                <span class="avatar"></span>
+                                                <span class="avatar"></span>
+                                            </div>
+                                            <span class="participant-count">1.2K 참여중</span>
+                                        </div>
+                                        <a href="#" class="card-action">
+                                            참여하기
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"/>
+                                            </svg>
+                                        </a>
                                     </div>
                                 </div>
                             </article>
 
-                            <!-- Pinned Item 2 -->
-                            <article class="pinned-item" data-pinned-id="2">
-                                <div class="pinned-badge">📢 공지</div>
-                                <div class="pinned-image">
-                                    <img src="https://via.placeholder.com/400x200/F59E0B/ffffff?text=Fee+Update" alt="수수료 업데이트">
+                            <!-- Featured Card 2 -->
+                            <article class="featured-card">
+                                <div class="card-ribbon">NEW</div>
+                                <div class="card-image-wrapper">
+                                    <img src="https://via.placeholder.com/400x240/4ECDC4/ffffff?text=Trading+Guide" alt="트레이딩 가이드">
+                                    <div class="card-overlay">
+                                        <span class="overlay-badge">필독</span>
+                                    </div>
                                 </div>
-                                <div class="pinned-content">
-                                    <div class="pinned-category">📢 공지사항</div>
-                                    <h3>2025년 1월 수수료 할인율 업데이트</h3>
-                                    <p>바이낸스, 바이비트, OKX 수수료 할인율 대폭 상향!</p>
-                                    <div class="pinned-footer">
-                                        <span class="date">01.14</span>
-                                        <button class="pinned-cta">자세히 →</button>
+                                <div class="card-content">
+                                    <div class="card-meta">
+                                        <span class="meta-tag guide">가이드</span>
+                                        <span class="meta-date">2025.01.14</span>
+                                    </div>
+                                    <h3 class="card-title">2025년 암호화폐 투자 완벽 가이드</h3>
+                                    <p class="card-description">
+                                        초보자부터 전문가까지, 단계별 투자 전략과 리스크 관리 방법을 알아보세요
+                                    </p>
+                                    <div class="card-footer">
+                                        <div class="read-info">
+                                            <span class="read-time">📖 5분 읽기</span>
+                                            <span class="view-count">조회 5.2K</span>
+                                        </div>
+                                        <a href="#" class="card-action">
+                                            읽어보기
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"/>
+                                            </svg>
+                                        </a>
                                     </div>
                                 </div>
                             </article>
 
-                            <!-- Pinned Item 3 -->
-                            <article class="pinned-item" data-pinned-id="3">
-                                <div class="pinned-badge">📘 가이드</div>
-                                <div class="pinned-image">
-                                    <img src="https://via.placeholder.com/400x200/10B981/ffffff?text=KYC+Guide" alt="KYC 가이드">
-                                </div>
-                                <div class="pinned-content">
-                                    <div class="pinned-category">📘 가이드</div>
-                                    <h3>바이낸스 KYC 인증 완벽 가이드</h3>
-                                    <p>2025년 변경된 KYC 정책과 빠른 인증 팁 총정리</p>
-                                    <div class="pinned-footer">
-                                        <span class="views">조회 5.2K</span>
-                                        <button class="pinned-cta">읽기 →</button>
+                            <!-- Featured Card 3 -->
+                            <article class="featured-card">
+                                <div class="card-ribbon">UPDATE</div>
+                                <div class="card-image-wrapper">
+                                    <img src="https://via.placeholder.com/400x240/FFD93D/333333?text=Fee+Update" alt="수수료 업데이트">
+                                    <div class="card-overlay">
+                                        <span class="overlay-badge">공지</span>
                                     </div>
                                 </div>
-                            </article>
-
-                            <!-- Pinned Item 4 -->
-                            <article class="pinned-item" data-pinned-id="4">
-                                <div class="pinned-badge">🎁 이벤트</div>
-                                <div class="pinned-image">
-                                    <img src="https://via.placeholder.com/400x200/EF4444/ffffff?text=Binance+Bonus" alt="바이낸스 보너스">
-                                </div>
-                                <div class="pinned-content">
-                                    <div class="pinned-category">🎁 이벤트</div>
-                                    <h3>바이낸스 신규가입 $100 보너스</h3>
-                                    <p>코인패스 전용 링크로 가입시 거래 보너스 $100!</p>
-                                    <div class="pinned-footer">
-                                        <span class="event-period">~01.25</span>
-                                        <button class="pinned-cta">참여하기 →</button>
+                                <div class="card-content">
+                                    <div class="card-meta">
+                                        <span class="meta-tag notice">공지사항</span>
+                                        <span class="meta-date">2025.01.10</span>
                                     </div>
-                                </div>
-                            </article>
-
-                            <!-- Pinned Item 5 -->
-                            <article class="pinned-item" data-pinned-id="5">
-                                <div class="pinned-badge">💡 팁</div>
-                                <div class="pinned-image">
-                                    <img src="https://via.placeholder.com/400x200/8B5CF6/ffffff?text=Trading+Tips" alt="거래 팁">
-                                </div>
-                                <div class="pinned-content">
-                                    <div class="pinned-category">📘 가이드</div>
-                                    <h3>선물거래 리스크 관리 전략</h3>
-                                    <p>안전한 선물거래를 위한 필수 리스크 관리 방법</p>
-                                    <div class="pinned-footer">
-                                        <span class="views">조회 3.8K</span>
-                                        <button class="pinned-cta">읽기 →</button>
-                                    </div>
-                                </div>
-                            </article>
-
-                            <!-- Pinned Item 6 -->
-                            <article class="pinned-item" data-pinned-id="6">
-                                <div class="pinned-badge">🎁 이벤트</div>
-                                <div class="pinned-image">
-                                    <img src="https://via.placeholder.com/400x200/3B82F6/ffffff?text=OKX+Payback" alt="OKX 페이백">
-                                </div>
-                                <div class="pinned-content">
-                                    <div class="pinned-category">🎁 이벤트</div>
-                                    <h3>OKX 첫 거래 수수료 100% 페이백</h3>
-                                    <p>OKX에서 첫 거래시 수수료 100% 돌려드립니다!</p>
-                                    <div class="pinned-footer">
-                                        <span class="event-period">~01.30</span>
-                                        <button class="pinned-cta">참여하기 →</button>
+                                    <h3 class="card-title">주요 거래소 수수료 할인율 대폭 상향</h3>
+                                    <p class="card-description">
+                                        바이낸스, 바이비트, OKX 등 주요 거래소 할인율이 최대 50%까지 상향되었습니다
+                                    </p>
+                                    <div class="card-footer">
+                                        <div class="importance-badge">
+                                            <span class="badge-important">중요</span>
+                                        </div>
+                                        <a href="#" class="card-action">
+                                            자세히 보기
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"/>
+                                            </svg>
+                                        </a>
                                     </div>
                                 </div>
                             </article>
@@ -214,141 +231,180 @@
                 </div>
             </section>
 
-            <!-- Main Content Grid -->
-            <section class="content-section">
+            <!-- Articles Grid Section -->
+            <section class="articles-section">
                 <div class="container">
-                    <div class="content-grid">
-                        
-                        <!-- 이벤트 1 (자체) -->
-                        <article class="content-card has-thumbnail event-active" data-type="internal" data-category="event">
-                            <div class="card-badge internal">코인패스</div>
-                            <div class="event-ribbon">진행중</div>
-                            <div class="card-thumbnail">
-                                <img src="https://via.placeholder.com/400x240/FF6B6B/ffffff?text=Referral+Event" alt="추천 이벤트">
+                    <div class="articles-grid" id="articles-grid">
+                        <!-- Article Card 1 -->
+                        <article class="article-card" data-category="guide">
+                            <div class="article-image">
+                                <img src="https://via.placeholder.com/350x200/6C63FF/ffffff?text=DeFi+Guide" alt="DeFi 가이드">
+                                <div class="article-badge">인기</div>
                             </div>
-                            <div class="card-body">
-                                <div class="card-category">🎁 이벤트</div>
-                                <h3 class="card-title">친구 추천 이벤트 - 함께하면 2배</h3>
-                                <p class="card-excerpt">친구를 추천하면 추천인과 친구 모두에게 수수료 할인 쿠폰!</p>
-                                <div class="event-status">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 45%"></div>
-                                    </div>
-                                    <span class="participants">225/500명 참여중</span>
+                            <div class="article-content">
+                                <div class="article-tags">
+                                    <span class="tag">DeFi</span>
+                                    <span class="tag">입문</span>
                                 </div>
-                                <div class="countdown">⏰ 종료까지 8일</div>
-                            </div>
-                        </article>
-
-                        <!-- 가이드 1 (네이버 블로그) -->
-                        <article class="content-card has-thumbnail" data-type="blog" data-category="guide">
-                            <div class="card-badge blog">
-                                <img src="https://via.placeholder.com/16x16/03C75A/ffffff?text=N" alt="N">
-                                블로그
-                            </div>
-                            <div class="card-thumbnail">
-                                <img src="https://via.placeholder.com/400x240/4EC53D/ffffff?text=Stablecoin+Guide" alt="스테이블코인">
-                            </div>
-                            <div class="card-body">
-                                <div class="card-category">📘 가이드</div>
-                                <h3 class="card-title">스테이블코인 종류별 특징과 선택 가이드</h3>
-                                <p class="card-excerpt">USDT, USDC, BUSD, DAI 등 다양한 스테이블코인의 차이점과 용도</p>
-                                <div class="card-meta">
-                                    <span class="author">코인백과</span>
-                                    <span class="platform">네이버 블로그</span>
-                                </div>
-                                <a href="#" target="_blank" class="blog-link">
-                                    블로그에서 읽기
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </a>
-                            </div>
-                        </article>
-
-                        <!-- 공지사항 1 (자체) -->
-                        <article class="content-card has-thumbnail" data-type="internal" data-category="notice">
-                            <div class="card-badge internal">코인패스</div>
-                            <div class="card-thumbnail">
-                                <img src="https://via.placeholder.com/400x240/667EEA/ffffff?text=System+Update" alt="시스템 업데이트">
-                            </div>
-                            <div class="card-body">
-                                <div class="card-category">📢 공지사항</div>
-                                <h3 class="card-title">시스템 정기 점검 안내</h3>
-                                <p class="card-excerpt">1월 20일 새벽 2시-4시 시스템 점검이 예정되어 있습니다.</p>
-                                <div class="card-meta">
-                                    <span class="date">2025.01.13</span>
-                                    <span class="views">조회 456</span>
+                                <h3 class="article-title">DeFi 완벽 입문 가이드</h3>
+                                <p class="article-excerpt">탈중앙화 금융의 개념부터 실전 투자까지</p>
+                                <div class="article-meta">
+                                    <span class="meta-author">
+                                        <img src="https://via.placeholder.com/24x24" alt="작성자">
+                                        김코인
+                                    </span>
+                                    <span class="meta-time">3일 전</span>
                                 </div>
                             </div>
                         </article>
 
-                        <!-- 가이드 2 (티스토리) -->
-                        <article class="content-card has-thumbnail" data-type="blog" data-category="guide">
-                            <div class="card-badge blog tistory">
-                                <img src="https://via.placeholder.com/16x16/000000/ffffff?text=T" alt="T">
-                                블로그
+                        <!-- Article Card 2 -->
+                        <article class="article-card" data-category="event">
+                            <div class="article-image">
+                                <img src="https://via.placeholder.com/350x200/FF6B6B/ffffff?text=Airdrop" alt="에어드랍">
+                                <div class="article-badge">D-3</div>
                             </div>
-                            <div class="card-thumbnail">
-                                <img src="https://via.placeholder.com/400x240/9333EA/ffffff?text=DeFi+Guide" alt="DeFi 가이드">
-                            </div>
-                            <div class="card-body">
-                                <div class="card-category">📘 가이드</div>
-                                <h3 class="card-title">DeFi 프로토콜 이해하기</h3>
-                                <p class="card-excerpt">탈중앙화 금융의 개념과 주요 DeFi 프로토콜 소개</p>
-                                <div class="card-meta">
-                                    <span class="author">블록체인연구소</span>
-                                    <span class="platform">티스토리</span>
+                            <div class="article-content">
+                                <div class="article-tags">
+                                    <span class="tag">에어드랍</span>
+                                    <span class="tag">한정</span>
                                 </div>
-                                <a href="#" target="_blank" class="blog-link">
-                                    블로그에서 읽기
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
-                                    </svg>
-                                </a>
+                                <h3 class="article-title">바이낸스 신규 에어드랍 이벤트</h3>
+                                <p class="article-excerpt">최대 $1,000 상당의 토큰 지급</p>
+                                <div class="article-meta">
+                                    <span class="meta-participants">👥 523명 참여</span>
+                                    <span class="meta-deadline">3일 남음</span>
+                                </div>
                             </div>
                         </article>
 
-                        <!-- 더 많은 콘텐츠... -->
+                        <!-- Article Card 3 -->
+                        <article class="article-card" data-category="notice">
+                            <div class="article-image">
+                                <img src="https://via.placeholder.com/350x200/4ECDC4/ffffff?text=Update" alt="업데이트">
+                                <div class="article-badge">공지</div>
+                            </div>
+                            <div class="article-content">
+                                <div class="article-tags">
+                                    <span class="tag">시스템</span>
+                                    <span class="tag">업데이트</span>
+                                </div>
+                                <h3 class="article-title">플랫폼 업데이트 안내</h3>
+                                <p class="article-excerpt">새로운 기능 추가 및 UI 개선 사항</p>
+                                <div class="article-meta">
+                                    <span class="meta-official">공식</span>
+                                    <span class="meta-time">1일 전</span>
+                                </div>
+                            </div>
+                        </article>
 
+                        <!-- Article Card 4 -->
+                        <article class="article-card" data-category="event">
+                            <div class="article-image">
+                                <img src="https://via.placeholder.com/350x200/9333EA/ffffff?text=Trading+Contest" alt="트레이딩 대회">
+                                <div class="article-badge">진행중</div>
+                            </div>
+                            <div class="article-content">
+                                <div class="article-tags">
+                                    <span class="tag">대회</span>
+                                    <span class="tag">상금</span>
+                                </div>
+                                <h3 class="article-title">OKX 트레이딩 대회</h3>
+                                <p class="article-excerpt">총 상금 $50,000 규모의 글로벌 트레이딩 대회</p>
+                                <div class="article-meta">
+                                    <span class="meta-participants">👥 2.1K 참여</span>
+                                    <span class="meta-deadline">7일 남음</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Article Card 5 -->
+                        <article class="article-card" data-category="guide">
+                            <div class="article-image">
+                                <img src="https://via.placeholder.com/350x200/10B981/ffffff?text=Tax+Guide" alt="세금 가이드">
+                                <div class="article-badge">필독</div>
+                            </div>
+                            <div class="article-content">
+                                <div class="article-tags">
+                                    <span class="tag">세금</span>
+                                    <span class="tag">2025</span>
+                                </div>
+                                <h3 class="article-title">2025 암호화폐 세금 가이드</h3>
+                                <p class="article-excerpt">개정된 세법에 따른 암호화폐 과세 완벽 정리</p>
+                                <div class="article-meta">
+                                    <span class="meta-author">
+                                        <img src="https://via.placeholder.com/24x24" alt="작성자">
+                                        세무전문가
+                                    </span>
+                                    <span class="meta-time">5일 전</span>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Article Card 6 -->
+                        <article class="article-card" data-category="notice">
+                            <div class="article-image">
+                                <img src="https://via.placeholder.com/350x200/F59E0B/ffffff?text=Maintenance" alt="점검 안내">
+                                <div class="article-badge">예정</div>
+                            </div>
+                            <div class="article-content">
+                                <div class="article-tags">
+                                    <span class="tag">점검</span>
+                                    <span class="tag">시스템</span>
+                                </div>
+                                <h3 class="article-title">정기 시스템 점검 안내</h3>
+                                <p class="article-excerpt">1월 20일 새벽 2시-4시 서비스 일시 중단</p>
+                                <div class="article-meta">
+                                    <span class="meta-official">공식</span>
+                                    <span class="meta-time">오늘</span>
+                                </div>
+                            </div>
+                        </article>
                     </div>
 
                     <!-- Pagination -->
                     <div class="pagination">
                         <button class="page-btn prev" disabled>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2"/>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </button>
                         <button class="page-number active">1</button>
                         <button class="page-number">2</button>
                         <button class="page-number">3</button>
+                        <button class="page-number">4</button>
+                        <button class="page-number">5</button>
+                        <span class="page-dots">...</span>
+                        <button class="page-number">12</button>
                         <button class="page-btn next">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2"/>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- Newsletter CTA -->
+            <!-- Newsletter Section -->
             <section class="newsletter-section">
                 <div class="container">
-                    <div class="newsletter-box">
-                        <div class="newsletter-icon">📮</div>
+                    <div class="newsletter-card">
                         <div class="newsletter-content">
-                            <h3>최신 이벤트와 가이드를 놓치지 마세요!</h3>
-                            <p>매주 화요일, 엄선된 투자 정보와 이벤트 소식을 이메일로 받아보세요.</p>
+                            <h3 class="newsletter-title">
+                                <span class="title-icon">📮</span>
+                                최신 소식을 가장 먼저 받아보세요
+                            </h3>
+                            <p class="newsletter-desc">
+                                매주 화요일, 엄선된 투자 정보와 이벤트 소식을 전해드립니다
+                            </p>
                         </div>
                         <form class="newsletter-form">
-                            <input type="email" placeholder="이메일 주소" class="email-input">
-                            <button type="submit" class="subscribe-btn">구독하기</button>
+                            <input type="email" placeholder="이메일 주소 입력" class="newsletter-input">
+                            <button type="submit" class="newsletter-btn">구독하기</button>
                         </form>
                     </div>
                 </div>
             </section>
-
         </main>
 
         <footer>
@@ -361,7 +417,6 @@
 
     <script type="module" src="theme-toggle.js"></script>
     <script src="/mobile-navigation.js" defer></script>
-    <script src="articles.js"></script>
     <script type="module" src="articles.tsx"></script>
 </body>
 </html>

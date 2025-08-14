@@ -48,6 +48,23 @@ interface PinnedArticle {
     is_active: boolean;
 }
 
+interface Article {
+    id?: string;
+    title: string;
+    category: 'notice' | 'guide' | 'event' | 'airdrop';
+    content_type: 'external' | 'internal';
+    content: string | null;
+    excerpt: string | null;
+    external_url: string | null;
+    image_url: string | null;
+    author: string;
+    is_pinned: boolean;
+    is_published: boolean;
+    view_count: number;
+    created_at?: string;
+    updated_at?: string;
+}
+
 
 interface PopupContent {
     enabled: boolean;
@@ -75,6 +92,7 @@ interface SiteData {
         telegramUrl: string;
     };
     pinnedArticles: PinnedArticle[];
+    articles: Article[];
 }
 
 // 기본 데이터 구조는 유지합니다.
@@ -86,7 +104,8 @@ const defaultSiteData: SiteData = {
     popup: { enabled: false, type: 'text', content: '', imageUrl: '', startDate: '', endDate: '' },
     indexPopup: { enabled: false, type: 'text', content: '', imageUrl: '', startDate: '', endDate: '' },
     support: { telegramUrl: '#' },
-    pinnedArticles: []
+    pinnedArticles: [],
+    articles: []
 };
 
 let siteData: SiteData = JSON.parse(JSON.stringify(defaultSiteData));
@@ -221,6 +240,7 @@ async function fetchDataFromSupabase() {
         const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
         const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
         const { data: pinnedData, error: pinnedError } = await supabase.from('pinned_articles').select('*').order('position');
+        const { data: articlesData, error: articlesError } = await supabase.from('articles').select('*').order('created_at', { ascending: false });
 
         if (cexError) {
             console.error('Exchange data error:', cexError);
@@ -238,11 +258,16 @@ async function fetchDataFromSupabase() {
             console.error('Pinned articles error:', pinnedError);
             // Pinned articles table might not exist yet
         }
+        if (articlesError) {
+            console.error('Articles data error:', articlesError);
+            // Articles table might not exist yet
+        }
         
         // 오류가 발생하더라도 빈 배열로 초기화
         siteData.exchanges = cex || [];
         siteData.faqs = faqsData || [];
         siteData.pinnedArticles = pinnedData || [];
+        siteData.articles = articlesData || [];
 
     singlePages?.forEach(page => {
         if (page.page_type === 'hero' && page.content) {
@@ -491,6 +516,7 @@ function renderAll() {
     renderExchanges();
     renderFaqs();
     renderPinnedArticles();
+    renderArticles();
     updateDashboard();
 }
 
@@ -834,6 +860,227 @@ async function saveAllPinnedArticles() {
     renderPinnedArticles();
 }
 
+// Articles 관리 함수들
+let currentEditingArticle: Article | null = null;
+let quillEditor: any = null;
+
+function renderArticles() {
+    const container = document.getElementById('articles-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    
+    siteData.articles.forEach((article) => {
+        const card = document.createElement('div');
+        card.className = 'article-card';
+        card.dataset.articleId = article.id || '';
+        
+        const categoryColors: Record<string, string> = {
+            notice: '#FF6B6B',
+            guide: '#4ECDC4',
+            event: '#FFD93D',
+            airdrop: '#95E1D3'
+        };
+        
+        const categoryLabels: Record<string, string> = {
+            notice: '공지사항',
+            guide: '가이드',
+            event: '이벤트',
+            airdrop: '에어드랍'
+        };
+        
+        card.innerHTML = `
+            <div class="article-card-header">
+                <span class="article-category" style="background: ${categoryColors[article.category]}">
+                    ${categoryLabels[article.category]}
+                </span>
+                <span class="article-type ${article.content_type}">
+                    ${article.content_type === 'external' ? '🔗 외부링크' : '📝 자체작성'}
+                </span>
+                ${article.is_pinned ? '<span class="article-pinned">📌 고정</span>' : ''}
+                ${article.is_published ? '' : '<span class="article-unpublished">미발행</span>'}
+            </div>
+            <div class="article-card-body">
+                <h3>${article.title || '제목 없음'}</h3>
+                ${article.image_url ? `<img src="${article.image_url}" alt="${article.title}" class="article-thumbnail">` : ''}
+                <p class="article-excerpt">${article.excerpt || ''}</p>
+                <div class="article-meta">
+                    <span>작성자: ${article.author}</span>
+                    <span>조회수: ${article.view_count || 0}</span>
+                    <span>${article.created_at ? new Date(article.created_at).toLocaleDateString('ko-KR') : ''}</span>
+                </div>
+            </div>
+            <div class="article-controls">
+                <button class="edit-article-btn" data-id="${article.id}">편집</button>
+                <button class="delete-article-btn" data-id="${article.id}">삭제</button>
+            </div>
+        `;
+        
+        fragment.appendChild(card);
+    });
+    
+    container.appendChild(fragment);
+    
+    // 이벤트 리스너 설정
+    setupArticleEventListeners();
+}
+
+function setupArticleEventListeners() {
+    // 편집 버튼
+    document.querySelectorAll('.edit-article-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = (e.target as HTMLElement).dataset.id;
+            const article = siteData.articles.find(a => a.id === id);
+            if (article) {
+                openArticleEditor(article);
+            }
+        });
+    });
+    
+    // 삭제 버튼
+    document.querySelectorAll('.delete-article-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const id = (e.target as HTMLElement).dataset.id;
+            if (id && confirm('정말로 이 게시물을 삭제하시겠습니까?')) {
+                await deleteArticle(id);
+            }
+        });
+    });
+}
+
+function openArticleEditor(article?: Article) {
+    currentEditingArticle = article || null;
+    const modal = document.getElementById('article-editor-modal');
+    if (!modal) return;
+    
+    // 폼 필드 채우기
+    (document.getElementById('article-title') as HTMLInputElement).value = article?.title || '';
+    (document.getElementById('article-category') as HTMLSelectElement).value = article?.category || 'notice';
+    (document.getElementById('article-content-type') as HTMLSelectElement).value = article?.content_type || 'internal';
+    (document.getElementById('article-excerpt') as HTMLTextAreaElement).value = article?.excerpt || '';
+    (document.getElementById('article-external-url') as HTMLInputElement).value = article?.external_url || '';
+    (document.getElementById('article-image-url') as HTMLInputElement).value = article?.image_url || '';
+    (document.getElementById('article-author') as HTMLInputElement).value = article?.author || 'CoinPass';
+    (document.getElementById('article-is-pinned') as HTMLInputElement).checked = article?.is_pinned || false;
+    (document.getElementById('article-is-published') as HTMLInputElement).checked = article?.is_published !== false;
+    
+    // content type에 따라 필드 표시/숨김
+    const contentType = article?.content_type || 'internal';
+    const editorContainer = document.getElementById('article-editor-container');
+    const externalUrlGroup = document.getElementById('external-url-group');
+    
+    if (contentType === 'internal') {
+        editorContainer!.style.display = 'block';
+        externalUrlGroup!.style.display = 'none';
+        
+        // Quill 에디터 초기화
+        if (!quillEditor) {
+            quillEditor = new (window as any).Quill('#article-content-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['link', 'image', 'video'],
+                        ['clean']
+                    ]
+                }
+            });
+        }
+        
+        // 콘텐츠 설정
+        if (article?.content) {
+            quillEditor.root.innerHTML = article.content;
+        } else {
+            quillEditor.setText('');
+        }
+    } else {
+        editorContainer!.style.display = 'none';
+        externalUrlGroup!.style.display = 'block';
+    }
+    
+    modal.style.display = 'flex';
+}
+
+function closeArticleEditor() {
+    const modal = document.getElementById('article-editor-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    currentEditingArticle = null;
+}
+
+async function saveArticle() {
+    const articleData: Article = {
+        title: (document.getElementById('article-title') as HTMLInputElement).value,
+        category: (document.getElementById('article-category') as HTMLSelectElement).value as Article['category'],
+        content_type: (document.getElementById('article-content-type') as HTMLSelectElement).value as Article['content_type'],
+        excerpt: (document.getElementById('article-excerpt') as HTMLTextAreaElement).value,
+        external_url: (document.getElementById('article-external-url') as HTMLInputElement).value || null,
+        image_url: (document.getElementById('article-image-url') as HTMLInputElement).value || null,
+        author: (document.getElementById('article-author') as HTMLInputElement).value || 'CoinPass',
+        is_pinned: (document.getElementById('article-is-pinned') as HTMLInputElement).checked,
+        is_published: (document.getElementById('article-is-published') as HTMLInputElement).checked,
+        view_count: currentEditingArticle?.view_count || 0,
+        content: null
+    };
+    
+    // 내부 콘텐츠인 경우 에디터 내용 저장
+    if (articleData.content_type === 'internal' && quillEditor) {
+        articleData.content = quillEditor.root.innerHTML;
+    }
+    
+    try {
+        let result;
+        if (currentEditingArticle?.id) {
+            // 업데이트
+            result = await supabase
+                .from('articles')
+                .update(articleData)
+                .eq('id', currentEditingArticle.id);
+        } else {
+            // 새로 추가
+            result = await supabase
+                .from('articles')
+                .insert(articleData);
+        }
+        
+        if (result.error) {
+            throw result.error;
+        }
+        
+        showToast('게시물이 저장되었습니다.');
+        closeArticleEditor();
+        await fetchDataFromSupabase();
+        renderArticles();
+    } catch (error) {
+        console.error('Error saving article:', error);
+        showToast('게시물 저장 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+async function deleteArticle(id: string) {
+    try {
+        const { error } = await supabase
+            .from('articles')
+            .delete()
+            .eq('id', id);
+            
+        if (error) throw error;
+        
+        showToast('게시물이 삭제되었습니다.');
+        await fetchDataFromSupabase();
+        renderArticles();
+    } catch (error) {
+        console.error('Error deleting article:', error);
+        showToast('게시물 삭제 중 오류가 발생했습니다.', 'error');
+    }
+}
+
 
 
 function setupEventListeners() {
@@ -849,6 +1096,33 @@ function setupEventListeners() {
                 }
             }
         });
+    });
+    
+    // Articles 섹션 이벤트 리스너
+    document.getElementById('add-article-button')?.addEventListener('click', () => {
+        openArticleEditor();
+    });
+    
+    document.getElementById('save-article-button')?.addEventListener('click', async () => {
+        await saveArticle();
+    });
+    
+    document.getElementById('cancel-article-button')?.addEventListener('click', () => {
+        closeArticleEditor();
+    });
+    
+    document.getElementById('article-content-type')?.addEventListener('change', (e) => {
+        const contentType = (e.target as HTMLSelectElement).value;
+        const editorContainer = document.getElementById('article-editor-container');
+        const externalUrlGroup = document.getElementById('external-url-group');
+        
+        if (contentType === 'internal') {
+            editorContainer!.style.display = 'block';
+            externalUrlGroup!.style.display = 'none';
+        } else {
+            editorContainer!.style.display = 'none';
+            externalUrlGroup!.style.display = 'block';
+        }
     });
     
     // Pinned articles event listeners

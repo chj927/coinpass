@@ -190,56 +190,102 @@ header {
     color: var(--text-muted);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    position: relative;
+}
+
+#main-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 2px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
 #main-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#main-nav a:hover::after {
+    transform: scaleX(1);
+}
+
+#main-nav a:hover .nav-title {
     color: var(--accent-color);
 }
 
 .nav-title {
     font-size: 0.95rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-/* Theme Switcher */
+/* Theme Switcher - Exchange Style */
 .theme-switcher {
     display: flex;
     align-items: center;
+    margin-right: 1rem;
 }
 
 #theme-toggle {
-    background: var(--card-bg);
+    background: none;
     border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    color: var(--primary-text-color);
+    position: relative;
+    width: 40px;
+    height: 40px;
 }
 
 #theme-toggle:hover {
-    background: var(--accent-color);
-    transform: scale(1.1);
+    border-color: var(--accent-color);
+    background-color: rgba(0, 242, 195, 0.1);
+}
+
+[data-theme="light"] #theme-toggle:hover {
+    background-color: rgba(45, 45, 45, 0.1);
 }
 
 .theme-icon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     width: 20px;
     height: 20px;
-    color: var(--text-color);
 }
 
-[data-theme="light"] .sun-icon {
-    display: none;
+.theme-icon.sun-icon {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
 }
 
-[data-theme="dark"] .moon-icon {
-    display: none;
+.theme-icon.moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-icon.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-icon.moon-icon {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
 }
 
 /* Hero Section */
