@@ -81,7 +81,7 @@ async function loadRemoteContent() {
         faqs: faqsData || [],
     };
     
-    singlePages?.forEach(page => {
+    singlePages?.forEach((page: any) => {
         if(page.page_type && page.content) {
             (siteData as any)[page.page_type] = page.content;
         }

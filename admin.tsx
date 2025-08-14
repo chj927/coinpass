@@ -269,7 +269,7 @@ async function fetchDataFromSupabase() {
         siteData.pinnedArticles = pinnedData || [];
         siteData.articles = articlesData || [];
 
-    singlePages?.forEach(page => {
+    singlePages?.forEach((page: any) => {
         if (page.page_type === 'hero' && page.content) {
             siteData.hero = page.content;
         } else if (page.page_type === 'aboutUs' && page.content) {
@@ -1421,7 +1421,7 @@ async function loadBannerData() {
             
         if (error) throw error;
         
-        banners?.forEach(banner => {
+        banners?.forEach((banner: any) => {
             const enabledCheckbox = document.getElementById(`${banner.page}-banner-enabled`) as HTMLInputElement;
             const imageInput = document.getElementById(`${banner.page}-banner-image`) as HTMLInputElement;
             const contentTextarea = document.getElementById(`${banner.page}-banner-content`) as HTMLTextAreaElement;
