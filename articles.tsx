@@ -149,11 +149,11 @@ class ModernArticlesManager {
     }
 
     private async init() {
-        // 실제로는 Supabase에서 데이터를 가져옴
-        // await this.loadArticles();
+        // 실제 Supabase 데이터 로드
+        await this.loadArticles();
         
-        // 현재는 목업 데이터 사용
-        this.articles = mockArticles;
+        // Mock 데이터는 더 이상 사용하지 않음
+        // this.articles = mockArticles;
         
         this.setupEventListeners();
         this.renderFeaturedContent();
