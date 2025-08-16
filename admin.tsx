@@ -989,38 +989,39 @@ function openArticleEditor(article?: Article) {
             editorContainer.style.display = 'block';
             externalUrlGroup.style.display = 'none';
         
-        // Quill 에디터 초기화
-        if (!quillEditor && (window as any).Quill) {
-            try {
-                quillEditor = new (window as any).Quill('#article-content-editor', {
-                    theme: 'snow',
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        ['blockquote', 'code-block'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'color': [] }, { 'background': [] }],
-                        ['link', 'image', 'video'],
-                        ['clean']
-                    ]
+            // Quill 에디터 초기화
+            if (!quillEditor && (window as any).Quill) {
+                try {
+                    quillEditor = new (window as any).Quill('#article-content-editor', {
+                        theme: 'snow',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            ['blockquote', 'code-block'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'color': [] }, { 'background': [] }],
+                            ['link', 'image', 'video'],
+                            ['clean']
+                        ]
+                    }
+                });
+                } catch (error) {
+                    console.error('Failed to initialize Quill editor:', error);
+                    showToast('에디터 초기화 실패', 'error');
                 }
-            });
-            } catch (error) {
-                console.error('Failed to initialize Quill editor:', error);
-                showToast('에디터 초기화 실패', 'error');
             }
-        }
-        
-        // 콘텐츠 설정
-        if (article?.content) {
-            quillEditor.root.innerHTML = article.content;
+            
+            // 콘텐츠 설정
+            if (article?.content) {
+                quillEditor.root.innerHTML = article.content;
+            } else {
+                quillEditor.setText('');
+            }
         } else {
-            quillEditor.setText('');
+            if (editorContainer) editorContainer.style.display = 'none';
+            if (externalUrlGroup) externalUrlGroup.style.display = 'block';
         }
-    } else {
-        if (editorContainer) editorContainer.style.display = 'none';
-        if (externalUrlGroup) externalUrlGroup.style.display = 'block';
     }
     
     modal.style.display = 'flex';
