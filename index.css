@@ -322,7 +322,7 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 /* Hero Badge */
@@ -377,7 +377,7 @@ header {
 .hero-banner h1 {
     font-size: clamp(2rem, 5vw, 4rem);
     font-weight: 700;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     line-height: 1.2;
     min-height: 1.4em;
     color: var(--text-color);
@@ -403,7 +403,8 @@ header {
 .hero-banner p {
     font-size: clamp(1rem, 2vw, 1.3rem);
     color: var(--text-muted);
-    margin-bottom: 2rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
     line-height: 1.7;
 }
 
@@ -1310,18 +1311,20 @@ footer {
     transform: translateX(5px);
 }
 
-/* Mobile Navigation */
+/* Mobile Navigation - Hamburger Menu */
 .hamburger-button {
     display: none;
-    background: transparent;
+    padding: 10px;
+    background-color: transparent;
     border: none;
     cursor: pointer;
-    padding: 0.5rem;
+    z-index: 101;
 }
 
 .hamburger-box {
     width: 30px;
     height: 24px;
+    display: inline-block;
     position: relative;
 }
 
@@ -1330,10 +1333,10 @@ footer {
 .hamburger-inner::after {
     width: 30px;
     height: 3px;
-    background: var(--text-color);
-    border-radius: 3px;
+    background-color: var(--text-color);
+    border-radius: 4px;
     position: absolute;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease-in-out;
 }
 
 .hamburger-inner {
@@ -1341,28 +1344,31 @@ footer {
     transform: translateY(-50%);
 }
 
-.hamburger-inner::before {
+.hamburger-inner::before,
+.hamburger-inner::after {
     content: '';
+    display: block;
+}
+
+.hamburger-inner::before {
     top: -10px;
 }
 
 .hamburger-inner::after {
-    content: '';
-    top: 10px;
+    bottom: -10px;
 }
 
 .hamburger-button.is-active .hamburger-inner {
-    background: transparent;
-}
-
-.hamburger-button.is-active .hamburger-inner::before {
-    top: 0;
     transform: rotate(45deg);
 }
 
+.hamburger-button.is-active .hamburger-inner::before {
+    transform: rotate(90deg) translate(-10px, 0);
+    opacity: 0;
+}
+
 .hamburger-button.is-active .hamburger-inner::after {
-    top: 0;
-    transform: rotate(-45deg);
+    transform: rotate(-90deg) translate(10px, 0);
 }
 
 /* Responsive Design */
