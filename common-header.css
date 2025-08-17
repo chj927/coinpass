@@ -1,0 +1,318 @@
+/* Common Header Styles for All Pages */
+
+/* Header Base Styles */
+header {
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] header {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo Styles */
+.logo-link {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-color);
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Navigation Container */
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Main Navigation */
+#main-nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+#main-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    position: relative;
+}
+
+#main-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    right: 1rem;
+    height: 2px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+#main-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+#main-nav a:hover::after {
+    transform: scaleX(1);
+}
+
+#main-nav a:hover .nav-title {
+    color: var(--accent-color);
+}
+
+/* Active Page Indicator */
+#main-nav a.active::after {
+    transform: scaleX(1);
+}
+
+#main-nav a.active .nav-title {
+    color: var(--accent-color);
+}
+
+.nav-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+/* Theme Switcher */
+.theme-switcher {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+#theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-text-color);
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+#theme-toggle:hover {
+    border-color: var(--accent-color);
+    background-color: rgba(0, 242, 195, 0.1);
+}
+
+[data-theme="light"] #theme-toggle:hover {
+    background-color: rgba(45, 45, 45, 0.1);
+}
+
+.theme-icon {
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    width: 20px;
+    height: 20px;
+}
+
+.theme-icon.sun-icon {
+    opacity: 0;
+    transform: rotate(180deg) scale(0.5);
+}
+
+.theme-icon.moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-icon.sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .theme-icon.moon-icon {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+}
+
+/* Hamburger Menu Button */
+.hamburger-button {
+    display: none;
+    padding: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 101;
+}
+
+.hamburger-box {
+    width: 30px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+}
+
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+    width: 30px;
+    height: 3px;
+    background-color: var(--text-color);
+    border-radius: 4px;
+    position: absolute;
+    transition: transform 0.2s ease-in-out;
+}
+
+.hamburger-inner {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.hamburger-inner::before,
+.hamburger-inner::after {
+    content: '';
+    display: block;
+}
+
+.hamburger-inner::before {
+    top: -10px;
+}
+
+.hamburger-inner::after {
+    bottom: -10px;
+}
+
+.hamburger-button.is-active .hamburger-inner {
+    transform: rotate(45deg);
+}
+
+.hamburger-button.is-active .hamburger-inner::before {
+    transform: rotate(90deg) translate(-10px, 0);
+    opacity: 0;
+}
+
+.hamburger-button.is-active .hamburger-inner::after {
+    transform: rotate(-90deg) translate(10px, 0);
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .header-container {
+        padding: 1rem;
+    }
+    
+    .nav-container {
+        gap: 1rem;
+    }
+    
+    .hamburger-button {
+        display: block;
+    }
+    
+    #main-nav {
+        display: none;
+        position: fixed;
+        top: 60px;
+        right: 0;
+        background: var(--card-bg);
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        min-width: 200px;
+        z-index: 100;
+    }
+    
+    #main-nav.active {
+        display: block;
+    }
+    
+    #main-nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    #main-nav a {
+        padding: 1rem;
+        justify-content: flex-start;
+    }
+    
+    #main-nav a::after {
+        display: none;
+    }
+    
+    #main-nav a:hover {
+        background-color: rgba(0, 212, 170, 0.1);
+    }
+    
+    .theme-switcher {
+        margin-right: 0.5rem;
+    }
+    
+    .logo-text {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0.75rem;
+    }
+    
+    .logo-img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .logo-text {
+        font-size: 1.1rem;
+    }
+    
+    #theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+}

@@ -165,7 +165,7 @@ header {
 
 .logo-text {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 900;
     color: var(--text-color);
     background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color) 100%);
     background-clip: text;

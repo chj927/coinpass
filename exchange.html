@@ -25,6 +25,7 @@
     <link rel="canonical" href="https://coinpass.com">
     <!-- <link rel="icon" href="/favicon.ico" type="image/x-icon"> -->
 
+    <link rel="stylesheet" href="common-header.css">
     <link rel="stylesheet" href="exchange.css">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -45,7 +46,7 @@
             <div class="header-container">
                 <a href="/" class="logo-link">
                     <div class="logo">
-                        <img src="assets/logo.png" alt="CoinPass Logo" class="logo-img">
+                        <img src="assets/logo.png" alt="CoinPass Logo" class="logo-img" width="40" height="40" loading="eager" decoding="async">
                         <span class="logo-text">CoinPass</span>
                     </div>
                 </a>
@@ -68,7 +69,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="exchange">
+                                <a href="exchange" class="active">
                                     <span class="nav-title">거래소 혜택</span>
                                 </a>
                             </li>
@@ -177,7 +178,7 @@
     </div>
 
     <script type="module" src="theme-toggle.js"></script>
-    <script src="/mobile-navigation.js" defer></script>
+    <script src="hamburger-menu.js" defer></script>
     <script type="module" src="exchange.tsx"></script>
 </body>
 </html>
