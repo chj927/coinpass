@@ -199,11 +199,11 @@ class ModernArticlesManager {
             });
         });
 
-        // NEW: Search Box Expansion
+        // Minimal Search Setup
         const searchToggle = document.getElementById('searchToggle') as HTMLButtonElement;
         const searchBox = document.getElementById('searchBox') as HTMLDivElement;
-        const searchInput = document.getElementById('content-search') as HTMLInputElement;
-        const searchClear = document.getElementById('search-clear') as HTMLButtonElement;
+        const searchInput = document.getElementById('articleSearch') as HTMLInputElement;
+        const searchClear = document.getElementById('searchClear') as HTMLButtonElement;
         
         if (searchToggle && searchBox) {
             searchToggle.addEventListener('click', () => {
@@ -261,6 +261,12 @@ class ModernArticlesManager {
                     searchClear.style.display = 'none';
                     this.currentPage = 1;
                     this.renderContentGrid();
+                }
+                // 검색 박스 닫기
+                if (searchBox) {
+                    setTimeout(() => {
+                        searchBox.classList.remove('expanded');
+                    }, 300);
                 }
             });
         }
@@ -414,25 +420,96 @@ class ModernArticlesManager {
 
     private renderFeaturedContent() {
         // 피처드 콘텐츠는 is_pinned가 true인 항목들
-        const featuredArticles = this.articles.filter(a => a.is_pinned).slice(0, 3);
+        const featuredArticles = this.articles.filter(a => a.is_pinned && a.is_published).slice(0, 3);
         
-        if (featuredArticles.length === 0) return;
-
-        // 메인 피처드 카드
-        const mainArticle = featuredArticles[0];
-        const mainCard = document.querySelector('.featured-main');
-        if (mainCard && mainArticle) {
-            this.updateFeaturedMainCard(mainCard, mainArticle);
+        if (featuredArticles.length === 0) {
+            // 고정된 글이 없으면 최신 글 3개를 표시
+            const latestArticles = this.articles.filter(a => a.is_published).slice(0, 3);
+            this.updateCarouselSlides(latestArticles);
+        } else {
+            this.updateCarouselSlides(featuredArticles);
         }
-
-        // 사이드 피처드 카드들
-        const sideArticles = featuredArticles.slice(1, 3);
-        const sideCards = document.querySelectorAll('.featured-small');
-        sideArticles.forEach((article, index) => {
-            if (sideCards[index]) {
-                this.updateFeaturedSideCard(sideCards[index], article);
-            }
-        });
+    }
+    
+    private updateCarouselSlides(articles: Article[]) {
+        const carouselTrack = document.getElementById('carouselTrack');
+        if (!carouselTrack || articles.length === 0) return;
+        
+        // 캐러셀 슬라이드 HTML 생성
+        carouselTrack.innerHTML = articles.map((article, index) => `
+            <article class="carousel-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
+                <div class="slide-content">
+                    <div class="slide-image">
+                        <img src="${article.image_url || 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=600&fit=crop'}" 
+                             alt="${article.title}"
+                             loading="lazy">
+                        <div class="slide-overlay">
+                            <div class="slide-badge">${this.getCategoryBadge(article.category)}</div>
+                            <div class="slide-category">${this.getCategoryLabel(article.category)}</div>
+                        </div>
+                    </div>
+                    <div class="slide-info">
+                        <div class="slide-meta">
+                            <span class="meta-author">${article.author}</span>
+                            <span class="meta-divider">•</span>
+                            <span class="meta-date">${this.formatDate(article.created_at)}</span>
+                            <span class="meta-divider">•</span>
+                            <span class="meta-views">👁 ${this.formatNumber(article.view_count)}</span>
+                        </div>
+                        <h3 class="slide-title">${article.title}</h3>
+                        <p class="slide-excerpt">${article.excerpt || ''}</p>
+                        <a href="${article.content_type === 'external' ? article.external_url : `/article/${article.id}`}" 
+                           target="${article.content_type === 'external' ? '_blank' : '_self'}" 
+                           class="slide-cta">
+                            자세히 보기
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+        `).join('');
+        
+        // 인디케이터 업데이트
+        const indicatorsContainer = document.querySelector('.carousel-indicators');
+        if (indicatorsContainer) {
+            indicatorsContainer.innerHTML = articles.map((_, index) => `
+                <button class="indicator ${index === 0 ? 'active' : ''}" 
+                        data-slide="${index}" 
+                        aria-label="슬라이드 ${index + 1}"></button>
+            `).join('');
+        }
+        
+        // 캐러셀 기능 재초기화 (이벤트 리스너 재설정)
+        this.reinitializeCarousel();
+    }
+    
+    private reinitializeCarousel() {
+        // 기존 setupCarousel 함수 호출
+        if (typeof setupCarousel === 'function') {
+            setupCarousel();
+        }
+    }
+    
+    private getCategoryBadge(category: string): string {
+        const badges: { [key: string]: string } = {
+            'event': 'HOT 🔥',
+            'airdrop': 'NEW 🪂',
+            'guide': 'GUIDE 📖',
+            'notice': 'NOTICE 📢'
+        };
+        return badges[category] || 'NEW ✨';
+    }
+    
+    private getCategoryLabel(category: string): string {
+        const labels: { [key: string]: string } = {
+            'event': '이벤트',
+            'airdrop': '에어드랍',
+            'guide': '가이드',
+            'notice': '공지사항'
+        };
+        return labels[category] || category;
     }
 
     private updateFeaturedMainCard(card: Element, article: Article) {
@@ -871,10 +948,77 @@ function setupHamburgerMenu() {
     });
 }
 
+// 캐러셀 기능 추가
+function setupCarousel(): void {
+    const track = document.getElementById('carouselTrack');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    
+    // 슬라이드 변경 함수
+    function goToSlide(slideIndex: number): void {
+        // 이전 슬라이드 비활성화
+        slides[currentSlide].classList.remove('active');
+        indicators[currentSlide].classList.remove('active');
+        
+        // 새 슬라이드 활성화
+        currentSlide = slideIndex;
+        slides[currentSlide].classList.add('active');
+        indicators[currentSlide].classList.add('active');
+    }
+    
+    // 다음 슬라이드
+    function nextSlide(): void {
+        const nextIndex = (currentSlide + 1) % totalSlides;
+        goToSlide(nextIndex);
+    }
+    
+    // 이전 슬라이드
+    function prevSlide(): void {
+        const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
+        goToSlide(prevIndex);
+    }
+    
+    // 버튼 이벤트 리스너
+    prevBtn?.addEventListener('click', prevSlide);
+    nextBtn?.addEventListener('click', nextSlide);
+    
+    // 인디케이터 이벤트 리스너
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            goToSlide(index);
+        });
+    });
+    
+    // 자동 슬라이드 (5초마다)
+    let autoSlideInterval = setInterval(nextSlide, 5000);
+    
+    // 마우스 호버 시 자동 슬라이드 중지
+    const carousel = document.querySelector('.featured-carousel');
+    carousel?.addEventListener('mouseenter', () => {
+        clearInterval(autoSlideInterval);
+    });
+    
+    carousel?.addEventListener('mouseleave', () => {
+        autoSlideInterval = setInterval(nextSlide, 5000);
+    });
+    
+    // 키보드 네비게이션
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') prevSlide();
+        if (e.key === 'ArrowRight') nextSlide();
+    });
+}
+
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
     new ModernArticlesManager();
     setupHamburgerMenu();
+    setupCarousel(); // 캐러셀 초기화 추가
 
     // 스타일 애니메이션 추가
     const style = document.createElement('style');

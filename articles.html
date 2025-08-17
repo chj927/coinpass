@@ -73,109 +73,16 @@
                 </div>
                 <div class="hero-content">
                     <h1 class="hero-title">
-                        <span class="title-line">암호화폐 투자의</span>
-                        <span class="title-line gradient-text">모든 정보가 한 곳에</span>
+                        <span class="title-line">암호화폐 투자</span>
+                        <span class="title-line gradient-text">이벤트 & 가이드</span>
                     </h1>
                     <p class="hero-description">
-                        거래소 이벤트부터 투자 가이드까지, 암호화폐 투자 정보를 쉽고 편리하게
+                        최신 거래소 이벤트, 에어드랍, 가입 가이드를 한눈에 확인하세요
                     </p>
                 </div>
             </section>
 
-            <!-- NEW Category Navigation -->
-            <section class="category-nav" id="categoryNav">
-                <div class="category-nav-container">
-                    <!-- Main Navigation Bar -->
-                    <div class="nav-main-bar">
-                        <!-- Category Pills -->
-                        <div class="category-scroll-container">
-                            <div class="category-pills" id="categoryPills">
-                                <button class="category-pill active" data-category="all">
-                                    <span class="pill-emoji">✨</span>
-                                    <span>전체</span>
-                                    <span class="pill-count">24</span>
-                                </button>
-                                <button class="category-pill" data-category="event">
-                                    <span class="pill-emoji">🎉</span>
-                                    <span>이벤트</span>
-                                    <span class="pill-count">8</span>
-                                </button>
-                                <button class="category-pill" data-category="guide">
-                                    <span class="pill-emoji">📖</span>
-                                    <span>가입 가이드</span>
-                                    <span class="pill-count">6</span>
-                                </button>
-                                <button class="category-pill" data-category="airdrop">
-                                    <span class="pill-emoji">🪂</span>
-                                    <span>에어드랍</span>
-                                    <span class="pill-count">5</span>
-                                </button>
-                                <button class="category-pill" data-category="notice">
-                                    <span class="pill-emoji">📢</span>
-                                    <span>공지사항</span>
-                                    <span class="pill-count">5</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="nav-actions">
-                            <!-- Search -->
-                            <div class="search-container">
-                                <button class="search-toggle" id="searchToggle" aria-label="검색">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                        <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" 
-                                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                </button>
-                                <div class="search-box" id="searchBox">
-                                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                        <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" 
-                                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                    <input type="text" class="search-input" placeholder="콘텐츠 검색..." id="content-search">
-                                    <button class="search-clear" id="search-clear" aria-label="검색 지우기">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Tags Filter -->
-                            <button class="tags-filter-btn" id="tagsFilterBtn">
-                                <span>🏷️ 태그 필터</span>
-                                <span class="filter-badge">8</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tags Panel (Hidden by default) -->
-                    <div class="tags-panel" id="tagsPanel">
-                        <div class="tags-grid">
-                            <button class="tag-chip" data-tag="신규가입">🎁 신규가입</button>
-                            <button class="tag-chip" data-tag="수수료할인">💰 수수료할인</button>
-                            <button class="tag-chip" data-tag="KYC인증">✅ KYC인증</button>
-                            <button class="tag-chip" data-tag="USDT">💵 USDT</button>
-                            <button class="tag-chip" data-tag="스테이킹">🔒 스테이킹</button>
-                            <button class="tag-chip" data-tag="NFT">🎨 NFT</button>
-                            <button class="tag-chip" data-tag="DeFi">🌐 DeFi</button>
-                            <button class="tag-chip" data-tag="Layer2">⚡ Layer2</button>
-                        </div>
-                    </div>
-
-                    <!-- Active Filters Summary -->
-                    <div class="active-filters" id="activeFilters">
-                        <div class="filters-list">
-                            <span style="color: var(--text-muted); font-size: 13px;">활성 필터:</span>
-                            <!-- Filter tags will be inserted here -->
-                        </div>
-                        <button class="clear-filters" id="clearFilters">모두 지우기</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Featured Content Section -->
+            <!-- Featured Content Section - Carousel -->
             <section class="featured-content">
                 <div class="container">
                     <div class="section-header">
@@ -186,74 +93,190 @@
                         <p class="section-subtitle">놓치면 후회할 이번 주 필독 콘텐츠</p>
                     </div>
 
-                    <div class="featured-grid">
-                        <!-- Featured Main Card -->
-                        <article class="featured-main">
-                            <div class="featured-image">
-                                <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=450&fit=crop" alt="바이낸스 메가 이벤트">
-                                <div class="featured-badge">HOT</div>
-                                <div class="featured-category">이벤트</div>
-                            </div>
-                            <div class="featured-content">
-                                <div class="content-meta">
-                                    <span class="meta-author">
-                                        <img src="https://via.placeholder.com/24x24" alt="작성자">
-                                        코인패스 에디터
-                                    </span>
-                                    <span class="meta-date">2시간 전</span>
-                                </div>
-                                <h3 class="featured-title">바이낸스 신규가입 100 USDT 즉시 지급 이벤트</h3>
-                                <p class="featured-excerpt">
-                                    바이낸스에서 역대급 신규가입 이벤트를 진행합니다. KYC 인증 완료 시 100 USDT를 즉시 지급하며, 
-                                    첫 거래 시 추가 50 USDT 보너스까지! 이번 기회를 놓치지 마세요.
-                                </p>
-                                <div class="featured-footer">
-                                    <div class="engagement">
-                                        <span>👁 2,341</span>
-                                        <span>💬 89</span>
-                                        <span>🔥 인기</span>
+                    <!-- Carousel Container -->
+                    <div class="featured-carousel">
+                        <div class="carousel-wrapper">
+                            <div class="carousel-track" id="carouselTrack">
+                                <!-- Slide 1 -->
+                                <article class="carousel-slide active" data-slide="0">
+                                    <div class="slide-content">
+                                        <div class="slide-image">
+                                            <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=600&fit=crop" alt="바이낸스 메가 이벤트">
+                                            <div class="slide-overlay">
+                                                <div class="slide-badge">HOT 🔥</div>
+                                                <div class="slide-category">이벤트</div>
+                                            </div>
+                                        </div>
+                                        <div class="slide-info">
+                                            <div class="slide-meta">
+                                                <span class="meta-author">코인패스 에디터</span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-date">2시간 전</span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-views">👁 2,341</span>
+                                            </div>
+                                            <h3 class="slide-title">바이낸스 신규가입 100 USDT 즉시 지급 이벤트</h3>
+                                            <p class="slide-excerpt">
+                                                바이낸스에서 역대급 신규가입 이벤트를 진행합니다. KYC 인증 완료 시 100 USDT를 즉시 지급하며, 
+                                                첫 거래 시 추가 50 USDT 보너스까지! 이번 기회를 놓치지 마세요.
+                                            </p>
+                                            <a href="https://blog.naver.com/example1" target="_blank" class="slide-cta">
+                                                자세히 보기
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <a href="https://blog.naver.com/example1" target="_blank" class="read-more">
-                                        자세히 보기
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
+                                </article>
 
-                        <!-- Featured Side Cards -->
-                        <div class="featured-side">
-                            <article class="featured-small">
-                                <div class="small-image">
-                                    <img src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=400&h=250&fit=crop" alt="에어드랍">
-                                    <span class="small-category">에어드랍</span>
-                                </div>
-                                <div class="small-content">
-                                    <h4>LayerZero 에어드랍 확정, 스냅샷 임박</h4>
-                                    <div class="small-meta">
-                                        <span>5시간 전</span>
-                                        <span>👁 1,892</span>
+                                <!-- Slide 2 -->
+                                <article class="carousel-slide" data-slide="1">
+                                    <div class="slide-content">
+                                        <div class="slide-image">
+                                            <img src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=1200&h=600&fit=crop" alt="LayerZero 에어드랍">
+                                            <div class="slide-overlay">
+                                                <div class="slide-badge">NEW 🪂</div>
+                                                <div class="slide-category">에어드랍</div>
+                                            </div>
+                                        </div>
+                                        <div class="slide-info">
+                                            <div class="slide-meta">
+                                                <span class="meta-author">코인패스 에디터</span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-date">5시간 전</span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-views">👁 1,892</span>
+                                            </div>
+                                            <h3 class="slide-title">LayerZero 에어드랍 확정, 스냅샷 임박</h3>
+                                            <p class="slide-excerpt">
+                                                LayerZero 프로토콜이 드디어 토큰 출시를 확정했습니다. 
+                                                스냅샷이 임박한 만큼 지금이라도 자격 조건을 충족시키세요. 예상 에어드랍 규모는 사용자당 $500~$5000!
+                                            </p>
+                                            <a href="https://blog.naver.com/example2" target="_blank" class="slide-cta">
+                                                자세히 보기
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                                <a href="https://blog.naver.com/example2" target="_blank" class="small-link" aria-label="자세히 보기"></a>
-                            </article>
+                                </article>
 
-                            <article class="featured-small">
-                                <div class="small-image">
-                                    <img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop" alt="가이드">
-                                    <span class="small-category">가이드</span>
-                                </div>
-                                <div class="small-content">
-                                    <h4>OKX 가입부터 인증까지 5분 완성 가이드</h4>
-                                    <div class="small-meta">
-                                        <span>1일 전</span>
-                                        <span>👁 956</span>
+                                <!-- Slide 3 -->
+                                <article class="carousel-slide" data-slide="2">
+                                    <div class="slide-content">
+                                        <div class="slide-image">
+                                            <img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=1200&h=600&fit=crop" alt="OKX 가이드">
+                                            <div class="slide-overlay">
+                                                <div class="slide-badge">GUIDE 📖</div>
+                                                <div class="slide-category">가이드</div>
+                                            </div>
+                                        </div>
+                                        <div class="slide-info">
+                                            <div class="slide-meta">
+                                                <span class="meta-author">코인패스 에디터</span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-date">1일 전</span>
+                                                <span class="meta-divider">•</span>
+                                                <span class="meta-views">👁 956</span>
+                                            </div>
+                                            <h3 class="slide-title">OKX 가입부터 인증까지 5분 완성 가이드</h3>
+                                            <p class="slide-excerpt">
+                                                OKX 거래소 가입이 어려우신가요? 사진과 함께 단계별로 설명해드립니다. 
+                                                KYC 인증 팁과 보안 설정까지 한 번에 끝내세요.
+                                            </p>
+                                            <a href="https://blog.naver.com/example3" target="_blank" class="slide-cta">
+                                                자세히 보기
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2"/>
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                                <a href="https://blog.naver.com/example3" target="_blank" class="small-link" aria-label="자세히 보기"></a>
-                            </article>
+                                </article>
+                            </div>
+                        </div>
+
+                        <!-- Carousel Controls -->
+                        <button class="carousel-btn carousel-prev" id="carouselPrev" aria-label="이전">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="carousel-btn carousel-next" id="carouselNext" aria-label="다음">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <!-- Carousel Indicators -->
+                        <div class="carousel-indicators">
+                            <button class="indicator active" data-slide="0" aria-label="슬라이드 1"></button>
+                            <button class="indicator" data-slide="1" aria-label="슬라이드 2"></button>
+                            <button class="indicator" data-slide="2" aria-label="슬라이드 3"></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Category Navigation with Search -->
+            <section class="category-nav" id="categoryNav">
+                <div class="category-nav-container">
+                    <!-- Category Pills with Search -->
+                    <div class="nav-main-bar">
+                        <!-- Category Pills -->
+                        <div class="category-scroll-container">
+                            <div class="category-pills" id="categoryPills">
+                                <button class="category-pill active" data-category="all">
+                                    <span class="pill-emoji">✨</span>
+                                    <span>전체</span>
+                                    <span class="pill-count">12</span>
+                                </button>
+                                <button class="category-pill" data-category="event">
+                                    <span class="pill-emoji">🎉</span>
+                                    <span>이벤트</span>
+                                    <span class="pill-count">4</span>
+                                </button>
+                                <button class="category-pill" data-category="guide">
+                                    <span class="pill-emoji">📖</span>
+                                    <span>가입 가이드</span>
+                                    <span class="pill-count">3</span>
+                                </button>
+                                <button class="category-pill" data-category="airdrop">
+                                    <span class="pill-emoji">🪂</span>
+                                    <span>에어드랍</span>
+                                    <span class="pill-count">3</span>
+                                </button>
+                                <button class="category-pill" data-category="notice">
+                                    <span class="pill-emoji">📢</span>
+                                    <span>공지사항</span>
+                                    <span class="pill-count">2</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Minimal Search Button -->
+                        <div class="search-container">
+                            <button class="search-toggle" id="searchToggle" aria-label="검색">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="m21 21-4.35-4.35"/>
+                                </svg>
+                            </button>
+                            <div class="search-box" id="searchBox">
+                                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <path d="m21 21-4.35-4.35"/>
+                                </svg>
+                                <input type="text" class="search-input" id="articleSearch" placeholder="검색어를 입력하세요...">
+                                <button class="search-clear" id="searchClear" aria-label="검색 지우기">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                        <line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -422,32 +445,13 @@
                 </div>
             </section>
 
-            <!-- Newsletter CTA -->
-            <section class="newsletter-cta">
-                <div class="container">
-                    <div class="newsletter-box">
-                        <div class="newsletter-content">
-                            <h3 class="newsletter-title">
-                                <span class="emoji">📬</span>
-                                매주 최신 콘텐츠를 이메일로 받아보세요
-                            </h3>
-                            <p class="newsletter-desc">
-                                놓치기 아까운 이벤트와 에어드랍 정보를 매주 화요일 아침에 보내드립니다
-                            </p>
-                        </div>
-                        <form class="newsletter-form">
-                            <input type="email" placeholder="이메일 주소" class="email-input">
-                            <button type="submit" class="subscribe-btn">구독하기</button>
-                        </form>
-                    </div>
-                </div>
-            </section>
+            <!-- Newsletter section removed for consistency with other pages -->
         </main>
 
         <footer>
             <div class="footer-content">
                 <p>&copy; 2025 CoinPass. All rights reserved.</p>
-                <p class="disclaimer">본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다.</p>
+                <p class="disclaimer">본 서비스는 정보 제공을 목적으로 하며, 투자를 권유하거나 보장하지 않습니다. 모든 투자의 최종 결정과 책임은 투자자 본인에게 있습니다.</p>
             </div>
         </footer>
     </div>
