@@ -221,6 +221,27 @@ async function initializeApp() {
     renderAll();
     setupEventListeners();
     setupNavigation();
+    
+    // Quill 라이브러리 로드 대기 후 초기화 시도
+    if (!(window as any).Quill) {
+        console.log('Waiting for Quill library to load...');
+        // Quill이 로드될 때까지 대기 (최대 5초)
+        let attempts = 0;
+        const checkQuill = setInterval(() => {
+            attempts++;
+            if ((window as any).Quill) {
+                console.log('Quill library loaded, attempting initialization');
+                clearInterval(checkQuill);
+                initializeQuillEditor();
+            } else if (attempts > 50) { // 5초 후 포기
+                console.warn('Quill library failed to load after 5 seconds');
+                clearInterval(checkQuill);
+            }
+        }, 100);
+    } else {
+        // Quill이 이미 로드되어 있으면 바로 초기화
+        initializeQuillEditor();
+    }
 }
 
 // --- Supabase 데이터 통신 함수들 ---
@@ -864,6 +885,47 @@ async function saveAllPinnedArticles() {
 let currentEditingArticle: Article | null = null;
 let quillEditor: any = null;
 
+// Quill 에디터 초기화 함수
+function initializeQuillEditor(): boolean {
+    if (quillEditor) {
+        console.log('Quill editor already initialized');
+        return true;
+    }
+    
+    if (!(window as any).Quill) {
+        console.warn('Quill library not loaded yet');
+        return false;
+    }
+    
+    const editorElement = document.getElementById('article-content-editor');
+    if (!editorElement) {
+        console.warn('Editor element not found');
+        return false;
+    }
+    
+    try {
+        quillEditor = new (window as any).Quill('#article-content-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'image', 'video'],
+                    ['clean']
+                ]
+            }
+        });
+        console.log('Quill editor initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('Failed to initialize Quill editor:', error);
+        return false;
+    }
+}
+
 function renderArticles() {
     const container = document.getElementById('articles-list');
     if (!container) return;
@@ -964,9 +1026,14 @@ function setupArticleEventListeners() {
 }
 
 function openArticleEditor(article?: Article) {
+    console.log('openArticleEditor called with article:', article);
     currentEditingArticle = article || null;
     const modal = document.getElementById('article-editor-modal');
-    if (!modal) return;
+    if (!modal) {
+        console.error('Article editor modal not found in DOM');
+        return;
+    }
+    console.log('Modal found, preparing to show');
     
     // 폼 필드 채우기
     (document.getElementById('article-title') as HTMLInputElement).value = article?.title || '';
@@ -989,34 +1056,40 @@ function openArticleEditor(article?: Article) {
             editorContainer.style.display = 'block';
             externalUrlGroup.style.display = 'none';
         
-            // Quill 에디터 초기화
-            if (!quillEditor && (window as any).Quill) {
-                try {
-                    quillEditor = new (window as any).Quill('#article-content-editor', {
-                        theme: 'snow',
-                    modules: {
-                        toolbar: [
-                            [{ 'header': [1, 2, 3, false] }],
-                            ['bold', 'italic', 'underline', 'strike'],
-                            ['blockquote', 'code-block'],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            [{ 'color': [] }, { 'background': [] }],
-                            ['link', 'image', 'video'],
-                            ['clean']
-                        ]
-                    }
-                });
-                } catch (error) {
-                    console.error('Failed to initialize Quill editor:', error);
-                    showToast('에디터 초기화 실패', 'error');
-                }
-            }
+            // Quill 에디터 초기화 시도
+            const editorInitialized = initializeQuillEditor();
             
-            // 콘텐츠 설정
-            if (article?.content) {
-                quillEditor.root.innerHTML = article.content;
+            if (editorInitialized && quillEditor) {
+                // 콘텐츠 설정
+                if (article?.content) {
+                    quillEditor.root.innerHTML = article.content;
+                } else {
+                    quillEditor.setText('');
+                }
             } else {
-                quillEditor.setText('');
+                console.warn('Quill editor not available, using fallback textarea');
+                
+                // 기존 fallback textarea 확인 또는 생성
+                let fallbackTextarea = document.getElementById('article-content-fallback') as HTMLTextAreaElement;
+                if (!fallbackTextarea) {
+                    fallbackTextarea = document.createElement('textarea');
+                    fallbackTextarea.id = 'article-content-fallback';
+                    fallbackTextarea.className = 'form-control';
+                    fallbackTextarea.rows = 10;
+                    fallbackTextarea.placeholder = '콘텐츠를 입력하세요...';
+                    
+                    const editorDiv = document.getElementById('article-content-editor');
+                    if (editorDiv && editorDiv.parentNode) {
+                        editorDiv.style.display = 'none';
+                        // 기존 fallback이 있으면 제거
+                        const existingFallback = document.getElementById('article-content-fallback');
+                        if (existingFallback) {
+                            existingFallback.remove();
+                        }
+                        editorDiv.parentNode.insertBefore(fallbackTextarea, editorDiv.nextSibling);
+                    }
+                }
+                fallbackTextarea.value = article?.content || '';
             }
         } else {
             if (editorContainer) editorContainer.style.display = 'none';
@@ -1087,8 +1160,16 @@ async function saveArticle() {
     };
     
     // 내부 콘텐츠인 경우 에디터 내용 저장
-    if (articleData.content_type === 'internal' && quillEditor) {
-        articleData.content = quillEditor.root.innerHTML;
+    if (articleData.content_type === 'internal') {
+        if (quillEditor) {
+            articleData.content = quillEditor.root.innerHTML;
+        } else {
+            // Fallback textarea 사용
+            const fallbackTextarea = document.getElementById('article-content-fallback') as HTMLTextAreaElement;
+            if (fallbackTextarea) {
+                articleData.content = fallbackTextarea.value;
+            }
+        }
     }
     
     try {
@@ -1155,10 +1236,36 @@ function setupEventListeners() {
         });
     });
     
-    // Articles 섹션 이벤트 리스너
-    document.getElementById('add-article-button')?.addEventListener('click', () => {
-        openArticleEditor();
-    });
+    // Articles 섹션 이벤트 리스너 - 이벤트 위임 방식 사용
+    const articlesSection = document.getElementById('articles-editor');
+    if (articlesSection) {
+        console.log('Articles section found, adding delegated event listener');
+        // 이벤트 위임을 사용하여 동적으로 생성되거나 숨겨진 요소도 처리
+        articlesSection.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            
+            // 새 콘텐츠 추가 버튼 클릭
+            if (target.id === 'add-article-button' || target.closest('#add-article-button')) {
+                console.log('Add article button clicked via delegation');
+                e.preventDefault();
+                openArticleEditor();
+            }
+        });
+    } else {
+        console.error('Articles section not found in DOM');
+    }
+    
+    // 직접 이벤트 리스너도 추가 (폴백)
+    const addArticleBtn = document.getElementById('add-article-button');
+    if (addArticleBtn && !addArticleBtn.dataset.listenerAdded) {
+        console.log('Direct listener: Article button found');
+        addArticleBtn.addEventListener('click', (e) => {
+            console.log('Add article button clicked directly');
+            e.preventDefault();
+            openArticleEditor();
+        });
+        addArticleBtn.dataset.listenerAdded = 'true';
+    }
     
     document.getElementById('save-article-button')?.addEventListener('click', async () => {
         await saveArticle();
@@ -1353,6 +1460,19 @@ function setupNavigation() {
         }
         navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('data-target') === targetId));
         editorSections.forEach(section => section.classList.toggle('active', section.id === targetId));
+        
+        // Articles 섹션이 활성화될 때 이벤트 리스너 재확인
+        if (targetId === 'articles-editor') {
+            const addBtn = document.getElementById('add-article-button');
+            if (addBtn && !addBtn.dataset.listenerAdded) {
+                console.log('Adding click listener to add-article-button');
+                addBtn.addEventListener('click', () => {
+                    console.log('Add article button clicked from navigation');
+                    openArticleEditor();
+                });
+                addBtn.dataset.listenerAdded = 'true';
+            }
+        }
         
         // Close mobile menu when switching tabs
         closeMobileMenu();
