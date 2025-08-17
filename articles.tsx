@@ -183,6 +183,7 @@ class ModernArticlesManager {
     private setupEventListeners() {
         // 카테고리 필터
         const categoryPills = document.querySelectorAll('.category-pill');
+        
         categoryPills.forEach(pill => {
             pill.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
@@ -198,11 +199,46 @@ class ModernArticlesManager {
             });
         });
 
-        // 검색 기능
+        // NEW: Search Box Expansion
+        const searchToggle = document.getElementById('searchToggle') as HTMLButtonElement;
+        const searchBox = document.getElementById('searchBox') as HTMLDivElement;
         const searchInput = document.getElementById('content-search') as HTMLInputElement;
         const searchClear = document.getElementById('search-clear') as HTMLButtonElement;
         
+        if (searchToggle && searchBox) {
+            searchToggle.addEventListener('click', () => {
+                searchBox.classList.add('expanded');
+                searchInput?.focus();
+            });
+        }
+        
+        // Close search on click outside
+        document.addEventListener('click', (e) => {
+            if (searchBox && searchToggle && 
+                !searchBox.contains(e.target as Node) && 
+                !searchToggle.contains(e.target as Node)) {
+                searchBox.classList.remove('expanded');
+                if (searchInput) {
+                    searchInput.value = '';
+                    this.searchQuery = '';
+                    this.currentPage = 1;
+                    this.renderContentGrid();
+                }
+            }
+        });
+        
+        // Close search on Escape key
         if (searchInput) {
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && searchBox) {
+                    searchBox.classList.remove('expanded');
+                    searchInput.value = '';
+                    this.searchQuery = '';
+                    this.currentPage = 1;
+                    this.renderContentGrid();
+                }
+            });
+            
             searchInput.addEventListener('input', (e) => {
                 const target = e.target as HTMLInputElement;
                 this.searchQuery = target.value.toLowerCase();
@@ -229,8 +265,24 @@ class ModernArticlesManager {
             });
         }
 
-        // 태그 필터
+        // NEW: Tags Panel Toggle
+        const tagsFilterBtn = document.getElementById('tagsFilterBtn') as HTMLButtonElement;
+        const tagsPanel = document.getElementById('tagsPanel') as HTMLDivElement;
+        
+        if (tagsFilterBtn && tagsPanel) {
+            tagsFilterBtn.addEventListener('click', () => {
+                tagsPanel.classList.toggle('expanded');
+                tagsFilterBtn.classList.toggle('active');
+            });
+        }
+        
+        // NEW: Tag Selection with Active Filters
         const tagChips = document.querySelectorAll('.tag-chip');
+        const activeFilters = document.getElementById('activeFilters') as HTMLDivElement;
+        const filtersList = activeFilters?.querySelector('.filters-list');
+        const clearFilters = document.getElementById('clearFilters') as HTMLButtonElement;
+        const filterBadge = document.querySelector('.filter-badge');
+        
         tagChips.forEach(chip => {
             chip.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
@@ -239,15 +291,44 @@ class ModernArticlesManager {
                 // 태그 토글
                 if (this.selectedTags.has(tag)) {
                     this.selectedTags.delete(tag);
-                    target.classList.remove('active');
+                    target.classList.remove('selected');
                 } else {
                     this.selectedTags.add(tag);
-                    target.classList.add('active');
+                    target.classList.add('selected');
                 }
                 
+                this.updateActiveFilters();
                 this.currentPage = 1;
                 this.renderContentGrid();
             });
+        });
+        
+        if (clearFilters) {
+            clearFilters.addEventListener('click', () => {
+                this.selectedTags.clear();
+                tagChips.forEach(chip => chip.classList.remove('selected'));
+                this.updateActiveFilters();
+                this.currentPage = 1;
+                this.renderContentGrid();
+            });
+        }
+        
+        // NEW: Sticky Navigation Scroll Effect
+        const categoryNav = document.getElementById('categoryNav');
+        let lastScroll = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (categoryNav) {
+                if (currentScroll > 100) {
+                    categoryNav.classList.add('scrolled');
+                } else {
+                    categoryNav.classList.remove('scrolled');
+                }
+            }
+            
+            lastScroll = currentScroll;
         });
 
         // 정렬 옵션
@@ -280,6 +361,38 @@ class ModernArticlesManager {
         }
     }
 
+    private updateActiveFilters() {
+        const activeFilters = document.getElementById('activeFilters') as HTMLDivElement;
+        const filtersList = activeFilters?.querySelector('.filters-list');
+        const filterBadge = document.querySelector('.filter-badge');
+        
+        if (!activeFilters || !filtersList) return;
+        
+        if (this.selectedTags.size > 0) {
+            activeFilters.classList.add('visible');
+            
+            // Update filter tags
+            const filterTagsHTML = Array.from(this.selectedTags).map(tag => 
+                `<span class="filter-tag">${tag} ×</span>`
+            ).join('');
+            
+            filtersList.innerHTML = `
+                <span style="color: var(--text-muted); font-size: 13px;">활성 필터:</span>
+                ${filterTagsHTML}
+            `;
+            
+            // Update badge count
+            if (filterBadge) {
+                filterBadge.textContent = this.selectedTags.size.toString();
+            }
+        } else {
+            activeFilters.classList.remove('visible');
+            if (filterBadge) {
+                filterBadge.textContent = '8'; // Default count
+            }
+        }
+    }
+    
     private updateCategoryCounts() {
         const categories = ['all', 'event', 'guide', 'airdrop', 'notice'];
         

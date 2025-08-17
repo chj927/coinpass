@@ -82,58 +82,77 @@
                 </div>
             </section>
 
-            <!-- Category Navigation -->
-            <section class="category-nav">
-                <div class="container">
-                    <div class="nav-wrapper">
-                        <div class="category-pills">
-                            <button class="category-pill active" data-category="all">
-                                <span class="pill-emoji">✨</span>
-                                <span class="pill-text">전체</span>
-                                <span class="pill-count">24</span>
-                            </button>
-                            <button class="category-pill" data-category="event">
-                                <span class="pill-emoji">🎉</span>
-                                <span class="pill-text">이벤트</span>
-                                <span class="pill-count">8</span>
-                            </button>
-                            <button class="category-pill" data-category="guide">
-                                <span class="pill-emoji">📖</span>
-                                <span class="pill-text">가입 가이드</span>
-                                <span class="pill-count">6</span>
-                            </button>
-                            <button class="category-pill" data-category="airdrop">
-                                <span class="pill-emoji">🪂</span>
-                                <span class="pill-text">에어드랍</span>
-                                <span class="pill-count">5</span>
-                            </button>
-                            <button class="category-pill" data-category="notice">
-                                <span class="pill-emoji">📢</span>
-                                <span class="pill-text">공지사항</span>
-                                <span class="pill-count">5</span>
-                            </button>
-                        </div>
-                        
-                        <!-- Search Bar -->
-                        <div class="search-wrapper">
-                            <div class="search-box">
-                                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                                <input type="text" class="search-input" placeholder="콘텐츠 검색..." id="content-search">
-                                <button class="search-clear" id="search-clear" style="display: none;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
+            <!-- NEW Category Navigation -->
+            <section class="category-nav" id="categoryNav">
+                <div class="nav-container">
+                    <!-- Main Navigation Bar -->
+                    <div class="nav-main-bar">
+                        <!-- Category Pills -->
+                        <div class="category-scroll-container">
+                            <div class="category-pills" id="categoryPills">
+                                <button class="category-pill active" data-category="all">
+                                    <span class="pill-emoji">✨</span>
+                                    <span>전체</span>
+                                    <span class="pill-count">24</span>
+                                </button>
+                                <button class="category-pill" data-category="event">
+                                    <span class="pill-emoji">🎉</span>
+                                    <span>이벤트</span>
+                                    <span class="pill-count">8</span>
+                                </button>
+                                <button class="category-pill" data-category="guide">
+                                    <span class="pill-emoji">📖</span>
+                                    <span>가입 가이드</span>
+                                    <span class="pill-count">6</span>
+                                </button>
+                                <button class="category-pill" data-category="airdrop">
+                                    <span class="pill-emoji">🪂</span>
+                                    <span>에어드랍</span>
+                                    <span class="pill-count">5</span>
+                                </button>
+                                <button class="category-pill" data-category="notice">
+                                    <span class="pill-emoji">📢</span>
+                                    <span>공지사항</span>
+                                    <span class="pill-count">5</span>
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Action Buttons -->
+                        <div class="nav-actions">
+                            <!-- Search -->
+                            <div class="search-container">
+                                <button class="search-toggle" id="searchToggle" aria-label="검색">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" 
+                                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <div class="search-box" id="searchBox">
+                                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                        <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" 
+                                              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    <input type="text" class="search-input" placeholder="콘텐츠 검색..." id="content-search">
+                                    <button class="search-clear" id="search-clear" aria-label="검색 지우기">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Tags Filter -->
+                            <button class="tags-filter-btn" id="tagsFilterBtn">
+                                <span>🏷️ 태그 필터</span>
+                                <span class="filter-badge">8</span>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <!-- Tags Section -->
-                    <div class="tags-section">
-                        <div class="tags-label">인기 태그:</div>
-                        <div class="tags-container">
+
+                    <!-- Tags Panel (Hidden by default) -->
+                    <div class="tags-panel" id="tagsPanel">
+                        <div class="tags-grid">
                             <button class="tag-chip" data-tag="신규가입">🎁 신규가입</button>
                             <button class="tag-chip" data-tag="수수료할인">💰 수수료할인</button>
                             <button class="tag-chip" data-tag="KYC인증">✅ KYC인증</button>
@@ -143,6 +162,15 @@
                             <button class="tag-chip" data-tag="DeFi">🌐 DeFi</button>
                             <button class="tag-chip" data-tag="Layer2">⚡ Layer2</button>
                         </div>
+                    </div>
+
+                    <!-- Active Filters Summary -->
+                    <div class="active-filters" id="activeFilters">
+                        <div class="filters-list">
+                            <span style="color: var(--text-muted); font-size: 13px;">활성 필터:</span>
+                            <!-- Filter tags will be inserted here -->
+                        </div>
+                        <button class="clear-filters" id="clearFilters">모두 지우기</button>
                     </div>
                 </div>
             </section>
