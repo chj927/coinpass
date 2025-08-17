@@ -430,7 +430,7 @@ header {
 
 .cta-button.primary {
     background: var(--accent-color);
-    color: #1a1a1a;
+    color: #ffffff;
 }
 
 .cta-button.primary:hover {

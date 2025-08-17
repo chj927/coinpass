@@ -324,19 +324,73 @@ function setupScrollAnimations() {
 }
 
 function setupMobileMenu() {
-    const hamburgerBtn = document.querySelector('.hamburger-button');
-    const nav = document.getElementById('main-nav');
-    if (!hamburgerBtn || !nav) return;
-    hamburgerBtn.addEventListener('click', () => {
-        const isActive = hamburgerBtn.classList.toggle('is-active');
-        nav.classList.toggle('is-active', isActive);
-        hamburgerBtn.setAttribute('aria-expanded', isActive.toString());
+    const hamburgerButton = document.querySelector('.hamburger-button') as HTMLButtonElement;
+    const mainNav = document.getElementById('main-nav');
+    
+    if (!hamburgerButton || !mainNav) {
+        console.warn('Hamburger menu elements not found');
+        return;
+    }
+    
+    // Toggle menu on hamburger click
+    hamburgerButton.addEventListener('click', function() {
+        const isActive = hamburgerButton.classList.contains('is-active');
+        
+        if (isActive) {
+            // Close menu
+            hamburgerButton.classList.remove('is-active');
+            hamburgerButton.setAttribute('aria-expanded', 'false');
+            mainNav.classList.remove('active');
+            document.body.style.overflow = '';
+        } else {
+            // Open menu
+            hamburgerButton.classList.add('is-active');
+            hamburgerButton.setAttribute('aria-expanded', 'true');
+            mainNav.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
     });
-    nav.querySelectorAll('a').forEach(link => {
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const target = event.target as HTMLElement;
+        if (!hamburgerButton.contains(target) && !mainNav.contains(target)) {
+            if (hamburgerButton.classList.contains('is-active')) {
+                hamburgerButton.classList.remove('is-active');
+                hamburgerButton.setAttribute('aria-expanded', 'false');
+                mainNav.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && hamburgerButton.classList.contains('is-active')) {
+            hamburgerButton.classList.remove('is-active');
+            hamburgerButton.setAttribute('aria-expanded', 'false');
+            mainNav.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && hamburgerButton.classList.contains('is-active')) {
+            hamburgerButton.classList.remove('is-active');
+            hamburgerButton.setAttribute('aria-expanded', 'false');
+            mainNav.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Close menu when clicking nav links
+    mainNav.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            hamburgerBtn.classList.remove('is-active');
-            nav.classList.remove('is-active');
-            hamburgerBtn.setAttribute('aria-expanded', 'false');
+            hamburgerButton.classList.remove('is-active');
+            mainNav.classList.remove('active');
+            hamburgerButton.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
         });
     });
 }
