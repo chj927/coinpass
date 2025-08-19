@@ -1127,8 +1127,17 @@ async function saveArticle() {
     const isPinnedElement = document.getElementById('article-is-pinned') as HTMLInputElement;
     const isPublishedElement = document.getElementById('article-is-published') as HTMLInputElement;
     
+    console.log('Checkbox elements:', {
+        isPinnedElement,
+        isPublishedElement,
+        isPinnedChecked: isPinnedElement?.checked,
+        isPublishedChecked: isPublishedElement?.checked
+    });
+    
     const isPinned = isPinnedElement ? isPinnedElement.checked : false;
     const isPublished = isPublishedElement ? isPublishedElement.checked : true;
+    
+    console.log('Final values:', { isPinned, isPublished });
     
     // 유효성 검사
     if (!title || title.trim().length === 0) {
@@ -1190,15 +1199,19 @@ async function saveArticle() {
         let result;
         if (currentEditingArticle?.id) {
             // 업데이트
+            console.log('Updating article with ID:', currentEditingArticle.id);
             result = await supabase
                 .from('articles')
                 .update(articleData)
-                .eq('id', currentEditingArticle.id);
+                .eq('id', currentEditingArticle.id)
+                .select();  // 업데이트 후 데이터 반환
         } else {
             // 새로 추가
+            console.log('Creating new article');
             result = await supabase
                 .from('articles')
-                .insert(articleData);
+                .insert(articleData)
+                .select();  // 삽입 후 데이터 반환
         }
         
         if (result.error) {
@@ -1206,6 +1219,7 @@ async function saveArticle() {
         }
         
         console.log('Save result:', result);
+        console.log('Saved data:', result.data);
         
         showToast('게시물이 저장되었습니다.');
         closeArticleEditor();

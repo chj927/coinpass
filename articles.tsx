@@ -46,6 +46,9 @@ class ModernArticlesManager {
     private async loadArticles() {
         this.showLoadingState(true);
         
+        console.log('Supabase client:', supabase);
+        console.log('Loading articles from database...');
+        
         try {
             const { data, error } = await supabase
                 .from('articles')
