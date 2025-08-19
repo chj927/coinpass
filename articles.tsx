@@ -524,6 +524,11 @@ class ModernArticlesManager {
         }
         
         // 캐러셀 슬라이드 HTML 생성
+        // 인라인 스타일 추가로 CSS 오버라이드 확실히 하기
+        carouselTrack.style.position = 'relative';
+        carouselTrack.style.minHeight = '450px';
+        carouselTrack.style.display = 'block'; // flex 제거
+        
         carouselTrack.innerHTML = articles.map((article, index) => `
             <article class="carousel-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
                 <div class="slide-content">
@@ -890,16 +895,6 @@ class ModernArticlesManager {
             toast.style.animation = 'slideOutDown 0.3s ease';
             setTimeout(() => document.body.removeChild(toast), 300);
         }, 3000);
-    }
-
-    private getCategoryLabel(category: string): string {
-        const labels: Record<string, string> = {
-            'notice': '공지사항',
-            'guide': '가이드',
-            'event': '이벤트',
-            'airdrop': '에어드랍'
-        };
-        return labels[category] || category;
     }
 
     private getRelativeTime(dateString: string): string {

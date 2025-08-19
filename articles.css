@@ -512,20 +512,25 @@
 }
 
 .carousel-track {
-    display: flex;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-height: 450px;
 }
 
 .carousel-slide {
-    min-width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease, visibility 0.5s ease;
+    pointer-events: none;
 }
 
 .carousel-slide.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .slide-content {
@@ -842,8 +847,13 @@ footer {
         right: 10px;
     }
     
+    .carousel-track {
+        min-height: auto;
+    }
+    
     .slide-content {
         grid-template-columns: 1fr;
+        min-height: auto;
     }
     
     .slide-info {
