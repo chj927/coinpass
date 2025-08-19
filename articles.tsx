@@ -27,6 +27,7 @@ class ModernArticlesManager {
     private searchQuery: string = '';
     private selectedTags: Set<string> = new Set();
     private shareMenu: HTMLElement | null = null;
+    private currentSlide: number = 0;
 
     constructor() {
         this.init();
@@ -471,10 +472,40 @@ class ModernArticlesManager {
     }
     
     private reinitializeCarousel() {
-        // 기존 setupCarousel 함수 호출
-        if (typeof setupCarousel === 'function') {
-            setupCarousel();
+        // 캐러셀 이벤트 리스너 재설정
+        this.setupCarousel();
+    }
+    
+    private setupCarousel() {
+        // 캐러셀 버튼 이벤트 리스너
+        const prevBtn = document.getElementById('carouselPrev');
+        const nextBtn = document.getElementById('carouselNext');
+        
+        if (prevBtn) {
+            prevBtn.onclick = () => this.previousSlide();
         }
+        if (nextBtn) {
+            nextBtn.onclick = () => this.nextSlide();
+        }
+        
+        // 인디케이터 이벤트 리스너
+        this.setupCarouselIndicators();
+    }
+    
+    private previousSlide() {
+        const slides = document.querySelectorAll('.carousel-slide');
+        if (slides.length === 0) return;
+        
+        this.currentSlide = (this.currentSlide - 1 + slides.length) % slides.length;
+        this.goToSlide(this.currentSlide);
+    }
+    
+    private nextSlide() {
+        const slides = document.querySelectorAll('.carousel-slide');
+        if (slides.length === 0) return;
+        
+        this.currentSlide = (this.currentSlide + 1) % slides.length;
+        this.goToSlide(this.currentSlide);
     }
     
     private getCategoryBadge(category: string): string {

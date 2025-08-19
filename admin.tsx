@@ -2,6 +2,9 @@ import { supabase, DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 import { authService } from './auth-service';
 
+// Quill 타입 선언
+declare const Quill: any;
+
 // 타입 정의
 interface DatabaseRecord {
     id?: number;
@@ -1121,8 +1124,11 @@ async function saveArticle() {
     const externalUrl = (document.getElementById('article-external-url') as HTMLInputElement)?.value || null;
     const imageUrl = (document.getElementById('article-image-url') as HTMLInputElement)?.value || null;
     const author = (document.getElementById('article-author') as HTMLInputElement)?.value || 'CoinPass';
-    const isPinned = (document.getElementById('article-is-pinned') as HTMLInputElement)?.checked || false;
-    const isPublished = (document.getElementById('article-is-published') as HTMLInputElement)?.checked || false;
+    const isPinnedElement = document.getElementById('article-is-pinned') as HTMLInputElement;
+    const isPublishedElement = document.getElementById('article-is-published') as HTMLInputElement;
+    
+    const isPinned = isPinnedElement ? isPinnedElement.checked : false;
+    const isPublished = isPublishedElement ? isPublishedElement.checked : true;
     
     // 유효성 검사
     if (!title || title.trim().length === 0) {
@@ -1279,6 +1285,10 @@ function setupEventListeners() {
     
     document.getElementById('save-article-button')?.addEventListener('click', async () => {
         await saveArticle();
+    });
+    
+    document.getElementById('close-article-modal')?.addEventListener('click', () => {
+        closeArticleEditor();
     });
     
     document.getElementById('cancel-article-button')?.addEventListener('click', () => {
