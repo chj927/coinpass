@@ -360,7 +360,22 @@ class ModernArticlesManager {
     
     private updateCarouselSlides(articles: Article[]) {
         const carouselTrack = document.getElementById('carouselTrack');
-        if (!carouselTrack || articles.length === 0) return;
+        const carouselIndicators = document.getElementById('carouselIndicators');
+        
+        if (!carouselTrack || articles.length === 0) {
+            // 데이터가 없을 때 처리
+            if (carouselTrack) {
+                carouselTrack.innerHTML = `
+                    <div class="no-featured-content">
+                        <p>현재 표시할 핫한 콘텐츠가 없습니다.</p>
+                    </div>
+                `;
+            }
+            if (carouselIndicators) {
+                carouselIndicators.innerHTML = '';
+            }
+            return;
+        }
         
         // 캐러셀 슬라이드 HTML 생성
         carouselTrack.innerHTML = articles.map((article, index) => `
@@ -398,18 +413,50 @@ class ModernArticlesManager {
             </article>
         `).join('');
         
-        // 인디케이터 업데이트
-        const indicatorsContainer = document.querySelector('.carousel-indicators');
-        if (indicatorsContainer) {
-            indicatorsContainer.innerHTML = articles.map((_, index) => `
+        // 인디케이터 동적 생성
+        if (carouselIndicators) {
+            carouselIndicators.innerHTML = articles.map((_, index) => `
                 <button class="indicator ${index === 0 ? 'active' : ''}" 
                         data-slide="${index}" 
                         aria-label="슬라이드 ${index + 1}"></button>
             `).join('');
+            
+            // 인디케이터 이벤트 리스너 재설정
+            this.setupCarouselIndicators();
         }
         
         // 캐러셀 기능 재초기화 (이벤트 리스너 재설정)
         this.reinitializeCarousel();
+    }
+    
+    private setupCarouselIndicators() {
+        const indicators = document.querySelectorAll('.carousel-indicators .indicator');
+        indicators.forEach(indicator => {
+            indicator.addEventListener('click', (e) => {
+                const target = e.currentTarget as HTMLElement;
+                const slideIndex = parseInt(target.dataset.slide || '0');
+                this.goToSlide(slideIndex);
+            });
+        });
+    }
+    
+    private goToSlide(index: number) {
+        const slides = document.querySelectorAll('.carousel-slide');
+        const indicators = document.querySelectorAll('.carousel-indicators .indicator');
+        
+        // 모든 슬라이드와 인디케이터 비활성화
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        
+        // 선택된 슬라이드와 인디케이터 활성화
+        if (slides[index]) {
+            slides[index].classList.add('active');
+        }
+        if (indicators[index]) {
+            indicators[index].classList.add('active');
+        }
+        
+        this.currentSlide = index;
     }
     
     private reinitializeCarousel() {
