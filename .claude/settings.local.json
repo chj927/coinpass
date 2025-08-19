@@ -33,7 +33,8 @@
       "Bash(curl:*)",
       "Bash(del:*)",
       "Bash(start http://localhost:3000/articles-new.html)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(start http://localhost:3000/articles)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
