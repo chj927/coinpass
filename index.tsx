@@ -216,137 +216,84 @@ function setupEventListeners() {
 }
 
 class TypingAnimator {
-    private element: HTMLElement;
-    private sentences: string[];
-    private currentIndex: number = 0;
+    private el!: HTMLElement;
+    private phrases!: string[];
+    private loopNum: number = 0;
     private typingSpeed: number = 100;
-    private delayBetweenSentences: number = 2000;
-    private delayBetweenCycles: number = 3000;
-    private isAnimating: boolean = false;
-    private rafId: number | null = null;
-    private isVisible: boolean = true;
+    private erasingSpeed: number = 50;
+    private delayBetweenPhrases: number = 2000;
+    private isPaused: boolean = false;
+    private timeoutId: number | null = null;
 
-    constructor(element: HTMLElement, sentences: string[]) {
-        this.element = element;
-        this.sentences = sentences.filter(s => s.trim().length > 0);
-        this.setupVisibilityHandling();
+    constructor(el: HTMLElement, phrases: string[]) {
+        if (!el || !phrases || phrases.length === 0) {
+            console.error('TypingAnimator: Invalid element or phrases');
+            return;
+        }
+        this.el = el;
+        this.phrases = phrases.filter(p => p && p.trim() !== '');
+        if (this.phrases.length === 0) {
+            console.error('TypingAnimator: No valid phrases');
+            return;
+        }
+        console.log('TypingAnimator initialized with phrases:', this.phrases);
+        this.tick();
     }
 
-    private setupVisibilityHandling() {
-        // Pause animation when page is not visible
-        document.addEventListener('visibilitychange', () => {
-            this.isVisible = !document.hidden;
-            if (!this.isVisible && this.isAnimating) {
-                this.pause();
-            } else if (this.isVisible && this.isAnimating) {
-                this.resume();
-            }
-        });
+    public setPhrases(phrases: string[]) {
+        this.phrases = phrases;
+        this.loopNum = 0;
+        if(this.timeoutId) clearTimeout(this.timeoutId);
+        this.tick();
+    }
 
-        // Intersection Observer to pause when not in viewport
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting && this.isAnimating) {
-                    this.pause();
-                } else if (entry.isIntersecting && this.isAnimating) {
-                    this.resume();
-                }
-            });
-        }, { threshold: 0.1 });
+    private tick() {
+        if (this.isPaused) return;
+        if (!this.el || !this.phrases || this.phrases.length === 0) return;
         
-        observer.observe(this.element);
-    }
-
-    public startTyping() {
-        if (this.sentences.length === 0) return;
-        if (this.isAnimating) return;
+        const i = this.loopNum % this.phrases.length;
+        const fullText = this.phrases[i];
+        const currentText = this.el.textContent || '';
         
-        this.isAnimating = true;
-        this.animateLoop();
+        const isDeleting = currentText.length > fullText.length || 
+                          (currentText.length === fullText.length && currentText === fullText);
+        
+        if (isDeleting) {
+            this.el.textContent = fullText.substring(0, currentText.length - 1);
+        } else {
+            this.el.textContent = fullText.substring(0, currentText.length + 1);
+        }
+        
+        let delta = isDeleting ? this.erasingSpeed : this.typingSpeed;
+        
+        if (!isDeleting && currentText === fullText) {
+            delta = this.delayBetweenPhrases;
+        } else if (isDeleting && currentText === '') {
+            this.loopNum++;
+            delta = 500;
+        }
+        
+        this.timeoutId = window.setTimeout(() => this.tick(), delta);
     }
-
+    
+    public pause() { 
+        this.isPaused = true; 
+        if(this.timeoutId) clearTimeout(this.timeoutId); 
+    }
+    
+    public resume() { 
+        if(this.isPaused) { 
+            this.isPaused = false; 
+            this.tick(); 
+        } 
+    }
+    
     public stop() {
-        this.isAnimating = false;
-        if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
+        this.isPaused = true;
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
         }
-    }
-
-    private pause() {
-        if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-        }
-    }
-
-    private resume() {
-        if (this.isAnimating && !this.rafId) {
-            this.animateLoop();
-        }
-    }
-
-    private async animateLoop() {
-        while (this.isAnimating && this.isVisible) {
-            const sentence = this.sentences[this.currentIndex];
-            await this.typeText(sentence);
-            
-            if (!this.isAnimating || !this.isVisible) break;
-            
-            await this.eraseText();
-            
-            if (!this.isAnimating || !this.isVisible) break;
-            
-            this.currentIndex = (this.currentIndex + 1) % this.sentences.length;
-            
-            if (this.currentIndex === 0) {
-                await this.sleep(this.delayBetweenCycles);
-            } else {
-                await this.sleep(this.delayBetweenSentences);
-            }
-        }
-    }
-
-    private async typeText(text: string) {
-        this.element.textContent = '';
-        
-        for (let i = 0; i <= text.length; i++) {
-            if (!this.isAnimating || !this.isVisible) break;
-            
-            // Use requestAnimationFrame for smoother text updates
-            await new Promise<void>(resolve => {
-                this.rafId = requestAnimationFrame(() => {
-                    this.element.textContent = text.substring(0, i);
-                    resolve();
-                });
-            });
-            
-            await this.sleep(this.typingSpeed);
-        }
-        
-        await this.sleep(this.delayBetweenSentences);
-    }
-
-    private async eraseText() {
-        const text = this.element.textContent || '';
-        
-        for (let i = text.length; i >= 0; i--) {
-            if (!this.isAnimating || !this.isVisible) break;
-            
-            // Use requestAnimationFrame for smoother text updates
-            await new Promise<void>(resolve => {
-                this.rafId = requestAnimationFrame(() => {
-                    this.element.textContent = text.substring(0, i);
-                    resolve();
-                });
-            });
-            
-            await this.sleep(this.typingSpeed * 0.5);
-        }
-    }
-
-    private sleep(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
@@ -355,11 +302,16 @@ let typingAnimator: TypingAnimator | null = null;
 // 즉시 기본값으로 타이핑 시작
 function startTypingAnimationWithDefaults() {
     const heroTitle = document.getElementById('hero-title');
-    if (!heroTitle) return;
+    const heroSection = document.querySelector('.hero');
+    if (!heroTitle) {
+        console.warn('Hero title element not found');
+        return;
+    }
     
     // 기존 애니메이션이 있다면 정지
     if (typingAnimator) {
         typingAnimator.stop();
+        typingAnimator = null;
     }
     
     const defaultSentences = [
@@ -368,17 +320,30 @@ function startTypingAnimationWithDefaults() {
         '한번 등록하고 평생 혜택받기!'
     ];
     
+    console.log('Starting typing animation with defaults:', defaultSentences);
     typingAnimator = new TypingAnimator(heroTitle as HTMLElement, defaultSentences);
-    typingAnimator.startTyping();
+    
+    // Intersection Observer로 가시성에 따라 애니메이션 제어
+    if(heroSection && typingAnimator){
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    typingAnimator?.resume();
+                } else {
+                    typingAnimator?.pause();
+                }
+            });
+        }, { threshold: 0.1 });
+        observer.observe(heroSection);
+    }
 }
 
 function startTypingAnimation() {
     const heroTitle = document.getElementById('hero-title');
-    if (!heroTitle || !heroData) return;
-
-    // 기존 애니메이션이 있다면 정지
-    if (typingAnimator) {
-        typingAnimator.stop();
+    const heroSection = document.querySelector('.hero');
+    if (!heroTitle || !heroData) {
+        console.warn('Cannot start typing animation: missing element or data');
+        return;
     }
 
     // 관리자가 설정한 문장들 사용, 없으면 기본값 사용
@@ -400,8 +365,28 @@ function startTypingAnimation() {
         ];
     }
 
-    typingAnimator = new TypingAnimator(heroTitle as HTMLElement, sentences);
-    typingAnimator.startTyping();
+    console.log('Starting typing animation with sentences:', sentences);
+
+    // 기존 애니메이션이 있다면 새 문장으로 업데이트
+    if (typingAnimator) {
+        typingAnimator.setPhrases(sentences);
+    } else {
+        typingAnimator = new TypingAnimator(heroTitle as HTMLElement, sentences);
+        
+        // Intersection Observer로 가시성에 따라 애니메이션 제어
+        if(heroSection && typingAnimator){
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        typingAnimator?.resume();
+                    } else {
+                        typingAnimator?.pause();
+                    }
+                });
+            }, { threshold: 0.1 });
+            observer.observe(heroSection);
+        }
+    }
     
     // hero subtitle 업데이트
     const heroSubtitle = document.getElementById('hero-subtitle');
@@ -854,12 +839,11 @@ function setupMobileTouchFeedback() {
         '.popup-actions button'
     ];
 
+    // DOMContentLoaded 이벤트를 기다리지 않고 바로 실행 (이미 DOMContentLoaded 내에서 호출됨)
     touchableSelectors.forEach(selector => {
-        document.addEventListener('DOMContentLoaded', () => {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(element => {
-                setupElementTouchFeedback(element as HTMLElement);
-            });
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            setupElementTouchFeedback(element as HTMLElement);
         });
     });
 

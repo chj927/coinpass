@@ -35,7 +35,11 @@
       "Bash(start http://localhost:3000/articles-new.html)",
       "Bash(sed:*)",
       "Bash(start http://localhost:3000/articles)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(start http://localhost:3002/test-pinned-articles.html)",
+      "Bash(start http://localhost:3002/articles.html)",
+      "Bash(start http://localhost:3003/articles.html)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
