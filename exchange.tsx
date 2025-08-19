@@ -81,11 +81,24 @@ async function loadRemoteContent() {
         faqs: faqsData || [],
     };
     
+    // Debug logging for aboutUs
+    console.log('Loading page contents:', singlePages?.length, 'pages found');
+    
     singlePages?.forEach((page: any) => {
         if(page.page_type && page.content) {
             (siteData as any)[page.page_type] = page.content;
+            
+            // Debug log for aboutUs specifically
+            if (page.page_type === 'aboutUs') {
+                console.log('AboutUs data loaded:', page.content);
+            }
         }
     });
+    
+    // Check if aboutUs was loaded
+    if (!siteData.aboutUs) {
+        console.warn('AboutUs data not found in page_contents');
+    }
 }
 
 function renderContent() {
@@ -201,10 +214,26 @@ function setupHero(heroData: any) {
 function updateAboutUs(aboutUsData: any) {
     const titleEl = document.getElementById('about-us-title');
     const contentEl = document.getElementById('about-us-content');
-    if (!aboutUsData) return;
+    
+    // Debug logging
+    console.log('UpdateAboutUs called with:', aboutUsData);
+    
+    if (!aboutUsData) {
+        console.warn('No aboutUs data provided to updateAboutUs function');
+        
+        // Set default content if no data
+        if (titleEl) {
+            titleEl.textContent = '서비스 소개';
+        }
+        if (contentEl) {
+            contentEl.innerHTML = '<p>코인패스는 암호화폐 거래소 수수료 할인 서비스입니다.</p>';
+        }
+        return;
+    }
 
     if (titleEl && aboutUsData.title) {
         titleEl.textContent = SecurityUtils.sanitizeHtml(aboutUsData.title || '');
+        console.log('AboutUs title updated:', aboutUsData.title);
     }
     if (contentEl && aboutUsData.content) {
         contentEl.innerHTML = '';
@@ -217,6 +246,7 @@ function updateAboutUs(aboutUsData: any) {
             fragment.appendChild(p);
         });
         contentEl.appendChild(fragment);
+        console.log('AboutUs content updated with', paragraphs.length, 'paragraphs');
     }
 }
 
