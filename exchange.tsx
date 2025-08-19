@@ -86,18 +86,19 @@ async function loadRemoteContent() {
     
     singlePages?.forEach((page: any) => {
         if(page.page_type && page.content) {
-            (siteData as any)[page.page_type] = page.content;
-            
-            // Debug log for aboutUs specifically
-            if (page.page_type === 'aboutUs') {
-                console.log('AboutUs data loaded:', page.content);
+            // Map 'about' from database to 'aboutUs' in siteData
+            if (page.page_type === 'about') {
+                siteData.aboutUs = page.content;
+                console.log('About/AboutUs data loaded:', page.content);
+            } else {
+                (siteData as any)[page.page_type] = page.content;
             }
         }
     });
     
     // Check if aboutUs was loaded
     if (!siteData.aboutUs) {
-        console.warn('AboutUs data not found in page_contents');
+        console.warn('AboutUs data not found in page_contents (looking for page_type="about")');
     }
 }
 

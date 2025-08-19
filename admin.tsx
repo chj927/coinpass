@@ -301,7 +301,7 @@ async function fetchDataFromSupabase() {
     singlePages?.forEach((page: any) => {
         if (page.page_type === 'hero' && page.content) {
             siteData.hero = page.content;
-        } else if (page.page_type === 'aboutUs' && page.content) {
+        } else if (page.page_type === 'about' && page.content) {
             siteData.aboutUs = page.content;
         } else if (page.page_type === 'popup' && page.content) {
             siteData.popup = page.content;
@@ -419,7 +419,7 @@ async function saveSinglePage(pageName: string, content: any) {
     }
 
     // 페이지명 화이트리스트 검증
-    const allowedPages = ['hero', 'aboutUs', 'popup', 'indexPopup', 'support'];
+    const allowedPages = ['hero', 'about', 'popup', 'indexPopup', 'support'];
     if (!allowedPages.includes(pageName)) {
         showToast('허용되지 않는 페이지입니다.', 'error');
         return;
@@ -1260,7 +1260,9 @@ function setupEventListeners() {
                 if (section === 'popup' && content.pageName && content.data) {
                     saveSinglePage(content.pageName, content.data);
                 } else {
-                    saveSinglePage(section, content);
+                    // Map aboutUs to about for database compatibility
+                    const dbSection = section === 'aboutUs' ? 'about' : section;
+                    saveSinglePage(dbSection, content);
                 }
             }
         });
@@ -1408,7 +1410,7 @@ function readDataFromSection(section: string): any {
             title: (document.getElementById('hero-title-ko-input') as HTMLTextAreaElement).value,
             subtitle: (document.getElementById('hero-subtitle-ko-input') as HTMLTextAreaElement).value
         };
-    } else if (section === 'aboutUs') {
+    } else if (section === 'about' || section === 'aboutUs') {
         return {
             title: (document.getElementById('about-us-title-ko-input') as HTMLInputElement).value,
             content: (document.getElementById('about-us-content-ko-input') as HTMLTextAreaElement).value
