@@ -924,3 +924,42 @@ footer {
         font-size: 13px;
     }
 }
+
+/* 로딩, 에러, 빈 상태 스타일 */
+.loading-message,
+.empty-state,
+.error-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state p,
+.error-state p {
+    margin-bottom: 16px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.retry-button {
+    padding: 10px 24px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 212, 170, 0.3);
+}
+
+.featured-section.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}

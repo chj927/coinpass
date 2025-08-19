@@ -17,122 +17,6 @@ interface Article {
     updated_at: string;
 }
 
-// 가상 데이터 (실제로는 Supabase에서 가져올 예정)
-const mockArticles: Article[] = [
-    {
-        id: '1',
-        title: '바이낸스 신규가입 100 USDT 즉시 지급 이벤트',
-        category: 'event',
-        content_type: 'external',
-        content: null,
-        excerpt: '바이낸스에서 역대급 신규가입 이벤트를 진행합니다. KYC 인증 완료 시 100 USDT를 즉시 지급하며, 첫 거래 시 추가 50 USDT 보너스까지!',
-        external_url: 'https://blog.naver.com/coinpass/binance-event',
-        image_url: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=450&fit=crop',
-        author: '코인패스 에디터',
-        is_pinned: true,
-        is_published: true,
-        view_count: 2341,
-        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-    },
-    {
-        id: '2',
-        title: 'LayerZero 에어드랍 확정, 스냅샷 임박',
-        category: 'airdrop',
-        content_type: 'external',
-        content: null,
-        excerpt: 'LayerZero 프로토콜의 공식 에어드랍이 확정되었습니다. 스냅샷 시점과 자격 조건을 확인하세요.',
-        external_url: 'https://blog.naver.com/coinpass/layerzero-airdrop',
-        image_url: 'https://images.unsplash.com/photo-1621504450181-5d356f61d307?w=400&h=250&fit=crop',
-        author: '에어드랍 전문가',
-        is_pinned: true,
-        is_published: true,
-        view_count: 1892,
-        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
-    },
-    {
-        id: '3',
-        title: 'OKX 가입부터 인증까지 5분 완성 가이드',
-        category: 'guide',
-        content_type: 'external',
-        content: null,
-        excerpt: 'OKX 거래소 가입과 KYC 인증을 5분 만에 완료하는 방법을 단계별로 설명합니다.',
-        external_url: 'https://blog.naver.com/coinpass/okx-guide',
-        image_url: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop',
-        author: '가이드 마스터',
-        is_pinned: true,
-        is_published: true,
-        view_count: 956,
-        created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    },
-    // 추가 콘텐츠
-    {
-        id: '4',
-        title: '바이비트 춘절 이벤트 - 888 USDT 럭키드로우',
-        category: 'event',
-        content_type: 'external',
-        content: null,
-        excerpt: '바이비트에서 춘절을 맞아 대규모 이벤트를 진행합니다. 거래량 조건 충족 시 자동 참여!',
-        external_url: 'https://blog.naver.com/coinpass/bybit-event',
-        image_url: 'https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=250&fit=crop',
-        author: '이벤트 헌터',
-        is_pinned: false,
-        is_published: true,
-        view_count: 523,
-        created_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
-    },
-    {
-        id: '5',
-        title: 'MEXC 거래소 가입 및 보안 설정 완벽 가이드',
-        category: 'guide',
-        content_type: 'external',
-        content: null,
-        excerpt: 'MEXC 거래소 가입부터 2FA 설정, 출금 주소 등록까지 한 번에 끝내는 가이드입니다.',
-        external_url: 'https://blog.naver.com/coinpass/mexc-guide',
-        image_url: 'https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?w=400&h=250&fit=crop',
-        author: '보안 전문가',
-        is_pinned: false,
-        is_published: true,
-        view_count: 412,
-        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
-    },
-    {
-        id: '6',
-        title: 'Scroll 메인넷 에어드랍 자격 조건 총정리',
-        category: 'airdrop',
-        content_type: 'external',
-        content: null,
-        excerpt: 'Scroll L2 에어드랍 예상 조건과 지금부터 준비해야 할 액션 플랜을 상세히 정리했습니다.',
-        external_url: 'https://blog.naver.com/coinpass/scroll-airdrop',
-        image_url: 'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=400&h=250&fit=crop',
-        author: '크립토 리서처',
-        is_pinned: false,
-        is_published: true,
-        view_count: 1234,
-        created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-    },
-    {
-        id: '7',
-        title: '코인패스 서비스 업데이트 및 신규 기능 안내',
-        category: 'notice',
-        content_type: 'external',
-        content: null,
-        excerpt: '더 나은 서비스를 위한 대규모 업데이트! 새로운 기능과 개선사항을 확인하세요.',
-        external_url: 'https://blog.naver.com/coinpass/service-update',
-        image_url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop',
-        author: '코인패스 팀',
-        is_pinned: false,
-        is_published: true,
-        view_count: 892,
-        created_at: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
-    }
-];
 
 class ModernArticlesManager {
     private articles: Article[] = [];
@@ -152,9 +36,6 @@ class ModernArticlesManager {
         // 실제 Supabase 데이터 로드
         await this.loadArticles();
         
-        // Mock 데이터는 더 이상 사용하지 않음
-        // this.articles = mockArticles;
-        
         this.setupEventListeners();
         this.renderFeaturedContent();
         this.renderContentGrid();
@@ -162,6 +43,8 @@ class ModernArticlesManager {
     }
 
     private async loadArticles() {
+        this.showLoadingState(true);
+        
         try {
             const { data, error } = await supabase
                 .from('articles')
@@ -173,10 +56,54 @@ class ModernArticlesManager {
             if (error) throw error;
             
             this.articles = data || [];
+            
+            // 데이터가 없을 경우 안내 메시지
+            if (this.articles.length === 0) {
+                this.showEmptyState();
+            }
         } catch (error) {
             console.error('Error loading articles:', error);
-            // 에러 시 목업 데이터 사용
-            this.articles = mockArticles;
+            // 에러 시 빈 배열로 초기화하고 에러 메시지 표시
+            this.articles = [];
+            this.showErrorState('아티클을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } finally {
+            this.showLoadingState(false);
+        }
+    }
+    
+    private showLoadingState(isLoading: boolean) {
+        const gridContainer = document.getElementById('contentGrid');
+        const featuredSection = document.querySelector('.featured-section');
+        
+        if (isLoading) {
+            if (gridContainer) gridContainer.innerHTML = '<div class="loading-message">콘텐츠를 불러오는 중...</div>';
+            if (featuredSection) featuredSection.classList.add('loading');
+        } else {
+            if (featuredSection) featuredSection.classList.remove('loading');
+        }
+    }
+    
+    private showEmptyState() {
+        const gridContainer = document.getElementById('contentGrid');
+        if (gridContainer) {
+            gridContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>아직 등록된 아티클이 없습니다.</p>
+                    <p>곧 새로운 콘텐츠가 업데이트될 예정입니다.</p>
+                </div>
+            `;
+        }
+    }
+    
+    private showErrorState(message: string) {
+        const gridContainer = document.getElementById('contentGrid');
+        if (gridContainer) {
+            gridContainer.innerHTML = `
+                <div class="error-state">
+                    <p>${message}</p>
+                    <button onclick="location.reload()" class="retry-button">다시 시도</button>
+                </div>
+            `;
         }
     }
 
