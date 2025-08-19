@@ -57,6 +57,10 @@ class ModernArticlesManager {
             
             this.articles = data || [];
             
+            // 디버깅을 위한 로그
+            console.log('Loaded articles:', this.articles);
+            console.log('Pinned articles:', this.articles.filter(a => a.is_pinned));
+            
             // 데이터가 없을 경우 안내 메시지
             if (this.articles.length === 0) {
                 this.showEmptyState();
@@ -349,11 +353,18 @@ class ModernArticlesManager {
         // 피처드 콘텐츠는 is_pinned가 true인 항목들
         const featuredArticles = this.articles.filter(a => a.is_pinned && a.is_published).slice(0, 3);
         
+        console.log('=== Featured Content Debug ===');
+        console.log('Total articles:', this.articles.length);
+        console.log('Featured articles (pinned):', featuredArticles);
+        console.log('Featured count:', featuredArticles.length);
+        
         if (featuredArticles.length === 0) {
+            console.log('No pinned articles, showing latest 3');
             // 고정된 글이 없으면 최신 글 3개를 표시
             const latestArticles = this.articles.filter(a => a.is_published).slice(0, 3);
             this.updateCarouselSlides(latestArticles);
         } else {
+            console.log('Showing pinned articles');
             this.updateCarouselSlides(featuredArticles);
         }
     }

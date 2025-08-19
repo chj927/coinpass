@@ -262,6 +262,11 @@ async function fetchDataFromSupabase() {
         const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
         const { data: pinnedData, error: pinnedError } = await supabase.from('pinned_articles').select('*').order('position');
         const { data: articlesData, error: articlesError } = await supabase.from('articles').select('*').order('created_at', { ascending: false });
+        
+        console.log('Fetched articles from DB:', articlesData);
+        if (articlesData) {
+            console.log('Articles with is_pinned:', articlesData.filter((a: any) => a.is_pinned));
+        }
 
         if (cexError) {
             console.error('Exchange data error:', cexError);
@@ -1159,6 +1164,9 @@ async function saveArticle() {
         content: null
     };
     
+    console.log('Saving article with data:', articleData);
+    console.log('is_pinned value:', isPinned);
+    
     // 내부 콘텐츠인 경우 에디터 내용 저장
     if (articleData.content_type === 'internal') {
         if (quillEditor) {
@@ -1190,6 +1198,8 @@ async function saveArticle() {
         if (result.error) {
             throw result.error;
         }
+        
+        console.log('Save result:', result);
         
         showToast('게시물이 저장되었습니다.');
         closeArticleEditor();
