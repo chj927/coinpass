@@ -37,43 +37,148 @@ class ModernArticlesManager {
         // 실제 Supabase 데이터 로드
         await this.loadArticles();
         
+        console.log('Articles loaded, rendering UI...');
+        
         this.setupEventListeners();
         this.renderFeaturedContent();
         this.renderContentGrid();
         this.updateCategoryCounts();
+        
+        // Make debug methods available globally
+        (window as any).refreshArticles = () => {
+            console.log('Manually refreshing articles...');
+            this.loadArticles().then(() => {
+                this.renderFeaturedContent();
+                this.renderContentGrid();
+                console.log('Articles refreshed');
+            });
+        };
+        
+        // Debug function to check pinned articles
+        (window as any).debugPinnedArticles = async () => {
+            console.log('=== DEBUGGING PINNED ARTICLES ===');
+            
+            // Check Supabase connection
+            if (!supabase) {
+                console.error('❌ Supabase client is NULL');
+                return;
+            }
+            console.log('✅ Supabase client exists');
+            
+            // Fetch all articles
+            const { data: allArticles, error: allError } = await supabase
+                .from('articles')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (allError) {
+                console.error('❌ Error fetching articles:', allError);
+                return;
+            }
+            
+            console.log(`📊 Total articles in database: ${allArticles?.length || 0}`);
+            
+            // Check pinned articles
+            const pinnedArticles = allArticles?.filter(a => 
+                a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1
+            ) || [];
+            
+            console.log(`📌 Pinned articles: ${pinnedArticles.length}`);
+            
+            if (pinnedArticles.length > 0) {
+                console.log('Pinned articles details:');
+                pinnedArticles.forEach(article => {
+                    console.log(`  - "${article.title}" (is_pinned: ${article.is_pinned}, type: ${typeof article.is_pinned})`);
+                });
+            }
+            
+            // Check what's currently rendered
+            const carouselTrack = document.getElementById('carouselTrack');
+            const renderedSlides = carouselTrack?.querySelectorAll('.carousel-slide').length || 0;
+            console.log(`🎠 Carousel slides rendered: ${renderedSlides}`);
+            
+            // Check current articles in memory
+            console.log(`💾 Articles in memory: ${this.articles.length}`);
+            const memoryPinned = this.articles.filter(a => 
+                a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1
+            );
+            console.log(`📌 Pinned articles in memory: ${memoryPinned.length}`);
+            
+            return {
+                database: allArticles?.length || 0,
+                pinned: pinnedArticles.length,
+                rendered: renderedSlides,
+                inMemory: this.articles.length
+            };
+        };
     }
 
     private async loadArticles() {
         this.showLoadingState(true);
         
-        console.log('Supabase client:', supabase);
-        console.log('Loading articles from database...');
+        console.log('=== LOADING ARTICLES ===');
         
         try {
+            // Check if Supabase is initialized
+            if (!supabase) {
+                console.error('Supabase client is not initialized');
+                throw new Error('Database connection not available');
+            }
+            
+            // Fetch ALL articles without any WHERE clause to avoid RLS issues
+            // We'll filter on the client side
             const { data, error } = await supabase
                 .from('articles')
                 .select('*')
-                .eq('is_published', true)
-                .order('is_pinned', { ascending: false })
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Database error:', error);
+                throw error;
+            }
             
-            this.articles = data || [];
+            // Process the data
+            const allArticles = data || [];
+            console.log(`Fetched ${allArticles.length} total articles from database`);
             
-            // 디버깅을 위한 로그
-            console.log('Loaded articles:', this.articles);
-            console.log('Pinned articles:', this.articles.filter(a => a.is_pinned));
+            // Filter for published articles on client side
+            // Use explicit comparison to avoid type coercion issues
+            this.articles = allArticles.filter(article => {
+                // Handle potential string 'true'/'false' values from database
+                const isPublished = article.is_published === true || 
+                                  article.is_published === 'true' || 
+                                  article.is_published === 1;
+                return isPublished;
+            });
             
-            // 데이터가 없을 경우 안내 메시지
+            console.log(`Filtered to ${this.articles.length} published articles`);
+            
+            // Sort articles: pinned first, then by date
+            this.articles.sort((a, b) => {
+                // Convert to boolean to handle any type issues
+                const aPinned = a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1;
+                const bPinned = b.is_pinned === true || b.is_pinned === 'true' || b.is_pinned === 1;
+                
+                if (aPinned && !bPinned) return -1;
+                if (!aPinned && bPinned) return 1;
+                
+                // If both pinned or both not pinned, sort by date
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            });
+            
+            // Log pinned articles for debugging
+            const pinnedCount = this.articles.filter(a => 
+                a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1
+            ).length;
+            console.log(`Found ${pinnedCount} pinned articles among published articles`);
+            
             if (this.articles.length === 0) {
                 this.showEmptyState();
             }
         } catch (error) {
-            console.error('Error loading articles:', error);
-            // 에러 시 빈 배열로 초기화하고 에러 메시지 표시
+            console.error('Failed to load articles:', error);
             this.articles = [];
-            this.showErrorState('아티클을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            this.showErrorState('아티클을 불러오는 중 오류가 발생했습니다.');
         } finally {
             this.showLoadingState(false);
         }
@@ -354,22 +459,48 @@ class ModernArticlesManager {
     }
 
     private renderFeaturedContent() {
-        // 피처드 콘텐츠는 is_pinned가 true인 항목들
-        const featuredArticles = this.articles.filter(a => a.is_pinned && a.is_published).slice(0, 3);
+        console.log('=== RENDERING FEATURED CONTENT ===');
         
-        console.log('=== Featured Content Debug ===');
-        console.log('Total articles:', this.articles.length);
-        console.log('Featured articles (pinned):', featuredArticles);
-        console.log('Featured count:', featuredArticles.length);
+        if (!this.articles || this.articles.length === 0) {
+            console.log('No articles available to render');
+            this.updateCarouselSlides([]);
+            return;
+        }
         
-        if (featuredArticles.length === 0) {
-            console.log('No pinned articles, showing latest 3');
-            // 고정된 글이 없으면 최신 글 3개를 표시
-            const latestArticles = this.articles.filter(a => a.is_published).slice(0, 3);
-            this.updateCarouselSlides(latestArticles);
-        } else {
-            console.log('Showing pinned articles');
+        // Filter for pinned articles with flexible type checking
+        // Handle potential database type inconsistencies
+        const featuredArticles = this.articles.filter(article => {
+            // Check is_pinned with multiple type possibilities
+            const isPinned = article.is_pinned === true || 
+                           article.is_pinned === 'true' || 
+                           article.is_pinned === 1;
+            
+            // Check is_published (should already be filtered, but double-check)
+            const isPublished = article.is_published === true || 
+                              article.is_published === 'true' || 
+                              article.is_published === 1;
+            
+            return isPinned && isPublished;
+        }).slice(0, 3); // Take maximum 3 featured articles
+        
+        console.log(`Found ${featuredArticles.length} pinned articles for featured section`);
+        
+        // If we have pinned articles, use them
+        if (featuredArticles.length > 0) {
+            console.log('Displaying pinned articles:', featuredArticles.map(a => a.title));
             this.updateCarouselSlides(featuredArticles);
+        } else {
+            // Otherwise, use the latest 3 published articles
+            console.log('No pinned articles found, using latest articles instead');
+            const latestArticles = this.articles.slice(0, 3);
+            
+            if (latestArticles.length > 0) {
+                console.log('Displaying latest articles:', latestArticles.map(a => a.title));
+                this.updateCarouselSlides(latestArticles);
+            } else {
+                console.log('No articles available for featured section');
+                this.updateCarouselSlides([]);
+            }
         }
     }
     
@@ -794,6 +925,14 @@ class ModernArticlesManager {
         }
         return num.toString();
     }
+    
+    private formatDate(dateString: string): string {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}.${month}.${day}`;
+    }
 
     private setupShareMenu() {
         // 공유 메뉴 생성
@@ -856,6 +995,8 @@ class ModernArticlesManager {
                     this.shareMenu.dataset.title = title;
                     this.shareMenu.dataset.url = url;
                     this.shareMenu.classList.add('active');
+                } else {
+                    console.warn('Share menu element not found');
                 }
             });
         });
@@ -967,77 +1108,101 @@ function setupHamburgerMenu() {
     });
 }
 
-// 캐러셀 기능 추가
-function setupCarousel(): void {
-    const track = document.getElementById('carouselTrack');
-    const slides = document.querySelectorAll('.carousel-slide');
-    const prevBtn = document.getElementById('carouselPrev');
-    const nextBtn = document.getElementById('carouselNext');
-    const indicators = document.querySelectorAll('.indicator');
+// 중복된 캐러셀 코드 제거 - ModernArticlesManager 클래스 내부의 캐러셀 기능 사용
+// function setupCarousel() 코드는 클래스 내부에 이미 구현되어 있음
+
+// Global debug function for console testing
+(window as any).debugPinnedArticles = async () => {
+    const { supabase } = await import('./supabaseClient');
     
-    let currentSlide = 0;
-    const totalSlides = slides.length;
+    console.log('=== MANUAL DEBUG: PINNED ARTICLES ===');
     
-    // 슬라이드 변경 함수
-    function goToSlide(slideIndex: number): void {
-        // 이전 슬라이드 비활성화
-        slides[currentSlide].classList.remove('active');
-        indicators[currentSlide].classList.remove('active');
+    if (!supabase) {
+        console.error('Supabase is not initialized');
+        return;
+    }
+    
+    try {
+        // Query 1: Get all articles
+        const { data: allArticles, error: allError } = await supabase
+            .from('articles')
+            .select('id, title, is_pinned, is_published, created_at')
+            .order('created_at', { ascending: false });
         
-        // 새 슬라이드 활성화
-        currentSlide = slideIndex;
-        slides[currentSlide].classList.add('active');
-        indicators[currentSlide].classList.add('active');
+        if (allError) {
+            console.error('Error fetching all articles:', allError);
+            return;
+        }
+        
+        console.log('Total articles in database:', allArticles?.length || 0);
+        
+        // Query 2: Get pinned articles
+        const { data: pinnedOnly, error: pinnedError } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('is_pinned', true);
+        
+        if (pinnedError) {
+            console.error('Error fetching pinned articles:', pinnedError);
+            return;
+        }
+        
+        console.log('Pinned articles (is_pinned=true):', pinnedOnly?.length || 0);
+        
+        if (pinnedOnly && pinnedOnly.length > 0) {
+            console.table(pinnedOnly.map(a => ({
+                id: a.id,
+                title: a.title,
+                is_pinned: a.is_pinned,
+                is_published: a.is_published,
+                created_at: a.created_at
+            })));
+        }
+        
+        // Query 3: Get published and pinned
+        const { data: pinnedPublished, error: bothError } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('is_pinned', true)
+            .eq('is_published', true);
+        
+        console.log('Pinned AND Published articles:', pinnedPublished?.length || 0);
+        
+        if (pinnedPublished && pinnedPublished.length > 0) {
+            console.table(pinnedPublished.map(a => ({
+                id: a.id,
+                title: a.title,
+                is_pinned: a.is_pinned,
+                is_published: a.is_published
+            })));
+        }
+        
+        // Check for any RLS issues
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        console.log('Current user:', userData?.user ? 'Authenticated' : 'Anonymous');
+        
+        return {
+            total: allArticles?.length || 0,
+            pinned: pinnedOnly?.length || 0,
+            pinnedAndPublished: pinnedPublished?.length || 0,
+            user: userData?.user ? 'authenticated' : 'anonymous'
+        };
+    } catch (error) {
+        console.error('Debug error:', error);
     }
-    
-    // 다음 슬라이드
-    function nextSlide(): void {
-        const nextIndex = (currentSlide + 1) % totalSlides;
-        goToSlide(nextIndex);
-    }
-    
-    // 이전 슬라이드
-    function prevSlide(): void {
-        const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
-        goToSlide(prevIndex);
-    }
-    
-    // 버튼 이벤트 리스너
-    prevBtn?.addEventListener('click', prevSlide);
-    nextBtn?.addEventListener('click', nextSlide);
-    
-    // 인디케이터 이벤트 리스너
-    indicators.forEach((indicator, index) => {
-        indicator.addEventListener('click', () => {
-            goToSlide(index);
-        });
-    });
-    
-    // 자동 슬라이드 (5초마다)
-    let autoSlideInterval = setInterval(nextSlide, 5000);
-    
-    // 마우스 호버 시 자동 슬라이드 중지
-    const carousel = document.querySelector('.featured-carousel');
-    carousel?.addEventListener('mouseenter', () => {
-        clearInterval(autoSlideInterval);
-    });
-    
-    carousel?.addEventListener('mouseleave', () => {
-        autoSlideInterval = setInterval(nextSlide, 5000);
-    });
-    
-    // 키보드 네비게이션
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') prevSlide();
-        if (e.key === 'ArrowRight') nextSlide();
-    });
-}
+};
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
-    new ModernArticlesManager();
+    const manager = new ModernArticlesManager();
+    // Export manager instance for debugging
+    (window as any).articlesManager = manager;
+    
     setupHamburgerMenu();
-    setupCarousel(); // 캐러셀 초기화 추가
+    // setupCarousel() 제거 - 클래스 내부에서 처리됨
+    
+    // Log initialization
+    console.log('Articles page initialized. Debug with: window.debugPinnedArticles()');
 
     // 스타일 애니메이션 추가
     const style = document.createElement('style');
