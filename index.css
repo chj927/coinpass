@@ -317,7 +317,7 @@ header {
     font-weight: 700;
     margin-bottom: 0.5rem;
     line-height: 1.2;
-    min-height: 1.4em;
+    min-height: 4.8rem; /* Fixed height to prevent layout shift */
     color: var(--text-color);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     display: flex;
@@ -1321,6 +1321,12 @@ footer {
     
     .hamburger-button {
         display: block;
+    }
+    
+    /* Fix hero title height on mobile to prevent layout shift */
+    .hero-banner h1 {
+        font-size: 2rem;
+        min-height: 6rem; /* Fixed height for mobile - accounts for 2 lines */
     }
     
     #main-nav {
