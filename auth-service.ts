@@ -321,9 +321,10 @@ export class AuthService {
     /**
      * IP 기반 접근 제한 (선택적)
      */
-    async checkIPRestriction(clientIP: string): Promise<boolean> {
+    async checkIPRestriction(_clientIP: string): Promise<boolean> {
         // 허용된 IP 목록을 Supabase 테이블에서 관리할 수 있음
         // 이는 추가적인 보안 계층으로 사용 가능
+        // Note: clientIP parameter reserved for future IP restriction implementation
         try {
             const { DatabaseUtils } = await import('./supabaseClient');
             const { data, error } = await DatabaseUtils.getPaginatedData(

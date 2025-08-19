@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { isTrue } from './utils/typeGuards';
 
 interface Article {
     id: string;
@@ -10,7 +11,7 @@ interface Article {
     external_url: string | null;
     image_url: string | null;
     author: string;
-    is_pinned: boolean;
+    is_pinned: boolean | string | number;  // Handle database type inconsistencies
     is_published: boolean;
     view_count: number;
     created_at: string;
@@ -79,15 +80,15 @@ class ModernArticlesManager {
             console.log(`📊 Total articles in database: ${allArticles?.length || 0}`);
             
             // Check pinned articles
-            const pinnedArticles = allArticles?.filter(a => 
-                a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1
+            const pinnedArticles = allArticles?.filter((a: any) => 
+                isTrue(a.is_pinned)
             ) || [];
             
             console.log(`📌 Pinned articles: ${pinnedArticles.length}`);
             
             if (pinnedArticles.length > 0) {
                 console.log('Pinned articles details:');
-                pinnedArticles.forEach(article => {
+                pinnedArticles.forEach((article: any) => {
                     console.log(`  - "${article.title}" (is_pinned: ${article.is_pinned}, type: ${typeof article.is_pinned})`);
                 });
             }
@@ -99,8 +100,8 @@ class ModernArticlesManager {
             
             // Check current articles in memory
             console.log(`💾 Articles in memory: ${this.articles.length}`);
-            const memoryPinned = this.articles.filter(a => 
-                a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1
+            const memoryPinned = this.articles.filter((a: Article) => 
+                isTrue(a.is_pinned)
             );
             console.log(`📌 Pinned articles in memory: ${memoryPinned.length}`);
             
@@ -143,7 +144,7 @@ class ModernArticlesManager {
             
             // Filter for published articles on client side
             // Use explicit comparison to avoid type coercion issues
-            this.articles = allArticles.filter(article => {
+            this.articles = allArticles.filter((article: any) => {
                 // Handle potential string 'true'/'false' values from database
                 const isPublished = article.is_published === true || 
                                   article.is_published === 'true' || 
@@ -154,10 +155,10 @@ class ModernArticlesManager {
             console.log(`Filtered to ${this.articles.length} published articles`);
             
             // Sort articles: pinned first, then by date
-            this.articles.sort((a, b) => {
+            this.articles.sort((a: Article, b: Article) => {
                 // Convert to boolean to handle any type issues
-                const aPinned = a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1;
-                const bPinned = b.is_pinned === true || b.is_pinned === 'true' || b.is_pinned === 1;
+                const aPinned = isTrue(a.is_pinned);
+                const bPinned = isTrue(b.is_pinned);
                 
                 if (aPinned && !bPinned) return -1;
                 if (!aPinned && bPinned) return 1;
@@ -167,8 +168,8 @@ class ModernArticlesManager {
             });
             
             // Log pinned articles for debugging
-            const pinnedCount = this.articles.filter(a => 
-                a.is_pinned === true || a.is_pinned === 'true' || a.is_pinned === 1
+            const pinnedCount = this.articles.filter((a: Article) => 
+                isTrue(a.is_pinned)
             ).length;
             console.log(`Found ${pinnedCount} pinned articles among published articles`);
             
@@ -324,10 +325,7 @@ class ModernArticlesManager {
         
         // NEW: Tag Selection with Active Filters
         const tagChips = document.querySelectorAll('.tag-chip');
-        const activeFilters = document.getElementById('activeFilters') as HTMLDivElement;
-        const filtersList = activeFilters?.querySelector('.filters-list');
         const clearFilters = document.getElementById('clearFilters') as HTMLButtonElement;
-        const filterBadge = document.querySelector('.filter-badge');
         
         tagChips.forEach(chip => {
             chip.addEventListener('click', (e) => {
@@ -361,7 +359,6 @@ class ModernArticlesManager {
         
         // NEW: Sticky Navigation Scroll Effect
         const categoryNav = document.getElementById('categoryNav');
-        let lastScroll = 0;
         
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
@@ -374,7 +371,7 @@ class ModernArticlesManager {
                 }
             }
             
-            lastScroll = currentScroll;
+            // Scroll position tracked
         });
 
         // 정렬 옵션
@@ -450,7 +447,7 @@ class ModernArticlesManager {
                     if (category === 'all') {
                         count.textContent = this.articles.length.toString();
                     } else {
-                        const categoryCount = this.articles.filter(a => a.category === category).length;
+                        const categoryCount = this.articles.filter((a: Article) => a.category === category).length;
                         count.textContent = categoryCount.toString();
                     }
                 }
@@ -471,14 +468,10 @@ class ModernArticlesManager {
         // Handle potential database type inconsistencies
         const featuredArticles = this.articles.filter(article => {
             // Check is_pinned with multiple type possibilities
-            const isPinned = article.is_pinned === true || 
-                           article.is_pinned === 'true' || 
-                           article.is_pinned === 1;
+            const isPinned = isTrue(article.is_pinned);
             
             // Check is_published (should already be filtered, but double-check)
-            const isPublished = article.is_published === true || 
-                              article.is_published === 'true' || 
-                              article.is_published === 1;
+            const isPublished = isTrue(article.is_published);
             
             return isPinned && isPublished;
         }).slice(0, 3); // Take maximum 3 featured articles
@@ -667,40 +660,7 @@ class ModernArticlesManager {
         return labels[category] || category;
     }
 
-    private updateFeaturedMainCard(card: Element, article: Article) {
-        const image = card.querySelector('.featured-image img') as HTMLImageElement;
-        const category = card.querySelector('.featured-category');
-        const author = card.querySelector('.meta-author');
-        const date = card.querySelector('.meta-date');
-        const title = card.querySelector('.featured-title');
-        const excerpt = card.querySelector('.featured-excerpt');
-        const viewCount = card.querySelector('.engagement span:first-child');
-        const link = card.querySelector('.read-more') as HTMLAnchorElement;
-
-        if (image) image.src = article.image_url || '';
-        if (category) category.textContent = this.getCategoryLabel(article.category);
-        if (date) date.textContent = this.getRelativeTime(article.created_at);
-        if (title) title.textContent = article.title;
-        if (excerpt) excerpt.textContent = article.excerpt || '';
-        if (viewCount) viewCount.textContent = `👁 ${this.formatNumber(article.view_count)}`;
-        if (link) link.href = article.external_url || '#';
-    }
-
-    private updateFeaturedSideCard(card: Element, article: Article) {
-        const image = card.querySelector('.small-image img') as HTMLImageElement;
-        const category = card.querySelector('.small-category');
-        const title = card.querySelector('h4');
-        const date = card.querySelector('.small-meta span:first-child');
-        const viewCount = card.querySelector('.small-meta span:last-child');
-        const link = card.querySelector('.small-link') as HTMLAnchorElement;
-
-        if (image) image.src = article.image_url || '';
-        if (category) category.textContent = this.getCategoryLabel(article.category);
-        if (title) title.textContent = article.title;
-        if (date) date.textContent = this.getRelativeTime(article.created_at);
-        if (viewCount) viewCount.textContent = `👁 ${this.formatNumber(article.view_count)}`;
-        if (link) link.href = article.external_url || '#';
-    }
+    // Removed unused updateFeaturedMainCard and updateFeaturedSideCard methods
 
     private renderContentGrid() {
         const container = document.querySelector('.content-grid');
@@ -711,7 +671,7 @@ class ModernArticlesManager {
         
         // 카테고리 필터
         if (this.currentCategory !== 'all') {
-            filteredArticles = filteredArticles.filter(a => a.category === this.currentCategory);
+            filteredArticles = filteredArticles.filter((a: Article) => a.category === this.currentCategory);
         }
         
         // 검색어 필터
@@ -799,7 +759,7 @@ class ModernArticlesManager {
     private sortArticles(sortBy: string) {
         switch (sortBy) {
             case 'popular':
-                this.articles.sort((a, b) => b.view_count - a.view_count);
+                this.articles.sort((a: Article, b: Article) => b.view_count - a.view_count);
                 break;
             case 'comments':
                 // 실제로는 댓글 수로 정렬
@@ -807,7 +767,7 @@ class ModernArticlesManager {
                 break;
             case 'latest':
             default:
-                this.articles.sort((a, b) => 
+                this.articles.sort((a: Article, b: Article) => 
                     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                 );
         }
@@ -1145,7 +1105,7 @@ function setupHamburgerMenu() {
         console.log('Pinned articles (is_pinned=true):', pinnedOnly?.length || 0);
         
         if (pinnedOnly && pinnedOnly.length > 0) {
-            console.table(pinnedOnly.map(a => ({
+            console.table(pinnedOnly.map((a: any) => ({
                 id: a.id,
                 title: a.title,
                 is_pinned: a.is_pinned,
@@ -1155,7 +1115,7 @@ function setupHamburgerMenu() {
         }
         
         // Query 3: Get published and pinned
-        const { data: pinnedPublished, error: bothError } = await supabase
+        const { data: pinnedPublished } = await supabase
             .from('articles')
             .select('*')
             .eq('is_pinned', true)
@@ -1164,7 +1124,7 @@ function setupHamburgerMenu() {
         console.log('Pinned AND Published articles:', pinnedPublished?.length || 0);
         
         if (pinnedPublished && pinnedPublished.length > 0) {
-            console.table(pinnedPublished.map(a => ({
+            console.table(pinnedPublished.map((a: any) => ({
                 id: a.id,
                 title: a.title,
                 is_pinned: a.is_pinned,
@@ -1173,7 +1133,7 @@ function setupHamburgerMenu() {
         }
         
         // Check for any RLS issues
-        const { data: userData, error: userError } = await supabase.auth.getUser();
+        const { data: userData } = await supabase.auth.getUser();
         console.log('Current user:', userData?.user ? 'Authenticated' : 'Anonymous');
         
         return {
