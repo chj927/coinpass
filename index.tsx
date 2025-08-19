@@ -226,17 +226,9 @@ class TypingAnimator {
     private timeoutId: number | null = null;
 
     constructor(el: HTMLElement, phrases: string[]) {
-        if (!el || !phrases || phrases.length === 0) {
-            console.error('TypingAnimator: Invalid element or phrases');
-            return;
-        }
+        if (!el || !phrases || phrases.length === 0) return;
         this.el = el;
-        this.phrases = phrases.filter(p => p && p.trim() !== '');
-        if (this.phrases.length === 0) {
-            console.error('TypingAnimator: No valid phrases');
-            return;
-        }
-        console.log('TypingAnimator initialized with phrases:', this.phrases);
+        this.phrases = phrases;
         this.tick();
     }
 
@@ -244,36 +236,43 @@ class TypingAnimator {
         this.phrases = phrases;
         this.loopNum = 0;
         if(this.timeoutId) clearTimeout(this.timeoutId);
-        this.tick();
+        this.el.textContent = '';
+        if(!this.isPaused) this.tick();
     }
 
-    private tick() {
-        if (this.isPaused) return;
-        if (!this.el || !this.phrases || this.phrases.length === 0) return;
-        
+    private tick = async () => {
+        if (this.isPaused || !this.el.isConnected) return;
         const i = this.loopNum % this.phrases.length;
-        const fullText = this.phrases[i];
-        const currentText = this.el.textContent || '';
+        const fullTxt = this.phrases[i];
         
-        const isDeleting = currentText.length > fullText.length || 
-                          (currentText.length === fullText.length && currentText === fullText);
-        
-        if (isDeleting) {
-            this.el.textContent = fullText.substring(0, currentText.length - 1);
-        } else {
-            this.el.textContent = fullText.substring(0, currentText.length + 1);
+        // 타이핑 애니메이션
+        for (let j = 0; j < fullTxt.length; j++) {
+            if (this.isPaused || !this.el.isConnected) return;
+            this.el.textContent = fullTxt.substring(0, j + 1);
+            await this.sleep(this.typingSpeed);
         }
         
-        let delta = isDeleting ? this.erasingSpeed : this.typingSpeed;
+        // 완성된 텍스트를 보여주는 시간
+        await this.sleep(this.delayBetweenPhrases);
         
-        if (!isDeleting && currentText === fullText) {
-            delta = this.delayBetweenPhrases;
-        } else if (isDeleting && currentText === '') {
-            this.loopNum++;
-            delta = 500;
+        // 삭제 애니메이션
+        for (let j = fullTxt.length; j > 0; j--) {
+            if (this.isPaused || !this.el.isConnected) return;
+            this.el.textContent = fullTxt.substring(0, j - 1);
+            await this.sleep(this.erasingSpeed);
         }
         
-        this.timeoutId = window.setTimeout(() => this.tick(), delta);
+        // 다음 문구 시작 전 짧은 대기
+        await this.sleep(500);
+        
+        this.loopNum++;
+        this.timeoutId = window.setTimeout(this.tick, 0);
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => { 
+            this.timeoutId = window.setTimeout(resolve, ms); 
+        });
     }
     
     public pause() { 
@@ -303,10 +302,7 @@ let typingAnimator: TypingAnimator | null = null;
 function startTypingAnimationWithDefaults() {
     const heroTitle = document.getElementById('hero-title');
     const heroSection = document.querySelector('.hero');
-    if (!heroTitle) {
-        console.warn('Hero title element not found');
-        return;
-    }
+    if (!heroTitle) return;
     
     // 기존 애니메이션이 있다면 정지
     if (typingAnimator) {
@@ -320,7 +316,6 @@ function startTypingAnimationWithDefaults() {
         '한번 등록하고 평생 혜택받기!'
     ];
     
-    console.log('Starting typing animation with defaults:', defaultSentences);
     typingAnimator = new TypingAnimator(heroTitle as HTMLElement, defaultSentences);
     
     // Intersection Observer로 가시성에 따라 애니메이션 제어
@@ -341,10 +336,7 @@ function startTypingAnimationWithDefaults() {
 function startTypingAnimation() {
     const heroTitle = document.getElementById('hero-title');
     const heroSection = document.querySelector('.hero');
-    if (!heroTitle || !heroData) {
-        console.warn('Cannot start typing animation: missing element or data');
-        return;
-    }
+    if (!heroTitle || !heroData) return;
 
     // 관리자가 설정한 문장들 사용, 없으면 기본값 사용
     let sentences: string[] = [];
@@ -364,8 +356,6 @@ function startTypingAnimation() {
             '한번 등록하고 평생 혜택받기!'
         ];
     }
-
-    console.log('Starting typing animation with sentences:', sentences);
 
     // 기존 애니메이션이 있다면 새 문장으로 업데이트
     if (typingAnimator) {
