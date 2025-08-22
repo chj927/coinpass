@@ -37,7 +37,7 @@ interface SiteData {
     hero?: {
         title: { ko: string };
         subtitle: { ko: string };
-    };
+    } | null;
     aboutUs?: {
         title: string;
         content: string;
