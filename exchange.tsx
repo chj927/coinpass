@@ -1,5 +1,6 @@
-import { supabase } from './supabaseClient';
+import { apiClient } from './api-client';
 import { SecurityUtils } from './security-utils';
+import { analytics } from './analytics';
 
 const uiStrings: Record<string, Record<string, string>> = {
     ko: {
@@ -67,14 +68,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadRemoteContent() {
-    const { data: exchanges, error: exchangesError } = await supabase.from('exchange_exchanges').select('*').order('id');
-    const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
-    const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
-
-    if (exchangesError || faqsError || singlePagesError) {
-        console.error("Failed to load site data from Supabase", { exchangesError, faqsError, singlePagesError });
-        return;
-    }
+    try {
+        // Use API client instead of direct Supabase calls
+        const [exchanges, faqsData] = await Promise.all([
+            apiClient.getExchanges(),
+            apiClient.getFAQs()
+        ]);
+        
+        // Get site data for about section
+        const aboutData = await apiClient.getSiteData('about');
+        const singlePages = aboutData ? [aboutData] : [];
     
     siteData = {
         exchanges: exchanges || [],
@@ -99,6 +102,11 @@ async function loadRemoteContent() {
     // Check if aboutUs was loaded
     if (!siteData.aboutUs) {
         console.warn('AboutUs data not found in page_contents (looking for page_type="about")');
+    }
+    } catch (error) {
+        console.error('Failed to load site data:', error);
+        // Track error
+        analytics.trackError('Failed to load site data', error?.toString());
     }
 }
 
@@ -303,8 +311,23 @@ function populateExchangeGrid(gridId: string, exchangesData: any[]) {
             <ul class="benefits-list">
                 ${benefitsHtml}
             </ul>
-            <a href="${SecurityUtils.isValidUrl(exchange.link) ? SecurityUtils.sanitizeHtml(exchange.link) : '#'}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow">${uiStrings[currentLang]['card.cta']}</a>
+            <a href="${SecurityUtils.isValidUrl(exchange.link) ? SecurityUtils.sanitizeHtml(exchange.link) : '#'}" class="card-cta" target="_blank" rel="noopener noreferrer nofollow" data-exchange-name="${name}">${uiStrings[currentLang]['card.cta']}</a>
         `;
+        
+        // Add click tracking for exchange links
+        const ctaButton = card.querySelector('.card-cta');
+        if (ctaButton) {
+            ctaButton.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const exchangeName = target.getAttribute('data-exchange-name') || 'Unknown';
+                const link = target.getAttribute('href') || '';
+                
+                // Track the exchange click
+                analytics.trackExchangeClick(exchangeName, link);
+                analytics.trackConversion('exchange_referral', undefined);
+            });
+        }
+        
         fragment.appendChild(card);
     });
     gridEl.innerHTML = '';

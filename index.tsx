@@ -1,9 +1,10 @@
 // Three.js 제거 - 이미지로 대체
 
-import { supabase, DatabaseUtils } from './supabaseClient';
+import { apiClient } from './api-client';
 import { SecurityUtils } from './security-utils';
 import { ErrorHandler, setupGlobalErrorHandling, handleAsyncError } from './error-handler';
 import { startPerformanceMonitoring } from './performance-monitor';
+import { analytics } from './analytics';
 
 // 성능 최적화를 위한 상수들
 const DEBOUNCE_DELAY = 250;
@@ -85,13 +86,18 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
     try {
         showLoadingState(true);
         
+        // Track page view
+        analytics.trackPageView(window.location.pathname, document.title);
+        
         // 즉시 기본 타이핑 애니메이션 시작 (데이터 로딩 전)
         startTypingAnimationWithDefaults();
         
-        // 데이터베이스 연결 상태 확인
-        const isConnected = await DatabaseUtils.checkConnection();
-        if (!isConnected) {
-            ErrorHandler.getInstance().showWarning('데이터베이스 연결에 문제가 있습니다. 일부 기능이 제한될 수 있습니다.');
+        // API 서버 연결 상태 확인
+        try {
+            // API 서버 헬스 체크를 위한 간단한 요청
+            await apiClient.getSiteData('hero');
+        } catch (error) {
+            ErrorHandler.getInstance().showWarning('서버 연결에 문제가 있습니다. 일부 기능이 제한될 수 있습니다.');
         }
         
         // 병렬 데이터 로딩 with 개별 에러 처리
@@ -142,39 +148,28 @@ async function loadHeroData() {
         return;
     }
 
+    const defaultData = {
+        title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
+        subtitle: { ko: '' }
+    };
+
     try {
-        if (!supabase) {
-            throw new Error('Supabase not configured');
-        }
-        const { data, error } = await supabase
-            .from('page_contents')
-            .select('content')
-            .eq('page_type', 'hero')
-            .single();
-
-        const defaultData = {
-            title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
-            subtitle: { ko: '' }
-        };
-
-        if (error) {
-            console.error('Failed to load hero data:', error);
-            heroData = defaultData;
-        } else {
-            const rawContent = data?.content || {};
+        const data = await apiClient.getSiteData('hero');
+        
+        if (data?.data) {
+            const rawContent = data.data;
             // Transform flat structure to expected nested structure
             heroData = {
                 title: { ko: rawContent.title || defaultData.title.ko },
                 subtitle: { ko: rawContent.subtitle || defaultData.subtitle.ko }
             };
             setCachedData(cacheKey, heroData);
+        } else {
+            heroData = defaultData;
         }
     } catch (error) {
         console.error('Error loading hero data:', error);
-        heroData = {
-            title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
-            subtitle: { ko: '' }
-        };
+        heroData = defaultData;
     }
 }
 
@@ -187,23 +182,13 @@ async function loadPopupData() {
     }
 
     try {
-        if (!supabase) {
-            throw new Error('Supabase not configured');
-        }
-        const { data, error } = await supabase
-            .from('page_contents')
-            .select('content')
-            .eq('page_type', 'popup')
-            .single();
-
-        if (error) {
-            console.error('Failed to load popup data:', error);
-            popupData = null;
+        const data = await apiClient.getSiteData('popup');
+        
+        if (data?.data) {
+            popupData = data.data;
+            setCachedData(cacheKey, popupData);
         } else {
-            popupData = data?.content || null;
-            if (popupData) {
-                setCachedData(cacheKey, popupData);
-            }
+            popupData = null;
         }
     } catch (error) {
         console.error('Error loading popup data:', error);
@@ -213,6 +198,29 @@ async function loadPopupData() {
 
 function setupEventListeners() {
     setupMobileMenu();
+    
+    // Track CTA button clicks
+    document.querySelectorAll('.cta-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const buttonText = target.textContent || '';
+            const href = target.getAttribute('href') || '';
+            
+            analytics.trackUserInteraction('cta_click', 'engagement', buttonText);
+            
+            if (href.includes('exchange')) {
+                analytics.trackConversion('exchange_page_visit');
+            }
+        });
+    });
+    
+    // Track calculator usage
+    const calculatorInput = document.getElementById('trading-volume');
+    if (calculatorInput) {
+        calculatorInput.addEventListener('change', () => {
+            analytics.trackUserInteraction('calculator_use', 'tools', 'savings_calculator');
+        });
+    }
 }
 
 class TypingAnimator {
