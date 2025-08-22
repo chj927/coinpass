@@ -32,8 +32,7 @@ dist-ssr
 *.env
 
 # Security sensitive files
-api-server.js
-server/*.js
+# Note: server/api-server.js is tracked as it doesn't contain sensitive data
 
 # Backup files
 *.backup

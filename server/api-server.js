@@ -1,13 +1,14 @@
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-import rateLimit from 'express-rate-limit';
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const dotenv = require('dotenv');
+const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: '.env.server' });
+dotenv.config(); // Also try regular .env
 
 const app = express();
 const PORT = process.env.API_PORT || 3001;
@@ -19,6 +20,8 @@ const jwtSecret = process.env.JWT_SECRET || 'your-secure-jwt-secret-change-this'
 
 if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Missing required environment variables');
+    console.error('SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing');
+    console.error('SUPABASE_SERVICE_ROLE_KEY:', supabaseServiceKey ? 'Set' : 'Missing');
     process.exit(1);
 }
 
@@ -29,16 +32,6 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
         autoRefreshToken: false,
     }
 });
-
-// Custom types
-interface AuthRequest extends Request {
-    user?: {
-        id: string;
-        email: string;
-        role: string;
-        isAdmin: boolean;
-    };
-}
 
 // Security middleware
 app.use(helmet({
@@ -59,7 +52,7 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-    origin: function (origin: string | undefined, callback: Function) {
+    origin: function (origin, callback) {
         const allowedOrigins = [
             'http://localhost:3000',
             'http://localhost:8080',
@@ -100,7 +93,7 @@ app.use('/api/', generalLimiter);
 app.use('/api/auth/', authLimiter);
 
 // JWT Authentication Middleware
-const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
+const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -109,7 +102,7 @@ const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunc
     }
 
     try {
-        const decoded = jwt.verify(token, jwtSecret) as any;
+        const decoded = jwt.verify(token, jwtSecret);
         
         // Verify user still exists and is active in database
         const { data: user, error } = await supabaseAdmin
@@ -136,7 +129,7 @@ const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunc
 };
 
 // Admin-only middleware
-const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+const requireAdmin = (req, res, next) => {
     if (!req.user || !req.user.isAdmin) {
         return res.status(403).json({ error: 'Admin access required' });
     }
@@ -146,7 +139,7 @@ const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
 // ============= AUTH ENDPOINTS =============
 
 // Login endpoint
-app.post('/api/auth/login', async (req: Request, res: Response) => {
+app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -214,7 +207,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 });
 
 // Logout endpoint
-app.post('/api/auth/logout', authenticateToken, async (req: AuthRequest, res: Response) => {
+app.post('/api/auth/logout', authenticateToken, async (req, res) => {
     try {
         // Update admin session if admin
         if (req.user?.isAdmin) {
@@ -233,7 +226,7 @@ app.post('/api/auth/logout', authenticateToken, async (req: AuthRequest, res: Re
 });
 
 // Verify session endpoint
-app.get('/api/auth/verify', authenticateToken, (req: AuthRequest, res: Response) => {
+app.get('/api/auth/verify', authenticateToken, (req, res) => {
     res.json({ 
         valid: true, 
         user: req.user 
@@ -243,7 +236,7 @@ app.get('/api/auth/verify', authenticateToken, (req: AuthRequest, res: Response)
 // ============= DATA ENDPOINTS =============
 
 // Get exchanges (public)
-app.get('/api/exchanges', async (_req: Request, res: Response) => {
+app.get('/api/exchanges', async (_req, res) => {
     try {
         const { data, error } = await supabaseAdmin
             .from('exchanges')
@@ -259,7 +252,7 @@ app.get('/api/exchanges', async (_req: Request, res: Response) => {
 });
 
 // Get FAQs (public)
-app.get('/api/faqs', async (_req: Request, res: Response) => {
+app.get('/api/faqs', async (_req, res) => {
     try {
         const { data, error } = await supabaseAdmin
             .from('faqs')
@@ -275,7 +268,7 @@ app.get('/api/faqs', async (_req: Request, res: Response) => {
 });
 
 // Get site data (public)
-app.get('/api/site-data/:section', async (req: Request, res: Response) => {
+app.get('/api/site-data/:section', async (req, res) => {
     const { section } = req.params;
     
     const allowedSections = ['hero', 'about', 'popup', 'benefits'];
@@ -301,7 +294,7 @@ app.get('/api/site-data/:section', async (req: Request, res: Response) => {
 // ============= ADMIN ENDPOINTS =============
 
 // Create/Update exchange (admin only)
-app.post('/api/admin/exchanges', authenticateToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+app.post('/api/admin/exchanges', authenticateToken, requireAdmin, async (req, res) => {
     const exchangeData = req.body;
 
     try {
@@ -343,7 +336,7 @@ app.post('/api/admin/exchanges', authenticateToken, requireAdmin, async (req: Au
 });
 
 // Delete exchange (admin only)
-app.delete('/api/admin/exchanges/:id', authenticateToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+app.delete('/api/admin/exchanges/:id', authenticateToken, requireAdmin, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -372,7 +365,7 @@ app.delete('/api/admin/exchanges/:id', authenticateToken, requireAdmin, async (r
 });
 
 // Update site data (admin only)
-app.post('/api/admin/site-data', authenticateToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+app.post('/api/admin/site-data', authenticateToken, requireAdmin, async (req, res) => {
     const { section, data: siteData } = req.body;
 
     const allowedSections = ['hero', 'about', 'popup', 'benefits'];
@@ -412,7 +405,7 @@ app.post('/api/admin/site-data', authenticateToken, requireAdmin, async (req: Au
 });
 
 // Get admin logs (admin only)
-app.get('/api/admin/logs', authenticateToken, requireAdmin, async (_req: AuthRequest, res: Response) => {
+app.get('/api/admin/logs', authenticateToken, requireAdmin, async (_req, res) => {
     try {
         const { data, error } = await supabaseAdmin
             .from('admin_logs')
@@ -432,7 +425,7 @@ app.get('/api/admin/logs', authenticateToken, requireAdmin, async (_req: AuthReq
 });
 
 // Error handling middleware
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err, _req, res, _next) => {
     console.error('Unhandled error:', err);
     res.status(500).json({ 
         error: 'Internal server error',
@@ -441,7 +434,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 // 404 handler
-app.use((_req: Request, res: Response) => {
+app.use((_req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
@@ -451,4 +444,4 @@ app.listen(PORT, () => {
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
-export default app;
+module.exports = app;
