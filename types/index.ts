@@ -21,24 +21,27 @@ export interface Article {
 export interface Exchange {
   id: number;
   name_ko: string;
-  name_en: string;
+  logoimageurl?: string;
+  benefit1_tag_ko: string;
+  benefit1_value_ko: string;
+  benefit2_tag_ko: string;
+  benefit2_value_ko: string;
+  benefit3_tag_ko: string;
+  benefit3_value_ko: string;
+  benefit4_tag_ko: string;
+  benefit4_value_ko: string;
   link: string;
-  logo_url?: string;
-  discount_rate?: number;
-  benefits?: string;
-  is_active?: boolean;
   created_at?: string;
+  updated_at?: string;
 }
 
 // FAQ related types
 export interface FAQ {
   id: number;
   question_ko: string;
-  question_en: string;
   answer_ko: string;
-  answer_en: string;
-  category?: string;
-  order?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Popup data type

@@ -106,7 +106,7 @@ const authenticateToken = async (req, res, next) => {
         
         // Verify user still exists and is active in database
         const { data: user, error } = await supabaseAdmin
-            .from('users')
+            .from('admin_users')
             .select('id, email, role, is_active')
             .eq('id', decoded.id)
             .single();
@@ -159,7 +159,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         // Check if user is admin
         const { data: userData, error: userError } = await supabaseAdmin
-            .from('users')
+            .from('admin_users')
             .select('role, is_active')
             .eq('id', authData.user.id)
             .single();
@@ -182,12 +182,12 @@ app.post('/api/auth/login', async (req, res) => {
         // Log admin session
         if (userData.role === 'admin') {
             await supabaseAdmin
-                .from('admin_sessions')
+                .from('login_logs')
                 .insert({
                     user_id: authData.user.id,
                     ip_address: req.ip,
                     user_agent: req.headers['user-agent'],
-                    started_at: new Date().toISOString()
+                    timestamp: new Date().toISOString()
                 });
         }
 
@@ -211,11 +211,15 @@ app.post('/api/auth/logout', authenticateToken, async (req, res) => {
     try {
         // Update admin session if admin
         if (req.user?.isAdmin) {
+            // Login logs는 종료 시간 업데이트 불필요
+            // 로그아웃 기록만 추가
             await supabaseAdmin
-                .from('admin_sessions')
-                .update({ ended_at: new Date().toISOString() })
-                .eq('user_id', req.user.id)
-                .is('ended_at', null);
+                .from('login_logs')
+                .insert({
+                    user_id: req.user.id,
+                    action: 'logout',
+                    timestamp: new Date().toISOString()
+                });
         }
 
         res.json({ message: 'Logged out successfully' });
@@ -239,7 +243,7 @@ app.get('/api/auth/verify', authenticateToken, (req, res) => {
 app.get('/api/exchanges', async (_req, res) => {
     try {
         const { data, error } = await supabaseAdmin
-            .from('exchanges')
+            .from('exchanges_exchanges')
             .select('*')
             .order('name_ko', { ascending: true });
 
@@ -255,9 +259,9 @@ app.get('/api/exchanges', async (_req, res) => {
 app.get('/api/faqs', async (_req, res) => {
     try {
         const { data, error } = await supabaseAdmin
-            .from('faqs')
+            .from('exchange_faqs')
             .select('*')
-            .order('order_index', { ascending: true });
+            .order('created_at', { ascending: true });
 
         if (error) throw error;
         res.json({ data });
@@ -278,9 +282,9 @@ app.get('/api/site-data/:section', async (req, res) => {
 
     try {
         const { data, error } = await supabaseAdmin
-            .from('site_data')
+            .from('page_contents')
             .select('*')
-            .eq('section', section)
+            .eq('page_type', section === 'hero' ? 'main' : section)
             .single();
 
         if (error) throw error;
@@ -311,7 +315,7 @@ app.post('/api/admin/exchanges', authenticateToken, requireAdmin, async (req, re
         };
 
         const { data, error } = await supabaseAdmin
-            .from('exchanges')
+            .from('exchanges_exchanges')
             .upsert(sanitizedData)
             .select()
             .single();
@@ -341,7 +345,7 @@ app.delete('/api/admin/exchanges/:id', authenticateToken, requireAdmin, async (r
 
     try {
         const { error } = await supabaseAdmin
-            .from('exchanges')
+            .from('exchanges_exchanges')
             .delete()
             .eq('id', id);
 
@@ -375,11 +379,10 @@ app.post('/api/admin/site-data', authenticateToken, requireAdmin, async (req, re
 
     try {
         const { data, error } = await supabaseAdmin
-            .from('site_data')
+            .from('page_contents')
             .upsert({
-                section,
-                data: siteData,
-                updated_by: req.user?.id,
+                page_type: section === 'hero' ? 'main' : section,
+                content: siteData,
                 updated_at: new Date().toISOString()
             })
             .select()

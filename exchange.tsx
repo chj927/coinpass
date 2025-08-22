@@ -1,4 +1,4 @@
-import { apiClient } from './api-client';
+import { DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 import { analytics } from './analytics';
 
@@ -35,8 +35,8 @@ const uiStrings: Record<string, Record<string, string>> = {
 
 interface SiteData {
     hero?: {
-        title: string;
-        subtitle: string;
+        title: { ko: string };
+        subtitle: { ko: string };
     };
     aboutUs?: {
         title: string;
@@ -69,35 +69,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadRemoteContent() {
     try {
-        // Use API client instead of direct Supabase calls
-        const [exchanges, faqsData] = await Promise.all([
-            apiClient.getExchanges(),
-            apiClient.getFAQs()
+        // Use DatabaseUtils instead of API client - hero 데이터 추가
+        const [exchanges, faqsData, heroData, aboutData] = await Promise.all([
+            DatabaseUtils.getExchanges(),
+            DatabaseUtils.getFAQs(),
+            DatabaseUtils.getPageContent('hero'),  // hero 데이터 로드 추가
+            DatabaseUtils.getPageContent('about')
         ]);
         
-        // Get site data for about section
-        const aboutData = await apiClient.getSiteData('about');
         const singlePages = aboutData ? [aboutData] : [];
+    
+    // Process hero data the same way as index.tsx
+    let processedHeroData = null;
+    if (heroData && heroData.content) {
+        const content = typeof heroData.content === 'string' ? JSON.parse(heroData.content) : heroData.content;
+        processedHeroData = {
+            title: { ko: content?.title || '' },
+            subtitle: { ko: content?.subtitle || '' }
+        };
+    }
     
     siteData = {
         exchanges: exchanges || [],
         faqs: faqsData || [],
+        ...(processedHeroData && { hero: processedHeroData }),  // hero 데이터 저장 (processed), null일 때는 제외
     };
     
     // Debug logging for aboutUs
     console.log('Loading page contents:', singlePages?.length, 'pages found');
     
-    singlePages?.forEach((page: any) => {
-        if(page.page_type && page.content) {
-            // Map 'about' from database to 'aboutUs' in siteData
-            if (page.page_type === 'about') {
-                siteData.aboutUs = page.content;
-                console.log('About/AboutUs data loaded:', page.content);
-            } else {
-                (siteData as any)[page.page_type] = page.content;
-            }
-        }
-    });
+    if (aboutData && aboutData.content) {
+        siteData.aboutUs = aboutData.content;
+        console.log('About/AboutUs data loaded:', aboutData.content);
+    }
     
     // Check if aboutUs was loaded
     if (!siteData.aboutUs) {
@@ -199,11 +203,37 @@ function setupHero(heroData: any) {
     const titleEl = document.getElementById('hero-title');
     const subtitleEl = document.getElementById('hero-subtitle');
     const heroSection = document.querySelector('.hero');
-    if (!heroData) return;
+    
+    // 기본값 설정
+    const defaultPhrases = [
+        '최대 50%까지 수수료 할인!',
+        '최고의 혜택을 누구나 무료로!',
+        '한번 등록하고 평생 혜택받기!'
+    ];
+    
+    // hero 데이터가 없어도 기본값으로 표시
+    if (!heroData) {
+        if (titleEl && !heroAnimator) {
+            heroAnimator = new TypingAnimator(titleEl as HTMLElement, defaultPhrases);
+            if(heroSection){
+                const observer = new IntersectionObserver(entries => {
+                    entries.forEach(entry => entry.isIntersecting ? heroAnimator?.resume() : heroAnimator?.pause());
+                });
+                observer.observe(heroSection);
+            }
+        }
+        if (subtitleEl) {
+            subtitleEl.textContent = '암호화폐 거래소 최고의 혜택을 지금 바로 받아보세요';
+        }
+        return;
+    }
 
-    if (titleEl && heroData.title) {
-        const sanitizedTitle = SecurityUtils.sanitizeHtml(heroData.title);
-        const phrases = sanitizedTitle.split('\n').filter(p => p.trim() !== '');
+    // hero 데이터가 있을 때 - 이미 processed된 구조화된 데이터 사용
+    if (titleEl) {
+        const title = heroData.title?.ko || '';
+        const sanitizedTitle = SecurityUtils.sanitizeHtml(title);
+        const phrases = sanitizedTitle ? sanitizedTitle.split('\n').filter((p: string) => p.trim() !== '') : defaultPhrases;
+        
         if (!heroAnimator) {
              heroAnimator = new TypingAnimator(titleEl as HTMLElement, phrases);
              if(heroSection){
@@ -217,7 +247,10 @@ function setupHero(heroData: any) {
         }
     }
     
-    if (subtitleEl && heroData.subtitle) subtitleEl.textContent = heroData.subtitle;
+    if (subtitleEl) {
+        const subtitle = heroData.subtitle?.ko || '암호화폐 거래소 최고의 혜택을 지금 바로 받아보세요';
+        subtitleEl.textContent = SecurityUtils.sanitizeHtml(subtitle);
+    }
 }
 
 function updateAboutUs(aboutUsData: any) {

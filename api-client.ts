@@ -1,12 +1,20 @@
 /**
- * Secure API Client
- * This replaces direct Supabase calls with secure API proxy calls
+ * API Client for Supabase
+ * Direct Supabase calls with correct table names
  */
 
+import { createClient } from '@supabase/supabase-js';
 import { SecurityUtils } from './security-utils';
 
-// API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// Supabase configuration
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Missing Supabase configuration');
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Token management
 class TokenManager {
@@ -60,120 +68,113 @@ export class APIClient {
         return this.instance;
     }
     
-    // Generic request method with authentication
-    private async request<T>(
-        endpoint: string,
-        options: RequestInit = {}
-    ): Promise<T> {
-        const token = TokenManager.getToken();
-        
-        // Check token expiration
-        if (token && TokenManager.isTokenExpired(token)) {
-            TokenManager.clearToken();
-            throw new APIError('Session expired', 401, 'TOKEN_EXPIRED');
+    // Helper method to handle Supabase errors
+    private handleError(error: any): void {
+        console.error('Supabase error:', error);
+        if (error.code === '42P01') {
+            throw new APIError('Table not found', 404, error.code);
         }
-        
-        const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
-            ...(options.headers as Record<string, string> || {}),
-        };
-        
-        // Add auth header if token exists
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        try {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                ...options,
-                headers,
-                credentials: 'include', // Include cookies for additional security
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new APIError(
-                    data.error || 'Request failed',
-                    response.status,
-                    data.code
-                );
-            }
-            
-            return data;
-        } catch (error) {
-            if (error instanceof APIError) {
-                throw error;
-            }
-            throw new APIError('Network error', 0, 'NETWORK_ERROR');
-        }
+        throw new APIError(error.message || 'Database error', 500, error.code);
     }
     
     // ============= Authentication Methods =============
     
     async login(email: string, password: string): Promise<{
-        token: string;
-        user: {
-            id: string;
-            email: string;
-            role: string;
-            isAdmin: boolean;
-        };
+        user: any;
+        session: any;
     }> {
         // Rate limiting check
         if (!SecurityUtils.checkRateLimit('login', 5, 15 * 60 * 1000)) {
             throw new APIError('Too many login attempts', 429, 'RATE_LIMIT');
         }
         
-        const response = await this.request<any>('/auth/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
         });
         
-        // Store token securely
-        if (response.token) {
-            TokenManager.setToken(response.token);
+        if (error) {
+            this.handleError(error);
         }
         
-        return response;
+        // Log to login_logs table
+        if (data?.user) {
+            await supabase.from('login_logs').insert({
+                user_id: data.user.id,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        return data as any;
     }
     
     async logout(): Promise<void> {
-        try {
-            await this.request('/auth/logout', { method: 'POST' });
-        } finally {
-            TokenManager.clearToken();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Logout error:', error);
         }
+        TokenManager.clearToken();
     }
     
     async verifySession(): Promise<boolean> {
-        try {
-            const response = await this.request<{ valid: boolean }>('/auth/verify');
-            return response.valid;
-        } catch (error) {
-            if (error instanceof APIError && error.statusCode === 401) {
-                TokenManager.clearToken();
-                return false;
-            }
-            throw error;
-        }
+        const { data: { session } } = await supabase.auth.getSession();
+        return !!session;
     }
     
     // ============= Public Data Methods =============
     
     async getExchanges(): Promise<any[]> {
-        const { data } = await this.request<{ data: any[] }>('/exchanges');
-        return data;
+        const { data, error } = await supabase
+            .from('exchange_exchanges')
+            .select('*')
+            .order('name_ko', { ascending: true });
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
+        return data || [];
     }
     
     async getFAQs(): Promise<any[]> {
-        const { data } = await this.request<{ data: any[] }>('/faqs');
-        return data;
+        const { data, error } = await supabase
+            .from('exchange_faqs')
+            .select('*')
+            .order('created_at', { ascending: true });
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
+        return data || [];
     }
     
     async getSiteData(section: 'hero' | 'about' | 'popup' | 'benefits'): Promise<any> {
-        const { data } = await this.request<{ data: any }>(`/site-data/${section}`);
-        return data;
+        // page_contents 테이블에서 데이터 가져오기
+        const { data, error } = await supabase
+            .from('page_contents')
+            .select('*')
+            .eq('page_type', section === 'hero' ? 'main' : section)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') { // PGRST116: No rows found
+            console.error('Error fetching site data:', error);
+        }
+        
+        // 데이터 구조 변환
+        if (data) {
+            return {
+                data: {
+                    title: data.content?.title || '',
+                    subtitle: data.content?.subtitle || '',
+                    content: data.content || {},
+                    enabled: data.is_active || false,
+                    type: data.content_type || 'text'
+                }
+            };
+        }
+        
+        return { data: null };
     }
     
     async getArticles(options?: {
@@ -181,53 +182,99 @@ export class APIClient {
         pinned?: boolean;
         limit?: number;
     }): Promise<any[]> {
-        const params = new URLSearchParams();
-        if (options?.category) params.append('category', options.category);
-        if (options?.pinned !== undefined) params.append('pinned', String(options.pinned));
-        if (options?.limit) params.append('limit', String(options.limit));
+        let query = supabase.from('articles').select('*');
         
-        const queryString = params.toString();
-        const endpoint = `/articles${queryString ? `?${queryString}` : ''}`;
+        if (options?.category) {
+            query = query.eq('category', options.category);
+        }
+        if (options?.pinned !== undefined) {
+            query = query.eq('is_pinned', options.pinned);
+        }
+        if (options?.limit) {
+            query = query.limit(options.limit);
+        }
         
-        const { data } = await this.request<{ data: any[] }>(endpoint);
-        return data;
+        const { data, error } = await query.order('created_at', { ascending: false });
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
+        return data || [];
     }
     
     // ============= Admin Methods =============
     
     async createExchange(exchangeData: any): Promise<any> {
-        const { data } = await this.request<{ data: any }>('/admin/exchanges', {
-            method: 'POST',
-            body: JSON.stringify(exchangeData),
-        });
+        const { data, error } = await supabase
+            .from('exchange_exchanges')
+            .insert(exchangeData)
+            .select()
+            .single();
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
         return data;
     }
     
     async updateExchange(id: number, exchangeData: any): Promise<any> {
-        const { data } = await this.request<{ data: any }>('/admin/exchanges', {
-            method: 'POST',
-            body: JSON.stringify({ ...exchangeData, id }),
-        });
+        const { data, error } = await supabase
+            .from('exchange_exchanges')
+            .update(exchangeData)
+            .eq('id', id)
+            .select()
+            .single();
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
         return data;
     }
     
     async deleteExchange(id: number): Promise<void> {
-        await this.request(`/admin/exchanges/${id}`, {
-            method: 'DELETE',
-        });
+        const { error } = await supabase
+            .from('exchange_exchanges')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            this.handleError(error);
+        }
     }
     
     async updateSiteData(section: string, data: any): Promise<any> {
-        const response = await this.request<{ data: any }>('/admin/site-data', {
-            method: 'POST',
-            body: JSON.stringify({ section, data }),
-        });
-        return response.data;
+        const { data: result, error } = await supabase
+            .from('page_contents')
+            .upsert({
+                page_type: section === 'hero' ? 'main' : section,
+                content: data,
+                updated_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
+        return result;
     }
     
     async getAdminLogs(): Promise<any[]> {
-        const { data } = await this.request<{ data: any[] }>('/admin/logs');
-        return data;
+        const { data, error } = await supabase
+            .from('login_logs')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(100);
+        
+        if (error) {
+            this.handleError(error);
+        }
+        
+        return data || [];
     }
     
     // ============= Utility Methods =============
@@ -237,21 +284,23 @@ export class APIClient {
         return !!(token && !TokenManager.isTokenExpired(token));
     }
     
-    getCurrentUser(): any | null {
-        const token = TokenManager.getToken();
-        if (!token) return null;
+    async getCurrentUser(): Promise<any | null> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return null;
         
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return {
-                id: payload.id,
-                email: payload.email,
-                role: payload.role,
-                isAdmin: payload.role === 'admin',
-            };
-        } catch {
-            return null;
-        }
+        // Check if admin
+        const { data: adminUser } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+        
+        return {
+            id: user.id,
+            email: user.email,
+            role: adminUser?.role || 'user',
+            isAdmin: adminUser?.role === 'admin'
+        };
     }
 }
 
@@ -272,19 +321,26 @@ export interface LoginResponse {
 export interface Exchange {
     id?: number;
     name_ko: string;
-    name_en: string;
+    logoimageurl?: string;
+    benefit1_tag_ko: string;
+    benefit1_value_ko: string;
+    benefit2_tag_ko: string;
+    benefit2_value_ko: string;
+    benefit3_tag_ko: string;
+    benefit3_value_ko: string;
+    benefit4_tag_ko: string;
+    benefit4_value_ko: string;
     link: string;
-    description?: string;
-    benefits?: string;
-    logo_url?: string;
-    is_active?: boolean;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface FAQ {
     id?: number;
-    question: string;
-    answer: string;
-    order_index?: number;
+    question_ko: string;
+    answer_ko: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface SiteData {

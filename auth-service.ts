@@ -98,7 +98,7 @@ export class AuthService {
                 return false;
             }
             
-            const user = apiClient.getCurrentUser();
+            const user = await apiClient.getCurrentUser();
             return !!(user && user.isAdmin);
         } catch (error) {
             console.error('Session check error:', error);
@@ -112,7 +112,7 @@ export class AuthService {
      */
     async getCurrentUser(): Promise<any | null> {
         try {
-            const user = apiClient.getCurrentUser();
+            const user = await apiClient.getCurrentUser();
             if (!user || !user.isAdmin) {
                 return null;
             }

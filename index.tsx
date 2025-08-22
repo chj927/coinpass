@@ -1,6 +1,6 @@
 // Three.js 제거 - 이미지로 대체
 
-import { apiClient } from './api-client';
+import { DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 import { ErrorHandler, setupGlobalErrorHandling, handleAsyncError } from './error-handler';
 import { startPerformanceMonitoring } from './performance-monitor';
@@ -92,12 +92,12 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
         // 즉시 기본 타이핑 애니메이션 시작 (데이터 로딩 전)
         startTypingAnimationWithDefaults();
         
-        // API 서버 연결 상태 확인
+        // 데이터베이스 연결 상태 확인
         try {
-            // API 서버 헬스 체크를 위한 간단한 요청
-            await apiClient.getSiteData('hero');
+            // Supabase 연결 확인을 위한 간단한 요청
+            await DatabaseUtils.checkConnection();
         } catch (error) {
-            ErrorHandler.getInstance().showWarning('서버 연결에 문제가 있습니다. 일부 기능이 제한될 수 있습니다.');
+            ErrorHandler.getInstance().showWarning('데이터베이스 연결에 문제가 있습니다. 일부 기능이 제한될 수 있습니다.');
         }
         
         // 병렬 데이터 로딩 with 개별 에러 처리
@@ -149,19 +149,19 @@ async function loadHeroData() {
     }
 
     const defaultData = {
-        title: { ko: '코인패스와 함께하는 스마트한 암호화폐 투자' },
-        subtitle: { ko: '' }
+        title: { ko: '최대 50%까지 수수료 할인!' },
+        subtitle: { ko: '암호화폐 거래소 최고의 혜택을 지금 바로 받아보세요' }
     };
 
     try {
-        const data = await apiClient.getSiteData('hero');
+        const data = await DatabaseUtils.getPageContent('hero');
         
-        if (data?.data) {
-            const rawContent = data.data;
-            // Transform flat structure to expected nested structure
+        if (data) {
+            // page_contents 테이블의 content 필드 구조에 맞게 수정
+            const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
             heroData = {
-                title: { ko: rawContent.title || defaultData.title.ko },
-                subtitle: { ko: rawContent.subtitle || defaultData.subtitle.ko }
+                title: { ko: content?.title || defaultData.title.ko },
+                subtitle: { ko: content?.subtitle || defaultData.subtitle.ko }
             };
             setCachedData(cacheKey, heroData);
         } else {
@@ -182,10 +182,12 @@ async function loadPopupData() {
     }
 
     try {
-        const data = await apiClient.getSiteData('popup');
+        const data = await DatabaseUtils.getPageContent('popup');
         
-        if (data?.data) {
-            popupData = data.data;
+        if (data) {
+            // page_contents 테이블의 content 필드 구조에 맞게 수정
+            const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+            popupData = content;
             setCachedData(cacheKey, popupData);
         } else {
             popupData = null;
