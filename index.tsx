@@ -142,11 +142,12 @@ function setCachedData(key: string, data: any, ttl: number = CACHE_TTL): void {
 
 async function loadHeroData() {
     const cacheKey = 'hero-data';
-    const cached = getCachedData(cacheKey);
-    if (cached) {
-        heroData = cached;
-        return;
-    }
+    // 캐시 임시 비활성화 (디버깅용)
+    // const cached = getCachedData(cacheKey);
+    // if (cached) {
+    //     heroData = cached;
+    //     return;
+    // }
 
     const defaultData = {
         title: { ko: '최대 50%까지 수수료 할인!' },
@@ -154,23 +155,46 @@ async function loadHeroData() {
     };
 
     try {
+        console.log('Attempting to load hero data from database...');
         const data = await DatabaseUtils.getPageContent('hero');
+        console.log('Raw data from DatabaseUtils.getPageContent:', data);
         
-        if (data) {
+        if (data && data.content) {
+            console.log('data.content type:', typeof data.content);
+            console.log('data.content value:', data.content);
+            
             // page_contents 테이블의 content 필드 구조에 맞게 수정
             const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
-            heroData = {
-                title: { ko: content?.title || defaultData.title.ko },
-                subtitle: { ko: content?.subtitle || defaultData.subtitle.ko }
-            };
+            console.log('Parsed content:', content);
+            console.log('content.title:', content?.title);
+            console.log('content.subtitle:', content?.subtitle);
+            
+            // content에는 title과 subtitle이 직접 들어있음 (ko 래핑 없음)
+            if (content && content.subtitle) {
+                heroData = {
+                    title: { ko: content.title || defaultData.title.ko },
+                    subtitle: { ko: content.subtitle }  // subtitle이 있으면 반드시 사용
+                };
+                console.log('✅ Successfully loaded hero data from database');
+                console.log('✅ Database subtitle:', heroData.subtitle.ko);
+            } else {
+                console.log('⚠️ Content missing subtitle, using defaults');
+                heroData = defaultData;
+            }
+            
             setCachedData(cacheKey, heroData);
         } else {
+            console.log('⚠️ No data or no content field returned from database, using defaults');
             heroData = defaultData;
         }
     } catch (error) {
-        console.error('Error loading hero data:', error);
+        console.error('❌ Error loading hero data:', error);
         heroData = defaultData;
     }
+    
+    console.log('=== Final heroData ===');
+    console.log('Title:', heroData?.title?.ko);
+    console.log('Subtitle:', heroData?.subtitle?.ko);
 }
 
 async function loadPopupData() {
@@ -311,6 +335,7 @@ let typingAnimator: TypingAnimator | null = null;
 // 즉시 기본값으로 타이핑 시작
 function startTypingAnimationWithDefaults() {
     const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
     const heroSection = document.querySelector('.hero');
     if (!heroTitle) return;
     
@@ -325,6 +350,11 @@ function startTypingAnimationWithDefaults() {
         '최고의 혜택을 누구나 무료로!',
         '한번 등록하고 평생 혜택받기!'
     ];
+    
+    // subtitle도 기본값으로 설정 (나중에 데이터 로드되면 덮어쓰기됨)
+    if (heroSubtitle) {
+        heroSubtitle.textContent = '암호화폐 거래소 최고의 혜택을 지금 바로 받아보세요';
+    }
     
     typingAnimator = new TypingAnimator(heroTitle as HTMLElement, defaultSentences);
     
@@ -345,8 +375,27 @@ function startTypingAnimationWithDefaults() {
 
 function startTypingAnimation() {
     const heroTitle = document.getElementById('hero-title');
+    const heroSubtitle = document.getElementById('hero-subtitle');
     const heroSection = document.querySelector('.hero');
-    if (!heroTitle || !heroData) return;
+    
+    console.log('🔄 startTypingAnimation called');
+    console.log('🔄 heroData:', heroData);
+    
+    // subtitle을 데이터베이스 값으로 업데이트 (heroData가 있을 때만)
+    if (heroSubtitle) {
+        if (heroData && heroData.subtitle && heroData.subtitle.ko) {
+            console.log('✅ Updating subtitle with database value:', heroData.subtitle.ko);
+            heroSubtitle.textContent = heroData.subtitle.ko;
+        } else {
+            console.log('⚠️ No heroData.subtitle.ko available');
+            console.log('Current heroData:', JSON.stringify(heroData, null, 2));
+        }
+    }
+    
+    if (!heroTitle || !heroData) {
+        console.log('⚠️ Missing heroTitle or heroData, exiting');
+        return;
+    }
 
     // 관리자가 설정한 문장들 사용, 없으면 기본값 사용
     let sentences: string[] = [];
@@ -388,11 +437,7 @@ function startTypingAnimation() {
         }
     }
     
-    // hero subtitle 업데이트
-    const heroSubtitle = document.getElementById('hero-subtitle');
-    if (heroSubtitle && heroData.subtitle?.ko) {
-        heroSubtitle.textContent = SecurityUtils.sanitizeHtml(heroData.subtitle.ko);
-    }
+    // subtitle 업데이트는 이미 위에서 처리됨
 }
 
 

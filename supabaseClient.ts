@@ -157,25 +157,59 @@ export class DatabaseUtils {
      */
     static async getPageContent(section: string) {
         try {
-            // page_type는 USER-DEFINED 타입이므로 정확한 값을 사용해야 함
-            const { data, error } = await supabase
+            console.log(`🔍 Fetching page content for section: ${section}`);
+            
+            // USER-DEFINED 타입 문제를 우회하기 위해 모든 데이터를 가져온 후 필터링
+            const { data: allData, error } = await supabase
                 .from('page_contents')
-                .select('*')
-                .eq('page_type', section)
-                .eq('is_active', true)  // 활성화된 컨텐츠만 가져오기
-                .single();
+                .select('*');
             
             if (error) {
-                // PGRST116 = no rows returned (데이터가 없는 경우)
-                if (error.code === 'PGRST116') {
-                    console.log(`No page content found for section: ${section}`);
-                    return null;
-                }
-                console.error('Error fetching page content:', error);
+                console.error('❌ Error fetching page contents:', error);
+                console.error('Error details:', error.message, error.details, error.hint);
                 return null;
             }
             
-            return data;
+            console.log(`📊 Retrieved ${allData?.length || 0} rows from page_contents table`);
+            
+            if (!allData || allData.length === 0) {
+                console.log('⚠️ No page contents in database - table might be empty');
+                
+                // RLS 정책 확인을 위한 추가 디버깅
+                console.log('Checking if this is an RLS issue...');
+                const { data: testData, error: testError } = await supabase
+                    .from('page_contents')
+                    .select('count');
+                console.log('RLS test result:', { testData, testError });
+                
+                return null;
+            }
+            
+            // 첫 번째 항목 디버깅 출력
+            if (allData.length > 0) {
+                console.log('Sample data from table:', allData[0]);
+                console.log('All page_types in database:', allData.map(item => ({
+                    page_type: item.page_type,
+                    is_active: item.is_active
+                })));
+            }
+            
+            // 클라이언트 측에서 필터링
+            const pageContent = allData.find(item => 
+                item.page_type === section && 
+                item.is_active === true
+            );
+            
+            if (!pageContent) {
+                console.log(`❌ No active page content found for section: ${section}`);
+                // 디버깅을 위해 모든 page_type 값 출력
+                console.log('Available page_types:', allData.map(item => item.page_type));
+                console.log('Looking for:', { page_type: section, is_active: true });
+                return null;
+            }
+            
+            console.log(`✅ Found page content for ${section}:`, pageContent);
+            return pageContent;
         } catch (error) {
             console.error('Failed to get page content:', error);
             return null;

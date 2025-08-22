@@ -80,20 +80,33 @@ async function loadRemoteContent() {
         const singlePages = aboutData ? [aboutData] : [];
     
     // Process hero data the same way as index.tsx
+    console.log('Raw heroData from database:', heroData);
+    
     let processedHeroData = null;
+    
     if (heroData && heroData.content) {
+        console.log('heroData.content type:', typeof heroData.content);
+        console.log('heroData.content value:', heroData.content);
+        
         const content = typeof heroData.content === 'string' ? JSON.parse(heroData.content) : heroData.content;
+        console.log('Parsed content:', content);
+        
         processedHeroData = {
             title: { ko: content?.title || '' },
             subtitle: { ko: content?.subtitle || '' }
         };
+        console.log('Processed hero data:', processedHeroData);
+    } else {
+        console.log('No hero data from database');
     }
     
     siteData = {
         exchanges: exchanges || [],
         faqs: faqsData || [],
-        ...(processedHeroData && { hero: processedHeroData }),  // hero 데이터 저장 (processed), null일 때는 제외
+        hero: processedHeroData,  // null이어도 hero 필드 설정
     };
+    
+    console.log('Final siteData.hero:', siteData.hero);
     
     // Debug logging for aboutUs
     console.log('Loading page contents:', singlePages?.length, 'pages found');
@@ -200,9 +213,17 @@ class TypingAnimator {
 
 let heroAnimator: TypingAnimator | undefined;
 function setupHero(heroData: any) {
+    console.log('setupHero called with:', heroData);
+    
     const titleEl = document.getElementById('hero-title');
     const subtitleEl = document.getElementById('hero-subtitle');
     const heroSection = document.querySelector('.hero');
+    
+    console.log('Hero elements found:', {
+        titleEl: !!titleEl,
+        subtitleEl: !!subtitleEl,
+        heroSection: !!heroSection
+    });
     
     // 기본값 설정
     const defaultPhrases = [
