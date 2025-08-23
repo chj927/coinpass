@@ -1479,6 +1479,19 @@ input:checked + .slider:before {
     transform: translateY(-2px);
 }
 
+/* 로그아웃 버튼 스타일 */
+.header-actions #logout-button {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.header-actions #logout-button:hover {
+    background: #c82333;
+    border-color: #bd2130;
+    transform: translateY(-2px);
+}
+
 /* 에디터 섹션 패딩 제거 */
 .editor-section {
     padding: 0;

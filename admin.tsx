@@ -204,16 +204,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // 로그아웃 버튼 추가
-    const logoutButton = document.createElement('button');
-    logoutButton.textContent = '로그아웃';
-    logoutButton.className = 'logout-button';
-    logoutButton.onclick = async () => {
-        await authService.logout();
-        SecurityUtils.clearSession(); // SecurityUtils 세션도 정리
-        location.reload();
-    };
-    adminPanel.querySelector('.admin-header')?.appendChild(logoutButton);
+    // 로그아웃 버튼 이벤트 핸들러
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
+        logoutButton.onclick = async () => {
+            await authService.logout();
+            SecurityUtils.clearSession(); // SecurityUtils 세션도 정리
+            location.reload();
+        };
+    }
     
     // 초기 세션 확인 호출
     checkExistingSession();
@@ -249,6 +248,86 @@ async function initializeApp() {
 
 // --- Supabase 데이터 통신 함수들 ---
 
+// 거래소 항목 저장
+async function saveExchangeItem(card: HTMLElement, itemId: string | undefined) {
+    try {
+        const exchangeData: any = {
+            name_ko: (card.querySelector('[name="name_ko"]') as HTMLInputElement)?.value || '',
+            logoimageurl: (card.querySelector('[name="logoimageurl"]') as HTMLInputElement)?.value || '',
+            link: (card.querySelector('[name="link"]') as HTMLInputElement)?.value || '',
+            benefit1_tag_ko: (card.querySelector('[name="benefit1_tag_ko"]') as HTMLInputElement)?.value || '',
+            benefit1_value_ko: (card.querySelector('[name="benefit1_value_ko"]') as HTMLInputElement)?.value || '',
+            benefit2_tag_ko: (card.querySelector('[name="benefit2_tag_ko"]') as HTMLInputElement)?.value || '',
+            benefit2_value_ko: (card.querySelector('[name="benefit2_value_ko"]') as HTMLInputElement)?.value || '',
+            benefit3_tag_ko: (card.querySelector('[name="benefit3_tag_ko"]') as HTMLInputElement)?.value || '',
+            benefit3_value_ko: (card.querySelector('[name="benefit3_value_ko"]') as HTMLInputElement)?.value || '',
+            benefit4_tag_ko: (card.querySelector('[name="benefit4_tag_ko"]') as HTMLInputElement)?.value || '',
+            benefit4_value_ko: (card.querySelector('[name="benefit4_value_ko"]') as HTMLInputElement)?.value || ''
+        };
+        
+        if (itemId && itemId !== 'new') {
+            // 기존 항목 업데이트
+            const { error } = await supabase
+                .from('exchange_exchanges')
+                .update(exchangeData)
+                .eq('id', parseInt(itemId));
+                
+            if (error) throw error;
+            showToast('거래소 정보가 업데이트되었습니다.', 'success');
+        } else {
+            // 새 항목 추가
+            const { error } = await supabase
+                .from('exchange_exchanges')
+                .insert([exchangeData]);
+                
+            if (error) throw error;
+            showToast('새 거래소가 추가되었습니다.', 'success');
+            // 데이터 다시 불러오기
+            await fetchDataFromSupabase();
+            renderExchanges();
+        }
+    } catch (error) {
+        console.error('Error saving exchange:', error);
+        showToast('저장 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// FAQ 항목 저장
+async function saveFaqItem(card: HTMLElement, itemId: string | undefined) {
+    try {
+        const faqData = {
+            question_ko: (card.querySelector('[name="question_ko"]') as HTMLInputElement)?.value || '',
+            answer_ko: (card.querySelector('[name="answer_ko"]') as HTMLTextAreaElement)?.value || ''
+        };
+        
+        if (itemId && itemId !== 'new') {
+            // 기존 항목 업데이트
+            const { error } = await supabase
+                .from('exchange_faqs')
+                .update(faqData)
+                .eq('id', parseInt(itemId));
+                
+            if (error) throw error;
+            showToast('FAQ가 업데이트되었습니다.', 'success');
+        } else {
+            // 새 항목 추가
+            const { error } = await supabase
+                .from('exchange_faqs')
+                .insert([faqData]);
+                
+            if (error) throw error;
+            showToast('새 FAQ가 추가되었습니다.', 'success');
+            // 데이터 다시 불러오기
+            await fetchDataFromSupabase();
+            renderFaqs();
+        }
+    } catch (error) {
+        console.error('Error saving FAQ:', error);
+        showToast('저장 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+
 async function fetchDataFromSupabase() {
     showToast('데이터를 불러오는 중...');
     
@@ -263,7 +342,10 @@ async function fetchDataFromSupabase() {
         const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('id');
         const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
         const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
-        const { data: pinnedData, error: pinnedError } = await supabase.from('pinned_articles').select('*').order('position');
+        // pinned_articles 테이블이 없으므로 주석 처리
+        // const { data: pinnedData, error: pinnedError } = await supabase.from('pinned_articles').select('*').order('position');
+        const pinnedData = null;
+        const pinnedError = null;
         const { data: articlesData, error: articlesError } = await supabase.from('articles').select('*').order('created_at', { ascending: false });
         
         console.log('Fetched articles from DB:', articlesData);
@@ -1268,6 +1350,39 @@ function setupEventListeners() {
         });
     });
     
+    // 개별 항목 저장 버튼 이벤트 리스너 (거래소, FAQ 등)
+    document.addEventListener('click', async (e) => {
+        const target = e.target as HTMLElement;
+        
+        // 항목 저장 버튼 클릭
+        if (target.classList.contains('save-item-button')) {
+            const card = target.closest('.exchange-item, .list-item') as HTMLElement;
+            if (card) {
+                const tableName = card.dataset.table;
+                const itemId = card.dataset.id;
+                
+                if (tableName === 'exchange_exchanges') {
+                    await saveExchangeItem(card, itemId);
+                } else if (tableName === 'exchange_faqs') {
+                    await saveFaqItem(card, itemId);
+                }
+            }
+        }
+        
+        // 삭제 버튼 클릭
+        if (target.classList.contains('delete-button')) {
+            const card = target.closest('.exchange-item, .list-item') as HTMLElement;
+            if (card) {
+                const tableName = card.dataset.table;
+                const itemId = card.dataset.id;
+                
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    await deleteItem(tableName, parseInt(itemId || '0'));
+                }
+            }
+        }
+    });
+    
     // Articles 섹션 이벤트 리스너 - 이벤트 위임 방식 사용
     const articlesSection = document.getElementById('articles-editor');
     if (articlesSection) {
@@ -1594,31 +1709,35 @@ async function saveBannerSection(section: string) {
             updated_at: new Date().toISOString()
         };
         
-        // Check if banner exists
-        const { data: existingBanner } = await supabase
-            .from('banners')
-            .select('id')
-            .eq('page', page)
-            .single();
-            
-        if (existingBanner) {
-            // Update existing banner
-            const { error } = await supabase
-                .from('banners')
-                .update(bannerData)
-                .eq('page', page);
-                
-            if (error) throw error;
-        } else {
-            // Insert new banner
-            const { error } = await supabase
-                .from('banners')
-                .insert(bannerData);
-                
-            if (error) throw error;
-        }
+        // banners 테이블이 없으므로 주석 처리
+        showToast('배너 기능은 현재 사용할 수 없습니다.', 'warning');
+        return;
         
-        showToast(`${page} 배너가 저장되었습니다.`);
+        // // Check if banner exists
+        // const { data: existingBanner } = await supabase
+        //     .from('banners')
+        //     .select('id')
+        //     .eq('page', page)
+        //     .single();
+        //     
+        // if (existingBanner) {
+        //     // Update existing banner
+        //     const { error } = await supabase
+        //         .from('banners')
+        //         .update(bannerData)
+        //         .eq('page', page);
+        //         
+        //     if (error) throw error;
+        // } else {
+        //     // Insert new banner
+        //     const { error } = await supabase
+        //         .from('banners')
+        //         .insert(bannerData);
+        //         
+        //     if (error) throw error;
+        // }
+        // 
+        // showToast(`${page} 배너가 저장되었습니다.`);
         
     } catch (error) {
         console.error('Banner save error:', error);
@@ -1628,21 +1747,22 @@ async function saveBannerSection(section: string) {
 
 async function loadBannerData() {
     try {
-        const { data: banners, error } = await supabase
-            .from('banners')
-            .select('*');
-            
-        if (error) throw error;
+        // banners 테이블이 없으므로 주석 처리
+        // const { data: banners, error } = await supabase
+        //     .from('banners')
+        //     .select('*');
+        //     
+        // if (error) throw error;
         
-        banners?.forEach((banner: any) => {
-            const enabledCheckbox = document.getElementById(`${banner.page}-banner-enabled`) as HTMLInputElement;
-            const imageInput = document.getElementById(`${banner.page}-banner-image`) as HTMLInputElement;
-            const contentTextarea = document.getElementById(`${banner.page}-banner-content`) as HTMLTextAreaElement;
-            
-            if (enabledCheckbox) enabledCheckbox.checked = banner.enabled;
-            if (imageInput) imageInput.value = banner.image_url || '';
-            if (contentTextarea) contentTextarea.value = banner.content || '';
-        });
+        // banners?.forEach((banner: any) => {
+        //     const enabledCheckbox = document.getElementById(`${banner.page}-banner-enabled`) as HTMLInputElement;
+        //     const imageInput = document.getElementById(`${banner.page}-banner-image`) as HTMLInputElement;
+        //     const contentTextarea = document.getElementById(`${banner.page}-banner-content`) as HTMLTextAreaElement;
+        //     
+        //     if (enabledCheckbox) enabledCheckbox.checked = banner.enabled;
+        //     if (imageInput) imageInput.value = banner.image_url || '';
+        //     if (contentTextarea) contentTextarea.value = banner.content || '';
+        // });
         
     } catch (error) {
         console.error('Banner load error:', error);

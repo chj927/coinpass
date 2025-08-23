@@ -3,18 +3,9 @@
  * Direct Supabase calls with correct table names
  */
 
-import { createClient } from '@supabase/supabase-js';
 import { SecurityUtils } from './security-utils';
-
-// Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing Supabase configuration');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// supabaseClient에서 이미 생성된 클라이언트 재사용
+import { supabase } from './supabaseClient';
 
 // Token management
 class TokenManager {
