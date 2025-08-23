@@ -1377,7 +1377,9 @@ function setupEventListeners() {
                 const itemId = card.dataset.id;
                 
                 if (confirm('정말 삭제하시겠습니까?')) {
-                    await deleteItem(tableName, parseInt(itemId || '0'));
+                    if (tableName) {
+                        await deleteItem(tableName, parseInt(itemId || '0'));
+                    }
                 }
             }
         }
@@ -1694,23 +1696,23 @@ function setupBannerManagement() {
     loadBannerData();
 }
 
-async function saveBannerSection(section: string) {
+async function saveBannerSection(_section: string) {
     try {
-        const page = section.replace('-banner', '');
-        const enabled = (document.getElementById(`${page}-banner-enabled`) as HTMLInputElement)?.checked || false;
-        const imageUrl = (document.getElementById(`${page}-banner-image`) as HTMLInputElement)?.value || '';
-        const content = (document.getElementById(`${page}-banner-content`) as HTMLTextAreaElement)?.value || '';
+        // const page = section.replace('-banner', '');
+        // const enabled = (document.getElementById(`${page}-banner-enabled`) as HTMLInputElement)?.checked || false;
+        // const imageUrl = (document.getElementById(`${page}-banner-image`) as HTMLInputElement)?.value || '';
+        // const content = (document.getElementById(`${page}-banner-content`) as HTMLTextAreaElement)?.value || '';
         
-        const bannerData = {
-            page: page,
-            enabled: enabled,
-            image_url: imageUrl,
-            content: content,
-            updated_at: new Date().toISOString()
-        };
+        // const bannerData = {
+        //     page: page,
+        //     enabled: enabled,
+        //     image_url: imageUrl,
+        //     content: content,
+        //     updated_at: new Date().toISOString()
+        // };
         
         // banners 테이블이 없으므로 주석 처리
-        showToast('배너 기능은 현재 사용할 수 없습니다.', 'warning');
+        showToast('배너 기능은 현재 사용할 수 없습니다.', 'error');
         return;
         
         // // Check if banner exists
