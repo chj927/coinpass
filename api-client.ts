@@ -99,10 +99,18 @@ export class APIClient {
         
         // Log to login_logs table
         if (data?.user) {
-            await supabase.from('login_logs').insert({
-                user_id: data.user.id,
-                timestamp: new Date().toISOString()
-            });
+            try {
+                await supabase.from('login_logs').insert({
+                    user_id: data.user.id,
+                    success: true,
+                    ip_address: null,
+                    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+                    timestamp: new Date().toISOString()
+                });
+            } catch (logError) {
+                console.warn('Failed to log login attempt:', logError);
+                // 로그 실패해도 로그인은 계속 진행
+            }
         }
         
         return data as any;
