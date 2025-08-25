@@ -252,6 +252,10 @@ async function initializeApp() {
 // 거래소 항목 저장
 async function saveExchangeItem(card: HTMLElement, itemId: string | undefined) {
     try {
+        // display_order 입력 필드 찾기
+        const orderInput = card.querySelector('[data-field="display_order"]') as HTMLInputElement;
+        const displayOrder = orderInput ? parseInt(orderInput.value) || 0 : 0;
+        
         const exchangeData: any = {
             name_ko: (card.querySelector('[name="name_ko"]') as HTMLInputElement)?.value || '',
             logoimageurl: (card.querySelector('[name="logoimageurl"]') as HTMLInputElement)?.value || '',
@@ -263,7 +267,8 @@ async function saveExchangeItem(card: HTMLElement, itemId: string | undefined) {
             benefit3_tag_ko: (card.querySelector('[name="benefit3_tag_ko"]') as HTMLInputElement)?.value || '',
             benefit3_value_ko: (card.querySelector('[name="benefit3_value_ko"]') as HTMLInputElement)?.value || '',
             benefit4_tag_ko: (card.querySelector('[name="benefit4_tag_ko"]') as HTMLInputElement)?.value || '',
-            benefit4_value_ko: (card.querySelector('[name="benefit4_value_ko"]') as HTMLInputElement)?.value || ''
+            benefit4_value_ko: (card.querySelector('[name="benefit4_value_ko"]') as HTMLInputElement)?.value || '',
+            display_order: displayOrder  // display_order 필드 추가
         };
         
         if (itemId && itemId !== 'new') {
@@ -340,7 +345,7 @@ async function fetchDataFromSupabase() {
             return;
         }
         
-        const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('id');
+        const { data: cex, error: cexError } = await supabase.from('exchange_exchanges').select('*').order('display_order', { ascending: true, nullsFirst: false }).order('id', { ascending: true });
         const { data: faqsData, error: faqsError } = await supabase.from('exchange_faqs').select('*').order('id');
         const { data: singlePages, error: singlePagesError } = await supabase.from('page_contents').select('*');
         // pinned_articles 테이블이 없으므로 주석 처리

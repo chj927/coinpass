@@ -117,7 +117,8 @@ export class DatabaseUtils {
             const { data, error } = await supabase
                 .from('exchange_exchanges')
                 .select('*')
-                .order('name_ko', { ascending: true });
+                .order('display_order', { ascending: true, nullsFirst: false })
+                .order('id', { ascending: true });  // display_order가 같을 때 id로 2차 정렬
 
             if (error) {
                 console.error('Error fetching exchanges:', error);
