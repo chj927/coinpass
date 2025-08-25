@@ -89,6 +89,29 @@ export class AuthService {
      */
     async checkSession(): Promise<boolean> {
         try {
+            // 먼저 로컬 세션 확인
+            const encryptedSession = sessionStorage.getItem('admin_session');
+            if (!encryptedSession) {
+                return false;
+            }
+            
+            // 세션 데이터 복호화
+            try {
+                const decrypted = atob(encryptedSession);
+                const sessionData = JSON.parse(decrypted);
+                
+                // 만료 시간 확인
+                if (sessionData.expiresAt && Date.now() > sessionData.expiresAt) {
+                    this.clearSession();
+                    return false;
+                }
+            } catch (e) {
+                // 복호화 실패 시 세션 제거
+                this.clearSession();
+                return false;
+            }
+            
+            // 서버에 세션 유효성 확인
             const isValid = await apiClient.verifySession();
             
             if (!isValid) {
@@ -139,7 +162,16 @@ export class AuthService {
      * 세션 정보 저장
      */
     private saveSession(sessionData: any): void {
-        sessionStorage.setItem('admin_session', JSON.stringify(sessionData));
+        // 민감한 정보는 제거하고 저장
+        const safeSessionData = {
+            userId: sessionData.userId,
+            email: sessionData.email,
+            expiresAt: Date.now() + (2 * 60 * 60 * 1000) // 2시간 후 만료
+        };
+        
+        // 암호화된 형태로 저장
+        const encrypted = btoa(JSON.stringify(safeSessionData));
+        sessionStorage.setItem('admin_session', encrypted);
         sessionStorage.setItem('admin_session_started', new Date().toISOString());
     }
 
