@@ -26,6 +26,7 @@ interface ExchangeData {
     benefit4_tag_ko: string;
     benefit4_value_ko: string;
     link: string;
+    display_order?: number;  // 표시 순서 필드 추가
 }
 
 interface FAQData {

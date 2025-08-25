@@ -18,6 +18,7 @@ export interface ExchangeData extends DatabaseRecord {
     benefit3_value_ko: string;
     benefit4_tag_ko: string;
     benefit4_value_ko: string;
+    display_order?: number;  // 표시 순서 필드 추가
 }
 
 export interface FAQData extends DatabaseRecord {
