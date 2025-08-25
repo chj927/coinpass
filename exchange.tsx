@@ -1,6 +1,7 @@
 import { DatabaseUtils } from './supabaseClient';
 import { SecurityUtils } from './security-utils';
 import { analytics } from './analytics';
+import { SimpleMarkdownParser } from './utils/markdown-parser';
 
 const uiStrings: Record<string, Record<string, string>> = {
     ko: {
@@ -70,12 +71,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadRemoteContent() {
     try {
         // Use DatabaseUtils instead of API client - hero 데이터 추가
-        const [exchanges, faqsData, heroData, aboutData] = await Promise.all([
+        const [exchangesData, faqsData, heroData, aboutData] = await Promise.all([
             DatabaseUtils.getExchanges(),
             DatabaseUtils.getFAQs(),
             DatabaseUtils.getPageContent('hero'),  // hero 데이터 로드 추가
             DatabaseUtils.getPageContent('about')
         ]);
+        
+        // display_order로 정렬 (숫자가 작을수록 앞에 표시)
+        let exchanges = exchangesData;
+        if (exchanges && Array.isArray(exchanges)) {
+            exchanges = exchanges.sort((a: any, b: any) => {
+                const orderA = a.display_order ?? 999999;  // display_order가 없으면 맨 뒤로
+                const orderB = b.display_order ?? 999999;
+                if (orderA === orderB) {
+                    return (a.id || 0) - (b.id || 0);  // 같은 순서면 ID로 정렬
+                }
+                return orderA - orderB;
+            });
+        }
         
         const singlePages = aboutData ? [aboutData] : [];
     
@@ -299,17 +313,10 @@ function updateAboutUs(aboutUsData: any) {
         console.log('AboutUs title updated:', aboutUsData.title);
     }
     if (contentEl && aboutUsData.content) {
-        contentEl.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-        const sanitizedContent = SecurityUtils.sanitizeHtml(aboutUsData.content || '');
-        const paragraphs = sanitizedContent.split(/\n\s*\n/).filter(p => p.trim() !== '');
-        paragraphs.forEach(pText => {
-            const p = document.createElement('p');
-            p.textContent = pText;
-            fragment.appendChild(p);
-        });
-        contentEl.appendChild(fragment);
-        console.log('AboutUs content updated with', paragraphs.length, 'paragraphs');
+        // 마크다운 파싱 적용 (Bold와 링크 지원)
+        const parsedContent = SimpleMarkdownParser.parse(aboutUsData.content || '');
+        contentEl.innerHTML = parsedContent;
+        console.log('AboutUs content updated with markdown parsing');
     }
 }
 
@@ -398,12 +405,12 @@ function updateFaqs(faqsData: any[]) {
         const details = document.createElement('details');
         details.className = 'anim-fade-in';
         const summary = document.createElement('summary');
-        summary.textContent = SecurityUtils.sanitizeHtml(faq.question_ko || '');
+        // FAQ 질문은 마크다운 파싱 적용
+        summary.innerHTML = SimpleMarkdownParser.parse(faq.question_ko || '');
         const contentDiv = document.createElement('div');
         contentDiv.className = 'faq-content';
-        const p = document.createElement('p');
-        p.textContent = SecurityUtils.sanitizeHtml(faq.answer_ko || '');
-        contentDiv.appendChild(p);
+        // FAQ 답변도 마크다운 파싱 적용 (Bold와 링크 지원)
+        contentDiv.innerHTML = SimpleMarkdownParser.parse(faq.answer_ko || '');
         details.appendChild(summary);
         details.appendChild(contentDiv);
         fragment.appendChild(details);

@@ -707,6 +707,28 @@ footer {
         font-size: 1.8rem;
     }
     
+    /* About-us 섹션 모바일 여백 개선 */
+    .about-us-content {
+        padding: 0 1.5rem;  /* 좌우 여백 추가 (24px) */
+        margin: 0 auto;
+        max-width: 100%;
+    }
+    
+    /* FAQ 섹션 모바일 여백 개선 */
+    .faq-container {
+        padding: 0 1.5rem;  /* 좌우 여백 추가 */
+    }
+    
+    .faq-item {
+        margin: 0 0.5rem 1rem;  /* 좌우 여백 추가 */
+    }
+    
+    /* Support 섹션 모바일 여백 개선 */
+    .support-box {
+        margin: 0 1.5rem 4rem;  /* 좌우 여백 추가 */
+        padding: 2rem 1.5rem;
+    }
+    
     .popup-box {
         width: 90vw;
     }
@@ -722,6 +744,29 @@ footer {
         font-size: 1.3rem; /* 제목 폰트 크기 약간 줄임 */
     }
     
+}
+
+/* 더 작은 모바일 화면 (480px 이하) */
+@media (max-width: 480px) {
+    /* About-us 섹션 작은 화면 여백 */
+    .about-us-content {
+        padding: 0 1rem;  /* 좌우 여백 약간 축소 (16px) */
+    }
+    
+    /* FAQ 섹션 작은 화면 여백 */
+    .faq-container {
+        padding: 0 1rem;
+    }
+    
+    .faq-item {
+        margin: 0 0.25rem 1rem;  /* 좌우 여백 축소 */
+    }
+    
+    /* Support 섹션 작은 화면 여백 */
+    .support-box {
+        margin: 0 1rem 3rem;  /* 좌우 여백 축소 */
+        padding: 1.5rem 1rem;
+    }
 }
 /* Exchange Card Logo Image Size Fix */
 .exchange-logo {

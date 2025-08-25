@@ -273,8 +273,14 @@
                         <input type="text" id="about-us-title-ko-input" class="about-us-title">
                     </div>
                      <div class="form-group">
-                        <label for="about-us-content-ko-input">내용 (문단은 빈 줄로 구분)</label>
-                        <textarea id="about-us-content-ko-input" class="about-us-content" rows="10"></textarea>
+                        <label for="about-us-content-ko-input">내용</label>
+                        <div class="markdown-guide" style="background: #f0f8ff; padding: 10px; margin-bottom: 10px; border-radius: 5px; font-size: 0.9em;">
+                            📝 <strong>텍스트 서식 사용법:</strong><br>
+                            • 굵은 글씨: **텍스트** → <strong>텍스트</strong><br>
+                            • 링크: [표시 텍스트](https://url.com) → <a href="#" onclick="return false;">표시 텍스트</a><br>
+                            • 줄바꿈: Enter 키
+                        </div>
+                        <textarea id="about-us-content-ko-input" class="about-us-content" rows="10" placeholder="예시: **코인패스**는 최대 **50% 수수료 할인**을 제공합니다."></textarea>
                     </div>
                 </section>
 
@@ -290,6 +296,11 @@
                      <div class="section-header">
                         <h2>자주 묻는 질문 (FAQ)</h2>
                         <button id="add-faq-button" class="add-button">FAQ 추가</button>
+                    </div>
+                    <div class="markdown-guide" style="background: #f0f8ff; padding: 10px; margin-bottom: 15px; border-radius: 5px; font-size: 0.9em;">
+                        📝 <strong>텍스트 서식 사용법:</strong>
+                        • 굵은 글씨: **텍스트** → <strong>텍스트</strong>
+                        • 링크: [표시 텍스트](https://url.com) → <a href="#" onclick="return false;" style="color: #007bff;">표시 텍스트</a>
                     </div>
                     <div id="faq-list"></div>
                 </section>

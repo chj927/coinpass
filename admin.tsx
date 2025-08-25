@@ -803,6 +803,37 @@ function renderExchanges() {
         card.dataset.listName = 'exchange_exchanges';
         card.dataset.itemId = item.id?.toString() || '';
 
+        // 순서 입력 필드 추가
+        const orderContainer = document.createElement('div');
+        orderContainer.className = 'form-group';
+        orderContainer.style.marginBottom = '12px';
+        
+        const orderLabel = document.createElement('label');
+        orderLabel.textContent = '표시 순서';
+        orderLabel.style.display = 'block';
+        orderLabel.style.marginBottom = '4px';
+        orderLabel.style.fontSize = '0.9rem';
+        orderLabel.style.color = 'var(--text-secondary)';
+        
+        const orderInput = document.createElement('input');
+        orderInput.type = 'number';
+        orderInput.value = (item.display_order || 0).toString();
+        orderInput.className = 'form-control order-input';
+        orderInput.dataset.field = 'display_order';
+        orderInput.min = '0';
+        orderInput.step = '10';
+        orderInput.placeholder = '숫자가 작을수록 먼저 표시 (10, 20, 30...)';
+        orderInput.style.width = '100%';
+        orderInput.style.padding = '8px';
+        orderInput.style.border = '1px solid var(--border-color)';
+        orderInput.style.borderRadius = '4px';
+        orderInput.style.backgroundColor = 'var(--input-bg)';
+        orderInput.style.color = 'var(--text-color)';
+        
+        orderContainer.appendChild(orderLabel);
+        orderContainer.appendChild(orderInput);
+        card.appendChild(orderContainer);
+        
         // 거래소 이름과 로고 URL
         createSingleFormGroup(card, 'name_ko', '거래소 이름', item, 'input');
         createSingleFormGroup(card, 'logoimageurl', '로고 이미지 URL', item, 'input', 'url');
