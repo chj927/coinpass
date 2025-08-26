@@ -697,8 +697,20 @@ class ModernArticlesManager {
         const endIndex = this.currentPage * this.articlesPerPage;
         const visibleArticles = filteredArticles.slice(startIndex, endIndex);
 
-        // 렌더링
-        container.innerHTML = visibleArticles.map(article => this.renderContentCard(article)).join('');
+        // 렌더링 - 스켈레톤 로더 제거 후 실제 콘텐츠 표시
+        if (visibleArticles.length > 0) {
+            container.innerHTML = visibleArticles.map(article => this.renderContentCard(article)).join('');
+            container.classList.add('loaded'); // 스켈레톤 로더 숨기기
+        } else {
+            // 데이터가 없을 때
+            container.innerHTML = `
+                <div class="no-results">
+                    <h3>${this.searchQuery ? '검색 결과가 없습니다' : '아직 등록된 콘텐츠가 없습니다'}</h3>
+                    <p>${this.searchQuery ? '다른 키워드로 검색해보세요' : '곧 새로운 콘텐츠가 추가될 예정입니다'}</p>
+                </div>
+            `;
+            container.classList.add('loaded');
+        }
         
         // 공유 버튼 이벤트 설정
         this.setupShareButtons();

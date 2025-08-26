@@ -215,141 +215,29 @@
                         </div>
                     </div>
 
-                    <div class="content-grid">
-                        <!-- Content Card 1 -->
-                        <article class="content-card" data-category="event">
-                            <a href="https://blog.naver.com/example4" target="_blank" class="card-link">
-                                <div class="card-image">
-                                    <img src="https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=250&fit=crop" alt="이벤트">
-                                    <div class="card-overlay">
-                                        <span class="overlay-text">블로그에서 읽기</span>
+                    <div class="content-grid" id="contentGrid">
+                        <!-- 로딩 스켈레톤 - JavaScript로 실제 데이터가 로드될 때까지 표시 -->
+                        <div class="skeleton-loader">
+                            <div class="skeleton-card">
+                                <div class="skeleton-image"></div>
+                                <div class="skeleton-body">
+                                    <div class="skeleton-meta">
+                                        <span class="skeleton-category"></span>
+                                        <span class="skeleton-time"></span>
+                                    </div>
+                                    <div class="skeleton-title"></div>
+                                    <div class="skeleton-excerpt">
+                                        <div class="skeleton-line"></div>
+                                        <div class="skeleton-line"></div>
+                                    </div>
+                                    <div class="skeleton-footer">
+                                        <div class="skeleton-stats"></div>
+                                        <div class="skeleton-icon"></div>
                                     </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="card-meta">
-                                        <span class="meta-category event">이벤트</span>
-                                        <span class="meta-time">3시간 전</span>
-                                    </div>
-                                    <h3 class="card-title">바이비트 춘절 이벤트 - 888 USDT 럭키드로우</h3>
-                                    <p class="card-excerpt">
-                                        바이비트에서 춘절을 맞아 대규모 이벤트를 진행합니다. 거래량 조건 충족 시 자동 참여!
-                                    </p>
-                                    <div class="card-footer">
-                                        <div class="card-stats">
-                                            <span>👁 523</span>
-                                            <span>💬 12</span>
-                                        </div>
-                                        <span class="external-link">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                        </article>
-
-                        <!-- Content Card 2 -->
-                        <article class="content-card" data-category="guide">
-                            <a href="https://blog.naver.com/example5" target="_blank" class="card-link">
-                                <div class="card-image">
-                                    <img src="https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?w=400&h=250&fit=crop" alt="가이드">
-                                    <div class="card-overlay">
-                                        <span class="overlay-text">블로그에서 읽기</span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-meta">
-                                        <span class="meta-category guide">가이드</span>
-                                        <span class="meta-time">5시간 전</span>
-                                    </div>
-                                    <h3 class="card-title">MEXC 거래소 가입 및 보안 설정 완벽 가이드</h3>
-                                    <p class="card-excerpt">
-                                        MEXC 거래소 가입부터 2FA 설정, 출금 주소 등록까지 한 번에 끝내는 가이드입니다.
-                                    </p>
-                                    <div class="card-footer">
-                                        <div class="card-stats">
-                                            <span>👁 412</span>
-                                            <span>💬 8</span>
-                                        </div>
-                                        <span class="external-link">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                        </article>
-
-                        <!-- Content Card 3 -->
-                        <article class="content-card" data-category="airdrop">
-                            <a href="https://blog.naver.com/example6" target="_blank" class="card-link">
-                                <div class="card-image">
-                                    <img src="https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=400&h=250&fit=crop" alt="에어드랍">
-                                    <div class="card-overlay">
-                                        <span class="overlay-text">블로그에서 읽기</span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-meta">
-                                        <span class="meta-category airdrop">에어드랍</span>
-                                        <span class="meta-time">1일 전</span>
-                                    </div>
-                                    <h3 class="card-title">Scroll 메인넷 에어드랍 자격 조건 총정리</h3>
-                                    <p class="card-excerpt">
-                                        Scroll L2 에어드랍 예상 조건과 지금부터 준비해야 할 액션 플랜을 상세히 정리했습니다.
-                                    </p>
-                                    <div class="card-footer">
-                                        <div class="card-stats">
-                                            <span>👁 1,234</span>
-                                            <span>💬 45</span>
-                                        </div>
-                                        <span class="external-link">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                        </article>
-
-                        <!-- Content Card 4 -->
-                        <article class="content-card" data-category="notice">
-                            <a href="https://blog.naver.com/example7" target="_blank" class="card-link">
-                                <div class="card-image">
-                                    <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop" alt="공지">
-                                    <div class="card-overlay">
-                                        <span class="overlay-text">블로그에서 읽기</span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-meta">
-                                        <span class="meta-category notice">공지</span>
-                                        <span class="meta-time">2일 전</span>
-                                    </div>
-                                    <h3 class="card-title">코인패스 서비스 업데이트 및 신규 기능 안내</h3>
-                                    <p class="card-excerpt">
-                                        더 나은 서비스를 위한 대규모 업데이트! 새로운 기능과 개선사항을 확인하세요.
-                                    </p>
-                                    <div class="card-footer">
-                                        <div class="card-stats">
-                                            <span>👁 892</span>
-                                            <span>💬 23</span>
-                                        </div>
-                                        <span class="external-link">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2"/>
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                        </article>
-
-                        <!-- More cards... -->
-                        <!-- 실제 구현 시 더 많은 카드를 동적으로 로드 -->
+                            </div>
+                        </div>
+                        <!-- 콘텐츠는 articles.tsx에서 동적으로 로드됩니다 -->
                     </div>
 
                     <!-- Load More Button -->
