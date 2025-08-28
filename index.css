@@ -744,7 +744,7 @@ footer {
 /* Exchange Comparison Table Section */
 .exchange-comparison-preview {
     padding: 5rem 0;
-    background: var(--primary-color);
+    background: var(--secondary-color);
 }
 
 .comparison-table-wrapper {
@@ -1437,4 +1437,204 @@ footer {
 .slider-nav,
 .slider-dots {
     display: none;
+}
+
+/* About Us Section */
+.about-us-section {
+    padding: 5rem 0;
+    background: var(--primary-color);
+    position: relative;
+}
+
+.about-us-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.about-us-section .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.about-us-section .section-description {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+}
+
+.about-content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] .about-content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.about-content-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(0, 242, 230, 0.05) 50%,
+        transparent 100%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+
+.about-content-card:hover::before {
+    transform: translateX(100%);
+}
+
+.about-content-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.about-content-inner #about-content {
+    margin-top: 0; /* h3가 제거되었으므로 상단 여백 제거 */
+}
+
+/* h3 제거로 인해 더 이상 필요없음 */
+
+.about-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+#about-content {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+
+#about-content p {
+    margin-bottom: 1.5rem;
+}
+
+#about-content strong {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+#about-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    display: grid;
+    gap: 1rem;
+}
+
+#about-content li {
+    position: relative;
+    padding-left: 2rem;
+    color: var(--text-color);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+}
+
+#about-content li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-gradient);
+    color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.about-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.about-stats-grid .stat-item {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.about-stats-grid .stat-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
+}
+
+.about-stats-grid .stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--gradient-text);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.about-stats-grid .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* About Section Responsive */
+@media (max-width: 768px) {
+    .about-us-section {
+        padding: 3rem 0;
+    }
+
+    .about-content-card {
+        padding: 2rem 1.5rem;
+    }
+
+    /* h3 제거로 인해 더 이상 필요없음 */
+
+    .about-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .about-stats-grid {
+        grid-template-columns: 1fr;
+    }
 }

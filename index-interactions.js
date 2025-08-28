@@ -67,11 +67,9 @@ function initSavingsCalculator() {
     }
     
     const exchangeRates = {
-        binance: { original: 0.001, discounted: 0.0005, discount: 50 },
-        bybit: { original: 0.001, discounted: 0.00055, discount: 45 },
-        okx: { original: 0.0008, discounted: 0.0005, discount: 38 },
-        mexc: { original: 0.001, discounted: 0.0006, discount: 40 },
-        gate: { original: 0.00075, discounted: 0.0005, discount: 33 }
+        binance: { original: 0.001, discounted: 0.0008, discount: 20 },
+        bybit: { original: 0.001, discounted: 0.0008, discount: 20 },
+        okx: { original: 0.0008, discounted: 0.00064, discount: 20 }
     };
     
     function formatNumber(num) {

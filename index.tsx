@@ -5,6 +5,7 @@ import { SecurityUtils } from './security-utils';
 import { ErrorHandler, setupGlobalErrorHandling, handleAsyncError } from './error-handler';
 import { startPerformanceMonitoring } from './performance-monitor';
 import { analytics } from './analytics';
+import { SimpleMarkdownParser } from './utils/markdown-parser';
 
 // 성능 최적화를 위한 상수들
 const DEBOUNCE_DELAY = 250;
@@ -32,6 +33,7 @@ interface PopupData {
 
 let heroData: HeroData | null = null;
 let popupData: PopupData | null = null;
+let aboutData: any = null;
 
 // Enhanced caching with LRU implementation
 class LRUCache {
@@ -101,9 +103,10 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
         }
         
         // 병렬 데이터 로딩 with 개별 에러 처리
-        const [heroResult, popupResult] = await Promise.allSettled([
+        const [heroResult, popupResult, aboutResult] = await Promise.allSettled([
             loadHeroData(),
-            loadPopupData()
+            loadPopupData(),
+            loadAboutData()
         ]);
         
         // 실패한 로딩 결과 처리
@@ -113,12 +116,19 @@ document.addEventListener('DOMContentLoaded', handleAsyncError(async () => {
         if (popupResult.status === 'rejected') {
             ErrorHandler.getInstance().handleError(popupResult.reason, 'Popup Data Loading');
         }
+        if (aboutResult.status === 'rejected') {
+            ErrorHandler.getInstance().handleError(aboutResult.reason, 'About Data Loading');
+        }
         
         setupEventListeners();
         setupScrollAnimations();
         // 데이터 로드 완료 후 실제 데이터로 타이핑 업데이트
         if (heroData) {
             startTypingAnimation();
+        }
+        // About 섹션 렌더링
+        if (aboutData) {
+            renderAboutSection();
         }
         // Three.js 제거 - 이미지로 대체됨
         setupPopup();
@@ -138,6 +148,56 @@ function getCachedData(key: string): any | null {
 
 function setCachedData(key: string, data: any, ttl: number = CACHE_TTL): void {
     dataCache.set(key, data, ttl);
+}
+
+async function loadAboutData() {
+    const cacheKey = 'about-data';
+    const cachedData = getCachedData(cacheKey); // Use default TTL
+    
+    if (cachedData) {
+        console.log('✅ Using cached about data');
+        aboutData = cachedData;
+        return;
+    }
+
+    const defaultData = {
+        title: '압도적 혜택으로 비합리적인 시장을 개혁하다',
+        content: `코인패스는 불합리한 구조의 레퍼럴 문제를 해결하고자 카이스트 Crypto DAO를 중심으로 개발된 프로젝트입니다.
+
+코인 거래 수수료는 통상적으로 거래소와 추천인(인플루언서 등)에게 돌아갑니다. 코인패스는 **최소 운영비(5%)를 제외한 추천인 수익 전부를 다시 사용자에게 페이백**합니다.
+
+만약 코인패스보다 높은 할인율을 보셨다면, 이는 사기 가능성을 의심해보셔야 합니다. 예를 들어, 일부 서비스들은 "추천인 수익 중 50% 페이백"을 마치 "전체 수수료의 50% 페이백"하는 것처럼 교묘하게 적어두었습니다.
+
+코인패스는 거래소와의 공식 파트너십으로 **①최대 수준의 기본 할인율을 확보**하고, **②추천인 수익 대부분을 사용자에게 환급**함으로써 타의 추종을 불허하는 압도적인 혜택을 제공합니다.
+
+불합리한 레퍼럴 시장을 개혁하고, 모든 혜택이 사용자에게 돌아가는 건전한 문화를 만들겠습니다. **지금 가입하지 않으면, 다음 거래부터 즉시 손해입니다.**`
+    };
+
+    try {
+        console.log('Loading about data from database...');
+        const data = await DatabaseUtils.getPageContent('about');
+        
+        if (data && data.content) {
+            const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+            
+            if (content) {
+                aboutData = {
+                    title: content.title || defaultData.title,
+                    content: content.content || defaultData.content
+                };
+                console.log('✅ Successfully loaded about data from database');
+            } else {
+                aboutData = defaultData;
+            }
+            
+            setCachedData(cacheKey, aboutData);
+        } else {
+            aboutData = defaultData;
+        }
+    } catch (error) {
+        console.error('❌ Error loading about data:', error);
+        aboutData = defaultData;
+    }
 }
 
 async function loadHeroData() {
@@ -371,6 +431,26 @@ function startTypingAnimationWithDefaults() {
         }, { threshold: 0.1 });
         observer.observe(heroSection);
     }
+}
+
+function renderAboutSection() {
+    if (!aboutData) return;
+    
+    const aboutSubtitleElement = document.getElementById('about-subtitle');
+    const aboutContentElement = document.getElementById('about-content');
+    
+    if (aboutSubtitleElement && aboutData.title) {
+        // subtitle을 title로 사용 (디자인상 일관성)
+        aboutSubtitleElement.innerHTML = `신뢰할 수 없는 불법이 판치는 시장, 이제는 완전히 바꿔야 합니다`;
+    }
+    
+    if (aboutContentElement && aboutData.content) {
+        // 마크다운 파싱 적용 (Bold와 링크 지원)
+        const parsedContent = SimpleMarkdownParser.parse(aboutData.content);
+        aboutContentElement.innerHTML = parsedContent;
+    }
+    
+    console.log('✅ About section rendered');
 }
 
 function startTypingAnimation() {
