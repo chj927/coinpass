@@ -1,0 +1,270 @@
+/* GPU-Accelerated Animations and Optimized Rendering */
+
+/* 1. Enable GPU acceleration for animations */
+.gpu-accelerated {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* 2. Optimized typing animation */
+.typing-text {
+    will-change: content;
+    contain: layout style paint;
+    /* Prevent layout shifts */
+    min-height: 1.5em;
+    display: inline-block;
+}
+
+/* 3. Efficient ripple effect */
+.touch-ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(0, 212, 170, 0.4);
+    pointer-events: none;
+    will-change: transform, opacity;
+    /* Use CSS animations instead of JS */
+    animation: ripple-effect 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes ripple-effect {
+    from {
+        transform: scale(0);
+        opacity: 1;
+    }
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* 4. Optimized scroll animations */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+}
+
+.scroll-animate.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 5. Efficient card hover effects */
+.feature-card,
+.benefit-card {
+    transform: translateZ(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.feature-card:hover,
+.benefit-card:hover {
+    transform: translateY(-4px) translateZ(0);
+}
+
+/* 6. Optimized gradient backgrounds */
+.optimized-gradient {
+    /* Use simpler gradients for better performance */
+    background: linear-gradient(135deg, 
+        var(--gradient-start) 0%, 
+        var(--gradient-end) 100%);
+    /* Cache gradient rendering */
+    will-change: background;
+}
+
+/* Replace complex multi-layer gradients */
+body.optimized-bg {
+    /* Single optimized gradient instead of multiple layers */
+    background: linear-gradient(135deg, 
+        #1a1a1a 0%, 
+        #242424 50%, 
+        #1a1a1a 100%);
+    /* Add texture via pseudo-element to reduce repaints */
+}
+
+body.optimized-bg::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.003) 2px,
+            rgba(255, 255, 255, 0.003) 4px
+        );
+    pointer-events: none;
+    z-index: 1;
+    will-change: transform;
+}
+
+/* 7. Contain layout for performance */
+.section-container {
+    contain: layout style;
+}
+
+.card-container {
+    contain: layout style paint;
+}
+
+/* 8. Optimized loading states */
+.skeleton-loader {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    will-change: background-position;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* 9. Reduce paint areas */
+.hero-section {
+    isolation: isolate;
+    contain: layout style;
+}
+
+.hero-title {
+    contain: layout style paint;
+    /* Prevent reflow during typing animation */
+    min-width: 500px;
+    min-height: 60px;
+}
+
+/* 10. Optimize mobile menu animations */
+.mobile-menu {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    contain: layout style paint;
+}
+
+.mobile-menu.active {
+    transform: translateX(0);
+}
+
+/* 11. Virtual scrolling for long lists */
+.virtual-scroll-container {
+    contain: strict;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.virtual-scroll-item {
+    contain: layout style paint;
+    content-visibility: auto;
+}
+
+/* 12. Optimize image loading */
+img {
+    content-visibility: auto;
+    contain-intrinsic-size: 300px 200px;
+}
+
+img.lazy-load {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+img.lazy-load.loaded {
+    opacity: 1;
+}
+
+/* 13. Reduce composite layers */
+.reduce-layers {
+    /* Only promote to layer when necessary */
+    will-change: auto;
+}
+
+.reduce-layers:hover {
+    will-change: transform;
+}
+
+/* 14. CSS Grid optimizations */
+.exchange-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    contain: layout;
+}
+
+/* 15. Font loading optimization */
+.font-display-swap {
+    font-display: swap;
+}
+
+/* Critical CSS for above-the-fold content */
+.critical-hero {
+    /* Inline critical styles */
+    background: var(--hero-bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 16. Reduce reflows during animations */
+.no-reflow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(var(--x), var(--y));
+}
+
+/* 17. Optimize backdrop filters */
+.optimized-blur {
+    /* Use CSS backdrop-filter sparingly */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* Cache the blur result */
+    will-change: backdrop-filter;
+}
+
+/* 18. Debounced hover effects */
+.debounced-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition-delay: 0.1s;
+}
+
+/* 19. CSS containment for modals */
+.modal-container {
+    contain: strict;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+}
+
+/* 20. Optimize CSS animations */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+
+# Crawl-delay: 1
+
+Sitemap: https://coinpass.kr/sitemap.xml
